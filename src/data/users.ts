@@ -1,0 +1,48 @@
+import { User } from '../types';
+
+export const dummyUsers: User[] = [
+  {
+    id: 'user-producer-1',
+    role: 'PRODUCER',
+    name: 'Juan Pérez',
+    ruc: '0912345678001',
+    email: 'juan.perez@example.com',
+    phone: '+593 99 123 4567',
+    address: 'Km 15 Vía a Daule, Guayaquil',
+    docs: ['Cédula: 0912345678', 'Permiso acuicultura: PA-2024-001'],
+    bankInfo: ['Banco Pichincha: 1234567890'],
+  },
+  {
+    id: 'user-packer-1',
+    role: 'PACKER',
+    name: 'ROSASUD S.A.S.',
+    ruc: '0998765432001',
+    email: 'comercial@rosasud.com',
+    phone: '+593 4 234 5678',
+    address: 'Av. Principal, Durán',
+    docs: ['RUC: 0998765432001', 'Permiso planta: PP-2024-045'],
+    bankInfo: ['Banco Guayaquil: 9876543210'],
+  },
+  {
+    id: 'user-logistics-1',
+    role: 'LOGISTICS',
+    name: 'Grupo FJ Logística',
+    ruc: '0991122334001',
+    email: 'operaciones@fjlogistica.com',
+    phone: '+593 4 345 6789',
+    address: 'Terminal Logístico, Guayaquil',
+    docs: ['Licencia transporte: LT-2024-123', 'Certificado ISO: ISO-9001'],
+    bankInfo: ['Banco del Pacífico: 1122334455'],
+  },
+  {
+    id: 'user-manager-1',
+    role: 'MANAGER',
+    name: 'Admin FJ',
+    ruc: '0991122334001',
+    email: 'admin@fjlogistica.com',
+    phone: '+593 4 345 6789',
+    address: 'Oficinas Centrales, Guayaquil',
+    docs: [],
+    bankInfo: [],
+  },
+];
