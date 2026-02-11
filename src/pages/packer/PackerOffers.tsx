@@ -3,15 +3,20 @@ import { useAuth } from '../../contexts/AuthContext';
 import { dummyOffers } from '../../data/offers';
 import { Card } from '../../components/Card';
 import { FormRow } from '../../components/FormRow';
+import { Alert } from '../../components/Alert';
 import {
   ProductForm,
   PriceTier,
   QualityRequirement,
   Adjustment,
   PaymentTerm,
+  Offer,
+  PackingCompany,
 } from '../../types';
+import { Modal } from '../../components/Modal';
+import { OfferPreviewContent } from '../../components/OfferPreviewContent';
 
-type OfferFormType = 'ENTERO' | 'COLA_DIRECTA' | 'CAMARON_VIVO';
+type OfferFormType = ProductForm;
 
 interface OfferFormData {
   productForm: ProductForm;
@@ -57,6 +62,8 @@ const getOfferLabel = (type: OfferFormType): string => {
     ENTERO: 'Entero',
     COLA_DIRECTA: 'Cola Directa',
     CAMARON_VIVO: 'Camarón Vivo',
+    SOBRANTE: 'Sobrante',
+    COLA_SOBRANTE: 'Cola Sobrante',
   };
   return labels[type];
 };
@@ -71,29 +78,129 @@ const isFormComplete = (data: OfferFormData): boolean => {
   ) {
     return false;
   }
-  const hasValidPriceTiers = data.priceTiers.some(
-    (t) => t.sizeMin > 0 && t.sizeMax > 0 && t.price > 0
-  );
-  const hasValidQualityReqs = data.qualityRequirements.some(
-    (q) => q.code.trim() !== '' && q.text.trim() !== ''
-  );
+  // Tabla de precios: debe haber al menos una fila y TODAS las filas deben tener Talla Min, Talla Max y Precio llenos y válidos (> 0)
+  const hasValidPriceTiers =
+    data.priceTiers.length > 0 &&
+    data.priceTiers.every(
+      (t) => t.sizeMin > 0 && t.sizeMax > 0 && t.price > 0
+    );
+  // Requisitos de calidad: debe haber al menos uno y TODOS deben tener Código y Descripción llenos
+  const hasValidQualityReqs =
+    data.qualityRequirements.length > 0 &&
+    data.qualityRequirements.every(
+      (q) => q.code.trim() !== '' && q.text.trim() !== ''
+    );
   const advanceTerm = data.paymentTerms.find((p) => p.termType === 'ADVANCE');
   const hasValidPaymentTerms = !!advanceTerm && (advanceTerm.percent ?? 0) > 0 && (advanceTerm.percent ?? 0) < 100;
-  return hasValidPriceTiers && hasValidQualityReqs && hasValidPaymentTerms;
+  // Si hay términos adicionales (CUSTOM), ninguno puede estar vacío
+  const customTerms = data.paymentTerms.filter((p) => p.termType === 'CUSTOM');
+  const hasValidCustomTerms =
+    customTerms.length === 0 ||
+    customTerms.every((t) => (t.text ?? '').trim() !== '');
+  return hasValidPriceTiers && hasValidQualityReqs && hasValidPaymentTerms && hasValidCustomTerms;
+};
+
+/** Devuelve las secciones que faltan completar para poder publicar la oferta */
+const getIncompleteSections = (data: OfferFormData): string[] => {
+  const sections: string[] = [];
+  if (
+    !data.validFrom ||
+    !data.validTo ||
+    !data.plantCity ||
+    !data.plantAddress ||
+    !data.logisticsTolerancePct
+  ) {
+    sections.push('Información General (fechas, ciudad, dirección, tolerancia logística)');
+  }
+  const hasValidPriceTiers =
+    data.priceTiers.length > 0 &&
+    data.priceTiers.every(
+      (t) => t.sizeMin > 0 && t.sizeMax > 0 && t.price > 0
+    );
+  if (!hasValidPriceTiers) {
+    sections.push('Tabla de Precios (todas las filas con Talla Min, Talla Max y Precio válidos)');
+  }
+  const hasValidQualityReqs =
+    data.qualityRequirements.length > 0 &&
+    data.qualityRequirements.every(
+      (q) => q.code.trim() !== '' && q.text.trim() !== ''
+    );
+  if (!hasValidQualityReqs) {
+    sections.push('Requisitos de Calidad (todos con Código y Descripción llenos)');
+  }
+  const advanceTerm = data.paymentTerms.find((p) => p.termType === 'ADVANCE');
+  const hasValidPaymentTerms = !!advanceTerm && (advanceTerm.percent ?? 0) > 0 && (advanceTerm.percent ?? 0) < 100;
+  if (!hasValidPaymentTerms) {
+    sections.push('Términos de Pago (anticipo con porcentaje entre 1 y 99%)');
+  }
+  const customTerms = data.paymentTerms.filter((p) => p.termType === 'CUSTOM');
+  const hasValidCustomTerms =
+    customTerms.length === 0 ||
+    customTerms.every((t) => (t.text ?? '').trim() !== '');
+  if (!hasValidCustomTerms) {
+    sections.push('Términos de Pago (los términos adicionales no pueden estar vacíos)');
+  }
+  return sections;
+};
+
+/** Construye un Offer para vista previa a partir del formulario y la empacadora */
+const buildPreviewOffer = (
+  data: OfferFormData,
+  packingCompany: PackingCompany,
+  productFormLabel: string
+): Offer => {
+  const advanceTerm = data.paymentTerms.find((p) => p.termType === 'ADVANCE');
+  const advancePercent = advanceTerm?.percent ?? 0;
+  const paymentTerms = data.paymentTerms.map((t) => {
+    if (t.termType === 'BALANCE') {
+      return { ...t, percent: 100 - advancePercent };
+    }
+    return t;
+  });
+  const adjustmentsWithValue = data.adjustments.filter((a) => a.amount > 0);
+  return {
+    id: 'preview',
+    offerCode: `${productFormLabel} - Vista previa`,
+    packingCompany,
+    productForm: data.productForm,
+    currency: 'USD',
+    priceUnit: data.priceUnit,
+    validFrom: data.validFrom,
+    validTo: data.validTo,
+    plantLocation: { city: data.plantCity, address: data.plantAddress },
+    logisticsTolerancePct: Number(data.logisticsTolerancePct) || 0,
+    status: 'PUBLISHED',
+    priceTiers: data.priceTiers.filter((t) => t.isActive),
+    qualityRequirements: data.qualityRequirements.filter(
+      (q) => q.code.trim() !== '' || q.text.trim() !== ''
+    ),
+    classDefinitions: [],
+    paymentTerms,
+    guaranteeClassAPct:
+      data.guaranteeClassAPct !== ''
+        ? Number(data.guaranteeClassAPct)
+        : undefined,
+    adjustments: adjustmentsWithValue,
+  };
 };
 
 interface OfferFormSectionProps {
   formType: OfferFormType;
   data: OfferFormData;
   onChange: (data: OfferFormData) => void;
+  packingCompany: PackingCompany;
 }
 
 const OfferFormSection: React.FC<OfferFormSectionProps> = ({
   formType,
   data,
   onChange,
+  packingCompany,
 }) => {
   const isLocked = data.isVisible;
+  const [showPublishAlert, setShowPublishAlert] = useState(false);
+  const [showPublishModal, setShowPublishModal] = useState(false);
+  const [checklistAccepted, setChecklistAccepted] = useState(false);
 
   const handleEditAttempt = () => {
     if (isLocked) {
@@ -113,12 +220,25 @@ const OfferFormSection: React.FC<OfferFormSectionProps> = ({
 
   const handleVisibilityChange = (checked: boolean) => {
     if (checked && !isFormComplete(data)) {
-      alert(
-        'Debe completar todos los campos (información general, tabla de precios con al menos un item válido, requisitos de calidad, y términos de pago) para hacer la oferta visible.'
-      );
+      setShowPublishAlert(true);
       return;
     }
+    if (checked && isFormComplete(data)) {
+      setShowPublishAlert(false);
+      setChecklistAccepted(false);
+      setShowPublishModal(true);
+      return;
+    }
+    setShowPublishAlert(false);
+    setShowPublishModal(false);
     onChange({ ...data, isVisible: checked });
+  };
+
+  const handleConfirmPublish = () => {
+    if (!checklistAccepted) return;
+    onChange({ ...data, isVisible: true });
+    setShowPublishModal(false);
+    setChecklistAccepted(false);
   };
 
   // Price table handlers
@@ -228,7 +348,7 @@ const OfferFormSection: React.FC<OfferFormSectionProps> = ({
   const inputProps = isLocked ? { readOnly: true, className: 'w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-100 cursor-not-allowed' } : { className: 'w-full border border-gray-300 rounded-md px-3 py-2' };
 
   return (
-    <Card className="mb-6">
+    <Card className="mt-2.5 mb-6">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-bold text-gray-900">
           Oferta - {getOfferLabel(formType)}
@@ -248,6 +368,77 @@ const OfferFormSection: React.FC<OfferFormSectionProps> = ({
         </label>
       </div>
 
+      {showPublishAlert && (
+        <Alert
+          variant="warning"
+          title="No se puede publicar la oferta"
+          description="Complete las siguientes secciones para activar el switch de oferta publicada:"
+          items={getIncompleteSections(data)}
+          onDismiss={() => setShowPublishAlert(false)}
+          className="mb-6"
+        />
+      )}
+
+      <Modal
+        isOpen={showPublishModal}
+        onClose={() => {
+          setShowPublishModal(false);
+          setChecklistAccepted(false);
+        }}
+        title="Vista previa antes de publicar"
+        size="xl"
+      >
+        <div className="space-y-6">
+          <p className="text-sm text-gray-600 bg-sky-50 border border-sky-200 rounded-lg p-4">
+            Esto es una vista previa de cómo el productor verá la oferta. Desplázate hacia abajo para revisar el contenido, acepta el checklist y pulsa Publicar para que la oferta pase a estado publicado.
+          </p>
+
+          <div className="max-h-[50vh] overflow-y-auto border border-gray-200 rounded-lg p-4 bg-gray-50">
+            <OfferPreviewContent
+              offer={buildPreviewOffer(data, packingCompany, getOfferLabel(formType))}
+            />
+          </div>
+
+          <div className="border-t border-gray-200 pt-4 space-y-4">
+            <p className="text-sm text-gray-700">
+              Al publicar, usted confirma que la información de la oferta es correcta y que cumple con las condiciones de uso de la plataforma. (Aquí irán las condiciones de publicación de oferta.)
+            </p>
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={checklistAccepted}
+                onChange={(e) => setChecklistAccepted(e.target.checked)}
+                className="mt-1 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+              />
+              <span className="text-sm text-gray-700">
+                Acepto las condiciones anteriores y deseo publicar esta oferta.
+              </span>
+            </label>
+
+            <div className="flex justify-end gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowPublishModal(false);
+                  setChecklistAccepted(false);
+                }}
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 font-medium"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmPublish}
+                disabled={!checklistAccepted}
+                className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Publicar oferta
+              </button>
+            </div>
+          </div>
+        </div>
+      </Modal>
+
       {/* Información General */}
       <section className="mb-8 p-6 rounded-lg border border-gray-200 bg-sky-50">
         <h3 className="text-lg font-semibold text-gray-900 mb-1 pb-3 border-b border-gray-200">Información General</h3>
@@ -256,7 +447,15 @@ const OfferFormSection: React.FC<OfferFormSectionProps> = ({
             <p className="py-2 text-gray-900">{getOfferLabel(formType)}</p>
           </FormRow>
           <FormRow label="Unidad de Precio">
-            <p className="py-2 text-gray-900">{data.priceUnit === 'PER_LB' ? 'Por libra' : 'Por kilogramo'}</p>
+            <select
+              value={data.priceUnit}
+              onChange={(e) => updateData({ priceUnit: e.target.value as 'PER_LB' | 'PER_KG' })}
+              disabled={isLocked}
+              className={`w-full border border-gray-300 rounded-md px-3 py-2 ${isLocked ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}`}
+            >
+              <option value="PER_LB">Por libra</option>
+              <option value="PER_KG">Por kilogramo</option>
+            </select>
           </FormRow>
           <FormRow label="Válido desde" required>
             <input
@@ -411,7 +610,9 @@ const OfferFormSection: React.FC<OfferFormSectionProps> = ({
       {/* Ajustes por Clase */}
       <section className="mb-8 p-6 rounded-lg border border-gray-200 bg-sky-50">
         <h3 className="text-lg font-semibold text-gray-900 mb-1 pb-3 border-b border-gray-200">Ajustes por Clase</h3>
-        <p className="text-sm text-gray-500 mb-4">Moneda fija: USD. Defina el descuento por clase (A, B, C).</p>
+        <p className="text-sm text-gray-500 mb-4">
+          Moneda fija: USD. Defina el descuento por clase (A, B, C). Los campos de esta sección no son obligatorios; los que no complete no se mostrarán en la oferta.
+        </p>
         <FormRow label="Porcentaje de Garantía para la clase A" className="mb-4">
           <div className="flex items-center gap-2">
             <input
@@ -595,6 +796,13 @@ export const PackerOffers: React.FC = () => {
   const packerId = 'packer-rosasud';
 
   const existingOffers = dummyOffers.filter((o) => o.packingCompany.id === packerId);
+  const packingCompany =
+    existingOffers[0]?.packingCompany ??
+    dummyOffers.find((o) => o.packingCompany.id === packerId)?.packingCompany ?? {
+      id: packerId,
+      name: 'Mi Empresa',
+      ruc: '',
+    };
 
   const mergeAdjustments = (existing: Adjustment[]): Adjustment[] => {
     const byClass = Object.fromEntries(existing.map((a) => [a.appliesToClass, a]));
@@ -644,34 +852,43 @@ export const PackerOffers: React.FC = () => {
   const [formVivo, setFormVivo] = useState<OfferFormData>(() =>
     getInitialFormData('CAMARON_VIVO')
   );
+  const [formSobrante, setFormSobrante] = useState<OfferFormData>(() =>
+    getInitialFormData('SOBRANTE')
+  );
+  const [formColaSobrante, setFormColaSobrante] = useState<OfferFormData>(() =>
+    getInitialFormData('COLA_SOBRANTE')
+  );
 
   const [activeTab, setActiveTab] = useState<OfferFormType>('ENTERO');
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Mis Ofertas</h1>
-
-      <div className="flex gap-2 mb-6 border-b border-gray-200">
-        {(['ENTERO', 'COLA_DIRECTA', 'CAMARON_VIVO'] as OfferFormType[]).map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 font-medium border-b-2 -mb-px transition-colors ${
-              activeTab === tab
-                ? 'border-primary-600 text-primary-600'
-                : 'border-transparent text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            {getOfferLabel(tab)}
-          </button>
-        ))}
+      <div className="sticky top-0 z-10 -mx-6 -mt-6 px-6 pt-6 pb-4 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">Mis Ofertas</h1>
+        <div className="flex gap-2">
+          {(['ENTERO', 'COLA_DIRECTA', 'CAMARON_VIVO', 'SOBRANTE', 'COLA_SOBRANTE'] as OfferFormType[]).map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-4 py-2 font-medium border-b-2 -mb-px transition-colors ${
+                activeTab === tab
+                  ? 'border-primary-600 text-primary-600'
+                  : 'border-transparent text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              {getOfferLabel(tab)}
+            </button>
+          ))}
+        </div>
       </div>
 
+      <div className="pt-6">
       {activeTab === 'ENTERO' && (
         <OfferFormSection
           formType="ENTERO"
           data={formEntero}
           onChange={setFormEntero}
+          packingCompany={packingCompany}
         />
       )}
       {activeTab === 'COLA_DIRECTA' && (
@@ -679,6 +896,7 @@ export const PackerOffers: React.FC = () => {
           formType="COLA_DIRECTA"
           data={formCola}
           onChange={setFormCola}
+          packingCompany={packingCompany}
         />
       )}
       {activeTab === 'CAMARON_VIVO' && (
@@ -686,8 +904,26 @@ export const PackerOffers: React.FC = () => {
           formType="CAMARON_VIVO"
           data={formVivo}
           onChange={setFormVivo}
+          packingCompany={packingCompany}
         />
       )}
+      {activeTab === 'SOBRANTE' && (
+        <OfferFormSection
+          formType="SOBRANTE"
+          data={formSobrante}
+          onChange={setFormSobrante}
+          packingCompany={packingCompany}
+        />
+      )}
+      {activeTab === 'COLA_SOBRANTE' && (
+        <OfferFormSection
+          formType="COLA_SOBRANTE"
+          data={formColaSobrante}
+          onChange={setFormColaSobrante}
+          packingCompany={packingCompany}
+        />
+      )}
+      </div>
     </div>
   );
 };

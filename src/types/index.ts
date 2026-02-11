@@ -1,6 +1,6 @@
 export type UserRole = 'PRODUCER' | 'PACKER' | 'LOGISTICS' | 'MANAGER';
 
-export type ProductForm = 'ENTERO' | 'COLA_DIRECTA' | 'CAMARON_VIVO';
+export type ProductForm = 'ENTERO' | 'COLA_DIRECTA' | 'CAMARON_VIVO' | 'SOBRANTE' | 'COLA_SOBRANTE';
 export type Currency = 'USD';
 export type PriceUnit = 'PER_LB' | 'PER_KG';
 export type OfferStatus = 'DRAFT' | 'PUBLISHED' | 'EXPIRED' | 'CANCELLED';
