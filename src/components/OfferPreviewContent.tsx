@@ -83,7 +83,7 @@ export const OfferPreviewContent: React.FC<OfferPreviewContentProps> = ({
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {offer.priceTiers
-                .filter((tier) => tier.isActive)
+                .filter((tier) => tier.isActive && tier.price > 0)
                 .map((tier, idx) => (
                   <tr key={idx}>
                     <td className="px-4 py-3 text-sm font-medium text-gray-900">
@@ -113,7 +113,46 @@ export const OfferPreviewContent: React.FC<OfferPreviewContentProps> = ({
         </ul>
       </Card>
 
-      {hasAdjustments && (
+      {offer.productForm === 'ENTERO' &&
+       offer.enteroAdjustmentsMode === 'COLA_DIRECTA_TABLE' &&
+       offer.colaDirectaPriceTiers &&
+       offer.colaDirectaPriceTiers.length > 0 && (
+        <Card>
+          <h2 className="text-lg font-semibold text-gray-900 mb-2">
+            Lo no entero se paga como Cola Directa
+          </h2>
+          <p className="text-sm text-gray-600 mb-4">
+            El producto que no califique como entero se pagará según la siguiente tabla de precios (USD/lb).
+          </p>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Talla</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Precio (USD/lb)</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {offer.colaDirectaPriceTiers
+                  .filter((tier) => tier.price > 0)
+                  .map((tier, idx) => (
+                    <tr key={idx}>
+                      <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                        {tier.sizeMin}/{tier.sizeMax}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-900">
+                        <Money amount={tier.price} />
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      )}
+
+      {hasAdjustments &&
+       !(offer.productForm === 'ENTERO' && offer.enteroAdjustmentsMode === 'COLA_DIRECTA_TABLE') && (
         <Card>
           <h2 className="text-lg font-semibold text-gray-900 mb-4">
             Ajustes por Clase
@@ -185,6 +224,19 @@ export const OfferPreviewContent: React.FC<OfferPreviewContentProps> = ({
           ))}
         </div>
       </Card>
+
+      {offer.additionalConditions && offer.additionalConditions.length > 0 && (
+        <Card>
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">
+            Condiciones adicionales
+          </h2>
+          <ul className="list-disc list-inside space-y-1 text-sm text-gray-700">
+            {offer.additionalConditions.map((item, idx) => (
+              <li key={idx}>{item}</li>
+            ))}
+          </ul>
+        </Card>
+      )}
     </div>
   );
 };

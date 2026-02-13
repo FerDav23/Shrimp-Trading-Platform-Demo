@@ -83,6 +83,14 @@ export interface Offer {
   classDefinitions: ClassDefinition[];
   paymentTerms: PaymentTerm[];
   guaranteeClassAPct?: number;
+  /** Solo para producto ENTERO: 'CLASS' = ajustes por clase A/B/C, 'COLA_DIRECTA_TABLE' = tabla de precios cola directa */
+  enteroAdjustmentsMode?: 'CLASS' | 'COLA_DIRECTA_TABLE';
+  /** Precios por talla cuando enteroAdjustmentsMode === 'COLA_DIRECTA_TABLE' (lo no entero se paga como cola directa) */
+  colaDirectaPriceTiers?: PriceTier[];
+  /** Solo ENTERO + COLA_DIRECTA_TABLE: precios venta local (Quebrado, Rojo, Juvenil) */
+  ventaLocalPrices?: { quebrado: number; rojo: number; juvenil: number };
+  /** Condiciones adicionales (cada item máx. 100 caracteres) */
+  additionalConditions?: string[];
 }
 
 export interface Sale {
