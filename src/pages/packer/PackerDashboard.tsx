@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { dummyOffers } from '../../data/offers';
 import { dummySales } from '../../data/sales';
+import { dummyMessages } from '../../data/messages';
 import { Card } from '../../components/Card';
 import { StatusBadge } from '../../components/StatusBadge';
 import { format } from 'date-fns';
@@ -14,57 +15,81 @@ export const PackerDashboard: React.FC = () => {
     (o) => o.packingCompany.id === 'packer-rosasud'
   );
   const publishedOffers = myOffers.filter((o) => o.status === 'PUBLISHED');
-  const draftOffers = myOffers.filter((o) => o.status === 'DRAFT');
   const mySales = dummySales.filter(
     (s) => s.packingCompanyId === 'packer-rosasud'
   );
+  
+  // Mensajes para el packer
+  const packerMessages = dummyMessages.filter(
+    (m) => m.toId === 'packer-rosasud'
+  );
+  const unreadMessages = packerMessages.filter((m) => !m.isRead);
+  const recentMessages = packerMessages
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .slice(0, 3);
 
   return (
     <div>
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Dashboard</h1>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <Card>
-          <div className="text-sm text-gray-600 mb-1">Ofertas Publicadas</div>
-          <div className="text-3xl font-bold text-green-600">{publishedOffers.length}</div>
-        </Card>
-        <Card>
-          <div className="text-sm text-gray-600 mb-1">Borradores</div>
-          <div className="text-3xl font-bold text-yellow-600">{draftOffers.length}</div>
-        </Card>
-        <Card>
-          <div className="text-sm text-gray-600 mb-1">Ventas Recibidas</div>
-          <div className="text-3xl font-bold text-blue-600">{mySales.length}</div>
-        </Card>
+        <Link to="/packer/offers">
+          <Card className="cursor-pointer hover:shadow-md transition-shadow">
+            <div className="text-sm text-gray-600 mb-1">Ofertas Publicadas</div>
+            <div className="text-3xl font-bold text-green-600">{publishedOffers.length}</div>
+          </Card>
+        </Link>
+        <Link to="/packer/messages">
+          <Card className="cursor-pointer hover:shadow-md transition-shadow">
+            <div className="text-sm text-gray-600 mb-1">Mensajes sin leer</div>
+            <div className="text-3xl font-bold text-yellow-600">{unreadMessages.length}</div>
+          </Card>
+        </Link>
+        <Link to="/packer/sales">
+          <Card className="cursor-pointer hover:shadow-md transition-shadow">
+            <div className="text-sm text-gray-600 mb-1">Compras en proceso</div>
+            <div className="text-3xl font-bold text-blue-600">{mySales.length}</div>
+          </Card>
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">Mis Ofertas</h2>
+            <h2 className="text-lg font-semibold text-gray-900">Mensajes Recientes</h2>
             <Link
-              to="/packer/offers"
+              to="/packer/messages"
               className="text-sm text-primary-600 hover:text-primary-700"
             >
-              Ver todas
+              Ver todos
             </Link>
           </div>
           <div className="space-y-3">
-            {myOffers.slice(0, 3).map((offer) => (
+            {recentMessages.map((message) => (
               <div
-                key={offer.id}
+                key={message.id}
                 className="border-b border-gray-200 pb-3 last:border-0"
               >
                 <div className="flex justify-between items-start">
-                  <div>
-                    <Link
-                      to={`/packer/offers/${offer.id}`}
-                      className="font-medium text-gray-900 hover:text-primary-600"
-                    >
-                      {offer.offerCode}
-                    </Link>
-                    <p className="text-sm text-gray-600">{offer.productForm}</p>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <Link
+                        to={`/packer/messages/${message.id}`}
+                        className={`font-medium hover:text-primary-600 ${
+                          message.isRead ? 'text-gray-700' : 'text-gray-900 font-semibold'
+                        }`}
+                      >
+                        {message.subject}
+                      </Link>
+                      {!message.isRead && (
+                        <span className="w-2 h-2 bg-yellow-600 rounded-full"></span>
+                      )}
+                    </div>
+                    <p className="text-sm text-gray-600">{message.from}</p>
+                    <p className="text-xs text-gray-500 mt-1">{message.preview}</p>
+                    <p className="text-xs text-gray-400 mt-1">
+                      {format(new Date(message.createdAt), 'dd MMM yyyy, HH:mm', { locale: es })}
+                    </p>
                   </div>
-                  <StatusBadge status={offer.status} />
                 </div>
               </div>
             ))}
@@ -73,7 +98,7 @@ export const PackerDashboard: React.FC = () => {
 
         <Card>
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">Ventas Recientes</h2>
+            <h2 className="text-lg font-semibold text-gray-900">Compras Recientes</h2>
             <Link
               to="/packer/sales"
               className="text-sm text-primary-600 hover:text-primary-700"
@@ -93,7 +118,7 @@ export const PackerDashboard: React.FC = () => {
                       to={`/packer/sales/${sale.id}`}
                       className="font-medium text-gray-900 hover:text-primary-600"
                     >
-                      Venta #{sale.id.split('-')[1]}
+                      Compra #{sale.id.split('-')[1]}
                     </Link>
                     <p className="text-sm text-gray-600">
                       {sale.quantityLb} lb - {sale.productForm}

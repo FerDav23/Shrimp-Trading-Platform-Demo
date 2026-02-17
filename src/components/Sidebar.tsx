@@ -23,6 +23,7 @@ const getNavItems = (role: string): NavItem[] => {
         { label: 'Dashboard', path: '/packer/dashboard' },
         { label: 'Mis Ofertas', path: '/packer/offers' },
         { label: 'Ventas', path: '/packer/sales' },
+        { label: 'Mensajes', path: '/packer/messages' },
       ];
     case 'LOGISTICS':
       return [
