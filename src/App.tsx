@@ -57,6 +57,7 @@ function App() {
                     <Route path="dashboard" element={<PackerDashboard />} />
                     <Route path="offers" element={<PackerOffers />} />
                     <Route path="sales" element={<PackerSales />} />
+                    <Route path="sales/:statusFilter" element={<PackerSales />} />
                     <Route path="messages" element={<PackerChat />} />
                     <Route path="*" element={<Navigate to="/packer/dashboard" replace />} />
                   </Routes>

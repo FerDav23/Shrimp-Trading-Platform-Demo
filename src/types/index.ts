@@ -8,6 +8,13 @@ export type LogisticsStatus = 'PENDING_PICKUP' | 'IN_TRANSIT' | 'DELIVERED';
 export type PaymentStatus = 'PENDING' | 'PARTIAL' | 'PAID' | 'OVERDUE';
 export type PaymentTermType = 'ADVANCE' | 'BALANCE' | 'CUSTOM';
 export type AdjustmentType = 'CLASS_DISCOUNT';
+export type SaleRequestStatus =
+  | 'PENDING_ACCEPTANCE'       // Pendientes de Aceptar
+  | 'CATCH_SETTLEMENT_PENDING' // Liquidación de Pesca pendiente
+  | 'ADVANCE_PENDING'          // Anticipo Pendiente
+  | 'BALANCE_PENDING'          // Saldo Restante Pendiente
+  | 'SALE_COMPLETED'           // Venta Finalizada
+  | 'REJECTED';                // Rechazada
 
 export interface User {
   id: string;
@@ -120,4 +127,91 @@ export interface LogisticsSector {
 
 export interface LogisticsPricing {
   sectors: LogisticsSector[];
+}
+
+/** Información sobre la pesca que el productor quiere vender */
+export interface CatchInfo {
+  /** Fecha estimada de cosecha */
+  estimatedHarvestDate: string;
+  /** Ubicación de la pesca/piscina */
+  harvestLocation: Location;
+  /** Cantidad estimada en libras */
+  estimatedQuantityLb: number;
+  /** Rango de tallas esperado */
+  sizeRange: { min: number; max: number };
+  /** Información adicional sobre la pesca (calidad, condiciones, etc.) */
+  notes?: string;
+  /** Fotos o documentos adjuntos */
+  attachments?: string[];
+}
+
+/** Línea del detalle de liquidación (talla/descripción, libras, precio). La clase es fija por tabla. */
+export interface CatchSettlementLine {
+  id: string;
+  /** Ej: 31-35, 41-50, Quebrado, Rojo, Juvenil */
+  sizeOrDesc: string;
+  pounds: number;
+  unitPrice: number;
+}
+
+/** Clases fijas para el detalle de liquidación (tres tablas) */
+export const CATCH_SETTLEMENT_CLASSES = {
+  COLA_DIRECTA_A: 'A COLA DIRECTA',
+  COLA_DIRECTA_B: 'B COLA DIRECTA',
+  VENTA_LOCAL: 'VENTA LOCAL',
+} as const;
+
+/** Liquidación de pesca: datos de ingreso, detalle por clase/talla (tres tablas) y resumen */
+export interface CatchSettlement {
+  /** Fecha de ingreso */
+  entryDate: string;
+  /** Número de lote */
+  lotNumber: string;
+  /** Guía de remisión */
+  remissionGuide: string;
+  /** Piscina */
+  pond: string;
+  /** Aguaje (periodo/código de cosecha) */
+  aguaje: string;
+  guiaMov?: string;
+  guiaRemProp?: string;
+  /** Líneas de la tabla A COLA DIRECTA */
+  colaDirectaALines: CatchSettlementLine[];
+  /** Líneas de la tabla B COLA DIRECTA */
+  colaDirectaBLines: CatchSettlementLine[];
+  /** Líneas de la tabla VENTA LOCAL */
+  ventaLocalLines: CatchSettlementLine[];
+  /** Libras remitidas referencial */
+  remitidasReferencialLb: number;
+  /** Basura cola directa (libras) */
+  basuraColaDirectaLb: number;
+}
+
+/** Solicitud de venta que un productor envía a un packer basada en una oferta */
+export interface SaleRequest {
+  id: string;
+  /** ID de la oferta a la que responde esta solicitud */
+  offerId: string;
+  /** ID del productor que envía la solicitud */
+  producerId: string;
+  /** Nombre del productor */
+  producerName: string;
+  /** ID del packer que recibe la solicitud */
+  packingCompanyId: string;
+  /** Forma del producto */
+  productForm: ProductForm;
+  /** Información sobre la pesca */
+  catchInfo: CatchInfo;
+  /** Estado de la solicitud */
+  status: SaleRequestStatus;
+  /** Fecha de creación de la solicitud */
+  createdAt: string;
+  /** Fecha de respuesta del packer (aceptación/rechazo) */
+  respondedAt?: string;
+  /** Comentarios del packer al responder */
+  packerNotes?: string;
+  /** ID de la venta creada si fue aceptada y convertida */
+  saleId?: string;
+  /** Liquidación de pesca registrada (cuando estado es CATCH_SETTLEMENT_PENDING) */
+  catchSettlement?: CatchSettlement;
 }
