@@ -19,6 +19,8 @@ export const PackerSales: React.FC = () => {
 
   const [selectedRequest, setSelectedRequest] = useState<SaleRequest | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  /** IDs de solicitudes cuya liquidación ya fue enviada (en espera de confirmación del productor) */
+  const [settlementSentIds, setSettlementSentIds] = useState<Set<string>>(new Set());
 
   const getStatusLabel = (status: SalesViewFilter): string => {
     const labels: Record<SalesViewFilter, string> = {
@@ -63,6 +65,20 @@ export const PackerSales: React.FC = () => {
   const handleReject = (requestId: string, notes?: string) => {
     alert(`Solicitud ${requestId} rechazada${notes ? `: ${notes}` : ''} (simulado)`);
     // En producción, aquí actualizarías el estado de la solicitud
+  };
+
+  const handleSendSettlement = (requestId: string) => {
+    setSettlementSentIds((prev) => new Set(prev).add(requestId));
+  };
+
+  const handleCancelPurchase = (requestId: string) => {
+    alert(`Cancelar compra para solicitud ${requestId} (simulado)`);
+    // En producción, aquí actualizarías el estado de la solicitud
+  };
+
+  const handleSendAdvanceProof = (requestId: string) => {
+    alert(`Prueba de anticipo enviada para solicitud ${requestId} (simulado)`);
+    // En producción, aquí subirías el archivo y actualizarías el estado
   };
 
   const columns = [
@@ -119,6 +135,17 @@ export const PackerSales: React.FC = () => {
         </span>
       ),
     },
+    {
+      header: 'Estado',
+      accessor: (request: SaleRequest) => {
+        const awaiting = settlementSentIds.has(request.id);
+        return (
+          <span className={awaiting ? 'text-amber-700 font-medium' : 'text-slate-700'}>
+            {awaiting ? 'En espera de confirmación' : getStatusLabel(activeFilter)}
+          </span>
+        );
+      },
+    },
   ];
 
   return (
@@ -158,11 +185,17 @@ export const PackerSales: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-sky-300">
-                    {filteredRequests.map((request) => (
+                    {filteredRequests.map((request) => {
+                      const isAwaitingConfirmation = settlementSentIds.has(request.id);
+                      return (
                       <tr
                         key={request.id}
-                        onClick={() => handleRowClick(request)}
-                        className="hover:bg-sky-50 cursor-pointer transition-colors"
+                        onClick={() => !isAwaitingConfirmation && handleRowClick(request)}
+                        className={
+                          isAwaitingConfirmation
+                            ? 'bg-gray-100 text-gray-500 cursor-not-allowed'
+                            : 'hover:bg-sky-50 cursor-pointer transition-colors'
+                        }
                       >
                         {columns.map((column, colIdx) => (
                           <td
@@ -175,7 +208,8 @@ export const PackerSales: React.FC = () => {
                           </td>
                         ))}
                       </tr>
-                    ))}
+                    );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -194,6 +228,9 @@ export const PackerSales: React.FC = () => {
         request={selectedRequest}
         onAccept={handleAccept}
         onReject={handleReject}
+        onSendSettlement={handleSendSettlement}
+        onCancelPurchase={handleCancelPurchase}
+        onSendAdvanceProof={handleSendAdvanceProof}
       />
     </div>
   );

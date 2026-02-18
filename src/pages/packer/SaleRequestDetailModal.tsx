@@ -3,7 +3,7 @@ import { Modal } from '../../components/Modal';
 import { FormRow } from '../../components/FormRow';
 import { StatusBadge } from '../../components/StatusBadge';
 import { OfferPreviewContent } from '../../components/OfferPreviewContent';
-import { SaleRequest, SaleRequestStatus, CatchSettlement, CatchSettlementLine, CATCH_SETTLEMENT_CLASSES } from '../../types';
+import { SaleRequest, SaleRequestStatus, CatchSettlement, CatchSettlementLine, CATCH_SETTLEMENT_CLASSES, ProducerBankAccount } from '../../types';
 import { dummyRequestMessages, RequestMessage } from '../../data/requestMessages';
 import { dummyOffers } from '../../data/offers';
 import { useAuth } from '../../contexts/AuthContext';
@@ -16,17 +16,22 @@ interface SaleRequestDetailModalProps {
   request: SaleRequest | null;
   onAccept: (requestId: string) => void;
   onReject: (requestId: string, notes?: string) => void;
+  onSendSettlement?: (requestId: string) => void;
+  onCancelPurchase?: (requestId: string) => void;
+  onSendAdvanceProof?: (requestId: string) => void;
 }
 
 const MAX_MESSAGE_LENGTH = 500;
 
-type SectionKey = 'general' | 'catch' | 'packerNotes' | 'settlement' | 'messages' | 'rejectForm';
+type SectionKey = 'general' | 'catch' | 'packerNotes' | 'settlement' | 'settlementReadOnly' | 'advanceTransfer' | 'messages' | 'rejectForm';
 
 const defaultExpanded: Record<SectionKey, boolean> = {
   general: false,
   catch: false,
   packerNotes: false,
   settlement: false,
+  settlementReadOnly: false,
+  advanceTransfer: false,
   messages: false,
   rejectForm: false,
 };
@@ -102,6 +107,9 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
   request,
   onAccept,
   onReject,
+  onSendSettlement,
+  onCancelPurchase,
+  onSendAdvanceProof,
 }) => {
   const { user } = useAuth();
   const [rejectNotes, setRejectNotes] = useState('');
@@ -112,7 +120,11 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
   const [showOfferModal, setShowOfferModal] = useState(false);
   const [settlement, setSettlement] = useState<CatchSettlement>(() => createEmptySettlement());
   const [isSettlementLocked, setIsSettlementLocked] = useState(false);
+  const [advanceProofFile, setAdvanceProofFile] = useState<File | null>(null);
+  const [advanceProofPreviewUrl, setAdvanceProofPreviewUrl] = useState<string | null>(null);
+  const [selectedBankIndex, setSelectedBankIndex] = useState<number>(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const advanceProofInputRef = useRef<HTMLInputElement>(null);
 
   const linkedOffer = request ? dummyOffers.find((o) => o.id === request.offerId) : null;
 
@@ -135,6 +147,11 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // Al cambiar de solicitud, resetear banco seleccionado
+  useEffect(() => {
+    setSelectedBankIndex(0);
+  }, [request?.id]);
+
   // Inicializar liquidación desde la solicitud al abrir
   useEffect(() => {
     if (request?.catchSettlement) {
@@ -146,6 +163,24 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
     }
   }, [request?.id, request?.status, request?.catchSettlement, isOpen]);
 
+  // Vista previa de la imagen del comprobante de anticipo (crear/revocar object URL)
+  useEffect(() => {
+    if (!advanceProofFile) {
+      setAdvanceProofPreviewUrl((prev) => {
+        if (prev) URL.revokeObjectURL(prev);
+        return null;
+      });
+      return;
+    }
+    if (!advanceProofFile.type.startsWith('image/')) {
+      setAdvanceProofPreviewUrl(null);
+      return;
+    }
+    const url = URL.createObjectURL(advanceProofFile);
+    setAdvanceProofPreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [advanceProofFile]);
+
   // Resetear el formulario cuando se cierra el modal
   useEffect(() => {
     if (!isOpen) {
@@ -155,6 +190,12 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
       setExpanded(defaultExpanded);
       setShowOfferModal(false);
       setIsSettlementLocked(false);
+      setAdvanceProofFile(null);
+      setAdvanceProofPreviewUrl((prev) => {
+        if (prev) URL.revokeObjectURL(prev);
+        return null;
+      });
+      setSelectedBankIndex(0);
     }
   }, [isOpen]);
 
@@ -179,6 +220,27 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
   const handleCancelReject = () => {
     setShowRejectForm(false);
     setRejectNotes('');
+  };
+
+  const handleSendSettlement = () => {
+    if (!request || !onSendSettlement) return;
+    const message = 'Una vez que se envía la liquidación debe esperar la respuesta del productor antes de poder proseguir con la compra de la pesca. ¿Desea enviar la liquidación?';
+    if (window.confirm(message)) {
+      onSendSettlement(request.id);
+      onClose();
+    }
+  };
+
+  const handleCancelPurchase = () => {
+    if (!request || !onCancelPurchase) return;
+    onCancelPurchase(request.id);
+    onClose();
+  };
+
+  const handleSendAdvanceProof = () => {
+    if (!request || !onSendAdvanceProof) return;
+    onSendAdvanceProof(request.id);
+    onClose();
   };
 
   const handleSendMessage = () => {
@@ -380,6 +442,247 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
               </div>
             )}
           </section>
+        )}
+
+        {/* Anticipo pendiente: Liquidación de pesca (solo lectura) + Transferencia de anticipo */}
+        {request.status === 'ADVANCE_PENDING' && (
+          <>
+            {/* Liquidación de pesca - solo lectura */}
+            {request.catchSettlement && (
+              <section className="rounded-xl border-2 border-sky-400/60 bg-sky-50 shadow-sm overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => toggleSection('settlementReadOnly')}
+                  className="w-full flex items-center justify-between p-4 text-left text-gray-900 hover:bg-sky-100/50 transition-colors"
+                >
+                  <h3 className="text-lg font-semibold text-gray-900">Liquidación de pesca</h3>
+                  <span className="text-gray-700"><ChevronIcon expanded={expanded.settlementReadOnly} /></span>
+                </button>
+                {expanded.settlementReadOnly && (() => {
+                  const s = normalizeSettlement(request.catchSettlement as Parameters<typeof normalizeSettlement>[0]);
+                  const allLines = [...s.colaDirectaALines, ...s.colaDirectaBLines, ...s.ventaLocalLines];
+                  const totalValor = allLines.reduce((sum, l) => sum + l.pounds * l.unitPrice, 0);
+                  const remitidasLb = request.catchInfo.estimatedQuantityLb;
+                  const recibidasReferencial = Math.max(0, remitidasLb - s.basuraColaDirectaLb);
+                  const procesadasReales = allLines.reduce((sum, l) => sum + l.pounds, 0);
+                  const rendimientoPct = recibidasReferencial > 0 ? (procesadasReales / recibidasReferencial) * 100 : 0;
+                  const mermaPct = 100 - rendimientoPct;
+                  return (
+                    <div className="px-6 pb-6">
+                      <div className="bg-white border border-sky-200 rounded-lg p-4 space-y-6">
+                        <div>
+                          <h4 className="text-sm font-semibold text-gray-700 mb-3">Datos del ingreso</h4>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm text-gray-900">
+                            <FormRow labelClassName="font-medium text-gray-700" label="Fecha ing."><span>{s.entryDate}</span></FormRow>
+                            <FormRow labelClassName="font-medium text-gray-700" label="No. Lote"><span>{s.lotNumber || '—'}</span></FormRow>
+                            <FormRow labelClassName="font-medium text-gray-700" label="Guía rem."><span>{s.remissionGuide || '—'}</span></FormRow>
+                            <FormRow labelClassName="font-medium text-gray-700" label="Piscina"><span>{s.pond || '—'}</span></FormRow>
+                            <FormRow labelClassName="font-medium text-gray-700" label="Aguaje"><span>{s.aguaje || '—'}</span></FormRow>
+                          </div>
+                        </div>
+                        <div className="space-y-4">
+                          <h4 className="text-sm font-semibold text-gray-700">Detalle por clase y talla</h4>
+                          {[
+                            { key: 'colaDirectaALines' as const, title: CATCH_SETTLEMENT_CLASSES.COLA_DIRECTA_A },
+                            { key: 'colaDirectaBLines' as const, title: CATCH_SETTLEMENT_CLASSES.COLA_DIRECTA_B },
+                            { key: 'ventaLocalLines' as const, title: CATCH_SETTLEMENT_CLASSES.VENTA_LOCAL },
+                          ].map(({ key, title }) => (
+                            <div key={key}>
+                              <div className="text-sm font-semibold text-gray-700 mb-2">{title}</div>
+                              <div className="overflow-x-auto">
+                                <table className="w-full text-sm border border-gray-200 rounded-lg">
+                                  <thead>
+                                    <tr className="bg-gray-100 text-left">
+                                      <th className="px-2 py-2 font-medium text-gray-700">Talla / Descripción</th>
+                                      <th className="px-2 py-2 font-medium text-gray-700">Libras</th>
+                                      <th className="px-2 py-2 font-medium text-gray-700">P. unit.</th>
+                                      <th className="px-2 py-2 font-medium text-gray-700">Valor total</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {s[key].length === 0 ? (
+                                      <tr><td colSpan={4} className="px-2 py-3 text-center text-gray-500">Sin líneas</td></tr>
+                                    ) : (
+                                      s[key].map((line) => (
+                                        <tr key={line.id} className="border-t border-gray-100">
+                                          <td className="px-2 py-1.5 text-gray-900">{line.sizeOrDesc || '—'}</td>
+                                          <td className="px-2 py-1.5 text-gray-900">{line.pounds}</td>
+                                          <td className="px-2 py-1.5 text-gray-900">{line.unitPrice}</td>
+                                          <td className="px-2 py-1.5 font-medium text-gray-800">{(line.pounds * line.unitPrice).toFixed(2)}</td>
+                                        </tr>
+                                      ))
+                                    )}
+                                  </tbody>
+                                </table>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-sky-200 text-sm text-gray-900">
+                          <div><span className="font-medium text-gray-700">Remitidas referencial (lb): </span>{remitidasLb}</div>
+                          <div><span className="font-medium text-gray-700">Basura cola directa (lb): </span>{s.basuraColaDirectaLb}</div>
+                          <div><span className="font-medium text-gray-700">Recibidas referencial (lb): </span>{recibidasReferencial.toFixed(2)}</div>
+                          <div><span className="font-medium text-gray-700">Procesadas reales (lb): </span>{procesadasReales.toFixed(2)}</div>
+                          <div><span className="font-medium text-gray-700">Total valor: </span>$ {totalValor.toFixed(2)}</div>
+                          <div><span className="font-medium text-gray-700">Rendimiento: </span>{rendimientoPct.toFixed(2)}%</div>
+                          <div><span className="font-medium text-gray-700">Merma: </span>{mermaPct.toFixed(2)}%</div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </section>
+            )}
+
+            {/* Transferencia de anticipo + subir prueba */}
+            <section className="rounded-xl border-2 border-sky-400/60 bg-sky-50 shadow-sm overflow-hidden">
+              <button
+                type="button"
+                onClick={() => toggleSection('advanceTransfer')}
+                className="w-full flex items-center justify-between p-4 text-left text-gray-900 hover:bg-sky-100/50 transition-colors"
+              >
+                <h3 className="text-lg font-semibold text-gray-900 tracking-tight">Transferencia de anticipo al productor</h3>
+                <span className="text-gray-700"><ChevronIcon expanded={expanded.advanceTransfer} /></span>
+              </button>
+              {expanded.advanceTransfer && (() => {
+                  const settlementForAdvance = request.catchSettlement
+                    ? normalizeSettlement(request.catchSettlement as Parameters<typeof normalizeSettlement>[0])
+                    : null;
+                  const totalValor = settlementForAdvance
+                    ? [...settlementForAdvance.colaDirectaALines, ...settlementForAdvance.colaDirectaBLines, ...settlementForAdvance.ventaLocalLines].reduce(
+                        (sum, l) => sum + l.pounds * l.unitPrice,
+                        0
+                      )
+                    : 0;
+                  const advanceTerm = linkedOffer?.paymentTerms.find((p) => p.termType === 'ADVANCE');
+                  const advancePercent = advanceTerm?.percent ?? 0;
+                  const advanceAmount = (advancePercent / 100) * totalValor;
+                  return (
+                <div className="px-6 pb-6">
+                  <div className="bg-white border border-sky-200 rounded-xl p-6 space-y-8 shadow-sm">
+                    {/* Información del productor y banco para transferencia */}
+                    <div className="space-y-4">
+                      <h4 className="text-base font-semibold text-sky-800 tracking-tight border-b border-sky-200 pb-2">Información del productor</h4>
+                      <div>
+                        <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Productor</p>
+                        <p className="text-base text-gray-900 font-medium leading-snug">{request.producerName}</p>
+                      </div>
+                      {request.producerBankAccounts && request.producerBankAccounts.length > 0 ? (
+                        <>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Banco para transferencia</label>
+                            <select
+                              value={selectedBankIndex >= (request.producerBankAccounts?.length ?? 0) ? 0 : selectedBankIndex}
+                              onChange={(e) => setSelectedBankIndex(Number(e.target.value))}
+                              className="w-full md:max-w-sm px-4 py-2.5 border border-sky-200 rounded-lg text-sm font-medium text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-shadow"
+                            >
+                              {request.producerBankAccounts.map((account, idx) => (
+                                <option key={idx} value={idx}>
+                                  {account.bankName}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          {(() => {
+                            const account = request.producerBankAccounts[selectedBankIndex >= request.producerBankAccounts.length ? 0 : selectedBankIndex] as ProducerBankAccount;
+                            if (!account) return null;
+                            return (
+                              <div className="mt-4 p-5 border border-sky-100 rounded-xl bg-sky-50/50 space-y-4">
+                                <h5 className="text-sm font-semibold text-sky-800 tracking-tight">Datos de la cuenta seleccionada</h5>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 text-sm">
+                                  <div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Banco</p><p className="text-gray-900 font-medium">{account.bankName}</p></div>
+                                  <div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Tipo de cuenta</p><p className="text-gray-900">{account.accountType}</p></div>
+                                  <div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Número de cuenta</p><p className="text-gray-900 font-semibold tabular-nums">{account.accountNumber}</p></div>
+                                  <div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Titular</p><p className="text-gray-900 font-medium">{account.accountHolderName}</p></div>
+                                  <div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Cédula / Identificación</p><p className="text-gray-900 tabular-nums">{account.identification}</p></div>
+                                  {account.email && (
+                                    <div className="md:col-span-2"><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Correo</p><p className="text-gray-900">{account.email}</p></div>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })()}
+                        </>
+                      ) : (
+                        <p className="text-sm text-gray-500 italic">No hay datos bancarios registrados para este productor.</p>
+                      )}
+                    </div>
+
+                    {/* Datos para imprimir / transferir */}
+                    <div className="border border-sky-200 rounded-xl p-5 bg-sky-50/30 print:bg-white">
+                      <h4 className="text-base font-semibold text-sky-800 tracking-tight border-b border-sky-200 pb-2 mb-4">Datos para la transferencia del anticipo</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 text-sm">
+                        <div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Beneficiario (productor)</p><p className="text-gray-900 font-medium">{request.producerName}</p></div>
+                        <div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">ID Solicitud</p><p className="text-gray-900 font-medium tabular-nums">#{request.id.split('-')[1]}</p></div>
+                        <div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Concepto</p><p className="text-gray-900">Anticipo por compra de pesca</p></div>
+                        <div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Valor total (liquidación)</p><p className="text-gray-900 font-medium tabular-nums">$ {totalValor.toFixed(2)}</p></div>
+                        <div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Porcentaje de anticipo (oferta)</p><p className="text-gray-900 tabular-nums">{advancePercent}%</p></div>
+                        <div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Monto del anticipo</p><p className="text-lg font-bold text-sky-700 tabular-nums">$ {advanceAmount.toFixed(2)}</p></div>
+                      </div>
+                      <p className="text-sm text-gray-600 mt-4 leading-relaxed">Realice la transferencia según los datos acordados con el productor y adjunte la prueba de pago abajo.</p>
+                    </div>
+
+                    {/* Subir prueba del anticipo (solo imágenes) */}
+                    <div className="space-y-3">
+                      <h4 className="text-base font-semibold text-sky-800 tracking-tight border-b border-sky-200 pb-2">Prueba del anticipo</h4>
+                      <input
+                        ref={advanceProofInputRef}
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        aria-hidden
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file && file.type.startsWith('image/')) setAdvanceProofFile(file);
+                          e.target.value = '';
+                        }}
+                      />
+                      <div className="flex flex-col gap-4">
+                        <div className="flex flex-wrap items-center gap-3">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              requestAnimationFrame(() => {
+                                advanceProofInputRef.current?.click();
+                              });
+                            }}
+                            className="flex items-center gap-2 px-5 py-2.5 bg-sky-600 text-white rounded-lg hover:bg-sky-700 font-medium text-sm transition-colors shadow-sm"
+                          >
+                            <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                            </svg>
+                            Subir imagen
+                          </button>
+                          {advanceProofFile && (
+                            <>
+                              <span className="font-medium text-gray-700 text-sm">{advanceProofFile.name}</span>
+                              <button
+                                type="button"
+                                onClick={() => setAdvanceProofFile(null)}
+                                className="text-red-600 hover:text-red-700 text-sm font-medium underline underline-offset-2"
+                              >
+                                Quitar
+                              </button>
+                            </>
+                          )}
+                        </div>
+                        {advanceProofPreviewUrl && (
+                          <div className="border border-sky-200 rounded-lg overflow-hidden bg-gray-100 max-w-xs">
+                            <img
+                              src={advanceProofPreviewUrl}
+                              alt="Vista previa del comprobante"
+                              className="w-full h-auto max-h-64 object-contain"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                  );
+                })()}
+            </section>
+          </>
         )}
 
         {/* Liquidación de pesca (solo cuando el estado es Liquidación de Pesca pendiente) */}
@@ -872,13 +1175,61 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
             </>
           )}
           {request.status !== 'PENDING_ACCEPTANCE' && (
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 font-medium transition-colors"
-            >
-              Cerrar
-            </button>
+            <>
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 font-medium transition-colors"
+              >
+                Cerrar
+              </button>
+              {request.status === 'CATCH_SETTLEMENT_PENDING' && (
+                <>
+                  {onSendSettlement && (
+                    <button
+                      type="button"
+                      onClick={handleSendSettlement}
+                      disabled={!isSettlementLocked}
+                      className="px-4 py-2 bg-sky-600 text-white rounded-md hover:bg-sky-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-sky-600"
+                    >
+                      Enviar liquidación de pesca
+                    </button>
+                  )}
+                  {onCancelPurchase && (
+                    <button
+                      type="button"
+                      onClick={handleCancelPurchase}
+                      className="px-4 py-2 border border-red-300 text-red-700 rounded-md hover:bg-red-50 font-medium transition-colors"
+                    >
+                      Cancelar compra
+                    </button>
+                  )}
+                </>
+              )}
+              {request.status === 'ADVANCE_PENDING' && (
+                <>
+                  {onSendAdvanceProof && (
+                    <button
+                      type="button"
+                      onClick={handleSendAdvanceProof}
+                      disabled={!advanceProofFile}
+                      className="px-4 py-2 bg-sky-600 text-white rounded-md hover:bg-sky-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-sky-600"
+                    >
+                      Enviar prueba de anticipo
+                    </button>
+                  )}
+                  {onCancelPurchase && (
+                    <button
+                      type="button"
+                      onClick={handleCancelPurchase}
+                      className="px-4 py-2 border border-red-300 text-red-700 rounded-md hover:bg-red-50 font-medium transition-colors"
+                    >
+                      Cancelar compra
+                    </button>
+                  )}
+                </>
+              )}
+            </>
           )}
         </div>
       </div>

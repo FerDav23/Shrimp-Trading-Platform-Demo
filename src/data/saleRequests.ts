@@ -44,26 +44,6 @@ export const dummySaleRequests: SaleRequest[] = [
     respondedAt: '2024-02-11T14:30:00Z',
     packerNotes: 'Aceptada. Coordinar logística para el día 22.',
     saleId: 'sale-2',
-    catchSettlement: {
-      entryDate: '2024-07-28',
-      lotNumber: 'FC218233',
-      remissionGuide: '484-483',
-      pond: '2',
-      aguaje: '2024-14',
-      colaDirectaALines: [
-        { id: 'li-1', sizeOrDesc: '31-35', pounds: 3200.5, unitPrice: 1.85 },
-        { id: 'li-2', sizeOrDesc: '41-50', pounds: 2100.25, unitPrice: 1.72 },
-      ],
-      colaDirectaBLines: [
-        { id: 'li-3', sizeOrDesc: '31-35', pounds: 856.24, unitPrice: 1.45 },
-      ],
-      ventaLocalLines: [
-        { id: 'li-4', sizeOrDesc: 'Quebrado', pounds: 520.0, unitPrice: 0.85 },
-        { id: 'li-5', sizeOrDesc: 'Rojo', pounds: 280.0, unitPrice: 0.70 },
-      ],
-      remitidasReferencialLb: 10963,
-      basuraColaDirectaLb: 124,
-    },
   },
   {
     id: 'request-3',
@@ -112,7 +92,7 @@ export const dummySaleRequests: SaleRequest[] = [
     id: 'request-5',
     offerId: 'offer-2',
     producerId: 'user-producer-2',
-    producerName: 'Camarones del Sur C.A.',
+    producerName: 'Luis Andres Asanza Castro',
     packingCompanyId: 'packer-rosasud',
     productForm: 'ENTERO',
     catchInfo: {
@@ -130,6 +110,27 @@ export const dummySaleRequests: SaleRequest[] = [
     respondedAt: '2024-02-14T16:00:00Z',
     packerNotes: 'Aceptada. Confirmar fecha exacta de cosecha.',
     saleId: 'sale-5',
+    producerBankAccounts: [
+      { bankName: 'Banco Bolivariano', accountType: 'Cta. Ahorros', accountNumber: '0841427955', accountHolderName: 'Luis Andres Asanza Castro', identification: '0926219924' },
+      { bankName: 'Banco Guayaquil', accountType: 'Ahorro', accountNumber: '0015076369', accountHolderName: 'Asanza Castro Luis Andres', identification: '0926219924', email: 'luisao232@gmail.com' },
+      { bankName: 'Banco del Pacífico', accountType: 'Cuenta de Ahorros', accountNumber: '1058247939', accountHolderName: 'Luis Andrés Asanza Castro', identification: '0926219924', email: 'luisao232@gmail.com' },
+    ],
+    catchSettlement: {
+      entryDate: '2024-02-22',
+      lotNumber: 'L-2024-022',
+      remissionGuide: 'GR-001',
+      pond: '4',
+      aguaje: '2024-08',
+      colaDirectaALines: [
+        { id: 'al-1', sizeOrDesc: '31-40', pounds: 280, unitPrice: 2.10 },
+      ],
+      colaDirectaBLines: [],
+      ventaLocalLines: [
+        { id: 'vl-1', sizeOrDesc: 'Quebrado', pounds: 45, unitPrice: 0.90 },
+      ],
+      remitidasReferencialLb: 400,
+      basuraColaDirectaLb: 15,
+    },
   },
   {
     id: 'request-6',

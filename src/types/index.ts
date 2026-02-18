@@ -187,6 +187,22 @@ export interface CatchSettlement {
   basuraColaDirectaLb: number;
 }
 
+/** Datos de una cuenta bancaria del productor para transferencias */
+export interface ProducerBankAccount {
+  /** Nombre del banco (ej. Banco Bolivariano, Banco Guayaquil) */
+  bankName: string;
+  /** Tipo de cuenta (ej. Cta. Ahorros, Cuenta de Ahorros) */
+  accountType: string;
+  /** Número de cuenta */
+  accountNumber: string;
+  /** Nombre del titular de la cuenta */
+  accountHolderName: string;
+  /** Cédula o identificación del titular */
+  identification: string;
+  /** Email del titular (opcional, no todos los bancos lo incluyen) */
+  email?: string;
+}
+
 /** Solicitud de venta que un productor envía a un packer basada en una oferta */
 export interface SaleRequest {
   id: string;
@@ -196,6 +212,8 @@ export interface SaleRequest {
   producerId: string;
   /** Nombre del productor */
   producerName: string;
+  /** Cuentas bancarias del productor para transferencias (el packer elige a cuál transferir) */
+  producerBankAccounts?: ProducerBankAccount[];
   /** ID del packer que recibe la solicitud */
   packingCompanyId: string;
   /** Forma del producto */
