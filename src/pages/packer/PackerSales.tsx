@@ -3,7 +3,7 @@ import { useParams, Navigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { dummySaleRequests } from '../../data/saleRequests';
 import { SaleRequest } from '../../types';
-import { SaleRequestDetailModal } from './SaleRequestDetailModal';
+import { SaleRequestDetailModal } from './saleRequestDetailModal';
 import { slugToStatus, DEFAULT_SALES_VIEW, statusToPath, type SalesViewFilter } from './salesRoutes';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
