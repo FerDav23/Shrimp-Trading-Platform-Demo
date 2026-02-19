@@ -15,15 +15,30 @@ interface SaleRequestDetailModalProps {
   onClose: () => void;
   request: SaleRequest | null;
   onAccept: (requestId: string) => void;
-  onReject: (requestId: string, notes?: string) => void;
+  onReject: (requestId: string, reason?: string, notes?: string) => void;
+  /** Motivos de rechazo guardados por el parent (para mostrar en solicitudes rechazadas) */
+  rejectionReasons?: Record<string, string>;
   onSendSettlement?: (requestId: string) => void;
   onCancelPurchase?: (requestId: string) => void;
   onSendAdvanceProof?: (requestId: string) => void;
+  onSendBalanceProof?: (requestId: string) => void;
 }
 
 const MAX_MESSAGE_LENGTH = 500;
 
-type SectionKey = 'general' | 'catch' | 'packerNotes' | 'settlement' | 'settlementReadOnly' | 'advanceTransfer' | 'messages' | 'rejectForm';
+/** Opciones del dropdown de motivo de rechazo (packer elige al rechazar) */
+const REJECTION_REASONS = [
+  { value: '', label: 'Seleccione un motivo...' },
+  { value: 'SIZE_RANGE', label: 'No cumple con el rango de tallas requerido para esta oferta.' },
+  { value: 'NO_CAPACITY', label: 'Sin capacidad de procesamiento en la fecha indicada.' },
+  { value: 'PRICE', label: 'Condiciones de precio no aceptables.' },
+  { value: 'OTHER_OFFER', label: 'Se priorizó otra oferta o productor.' },
+  { value: 'QUALITY', label: 'No cumple con los requisitos de calidad de la oferta.' },
+  { value: 'LOGISTICS', label: 'Problemas de logística o ubicación.' },
+  { value: 'OTHER', label: 'Otro motivo.' },
+] as const;
+
+type SectionKey = 'general' | 'catch' | 'packerNotes' | 'settlement' | 'settlementReadOnly' | 'advanceTransfer' | 'advanceReadOnly' | 'balanceTransfer' | 'balanceReadOnly' | 'messages' | 'rejectForm';
 
 const defaultExpanded: Record<SectionKey, boolean> = {
   general: false,
@@ -32,6 +47,9 @@ const defaultExpanded: Record<SectionKey, boolean> = {
   settlement: false,
   settlementReadOnly: false,
   advanceTransfer: false,
+  advanceReadOnly: false,
+  balanceTransfer: false,
+  balanceReadOnly: false,
   messages: false,
   rejectForm: false,
 };
@@ -107,12 +125,15 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
   request,
   onAccept,
   onReject,
+  rejectionReasons,
   onSendSettlement,
   onCancelPurchase,
   onSendAdvanceProof,
+  onSendBalanceProof,
 }) => {
   const { user } = useAuth();
   const [rejectNotes, setRejectNotes] = useState('');
+  const [selectedRejectionReason, setSelectedRejectionReason] = useState('');
   const [showRejectForm, setShowRejectForm] = useState(false);
   const [messageText, setMessageText] = useState('');
   const [messages, setMessages] = useState<RequestMessage[]>([]);
@@ -123,8 +144,20 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
   const [advanceProofFile, setAdvanceProofFile] = useState<File | null>(null);
   const [advanceProofPreviewUrl, setAdvanceProofPreviewUrl] = useState<string | null>(null);
   const [selectedBankIndex, setSelectedBankIndex] = useState<number>(0);
+  const [advancePaymentEndsAt, setAdvancePaymentEndsAt] = useState<number | null>(null);
+  const [advanceTimerTick, setAdvanceTimerTick] = useState(0);
+  const [balancePaymentEndsAt, setBalancePaymentEndsAt] = useState<number | null>(null);
+  const [balanceTimerTick, setBalanceTimerTick] = useState(0);
+  const [balanceProofFile, setBalanceProofFile] = useState<File | null>(null);
+  const [balanceProofPreviewUrl, setBalanceProofPreviewUrl] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const advanceProofInputRef = useRef<HTMLInputElement>(null);
+  const balanceProofInputRef = useRef<HTMLInputElement>(null);
+
+  const ADVANCE_DEADLINE_HOURS = 24;
+  const BALANCE_DEADLINE_HOURS = 24;
+  const DUMMY_ADVANCE_PROOF_IMAGE = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180" viewBox="0 0 320 180"><rect width="320" height="180" fill="#e2e8f0"/><text x="160" y="85" font-family="sans-serif" font-size="14" fill="#64748b" text-anchor="middle">Comprobante de anticipo</text><text x="160" y="105" font-family="sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">(imagen de ejemplo)</text></svg>');
+  const DUMMY_BALANCE_PROOF_IMAGE = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180" viewBox="0 0 320 180"><rect width="320" height="180" fill="#e2e8f0"/><text x="160" y="85" font-family="sans-serif" font-size="14" fill="#64748b" text-anchor="middle">Comprobante de saldo</text><text x="160" y="105" font-family="sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">(imagen de ejemplo)</text></svg>');
 
   const linkedOffer = request ? dummyOffers.find((o) => o.id === request.offerId) : null;
 
@@ -151,6 +184,38 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
   useEffect(() => {
     setSelectedBankIndex(0);
   }, [request?.id]);
+
+  // Iniciar timer de 24 h para anticipo cuando se abre el modal en estado ADVANCE_PENDING
+  useEffect(() => {
+    if (isOpen && request?.status === 'ADVANCE_PENDING') {
+      setAdvancePaymentEndsAt(Date.now() + ADVANCE_DEADLINE_HOURS * 60 * 60 * 1000);
+    } else {
+      setAdvancePaymentEndsAt(null);
+    }
+  }, [isOpen, request?.id, request?.status]);
+
+  // Actualizar countdown del anticipo cada segundo
+  useEffect(() => {
+    if (advancePaymentEndsAt == null) return;
+    const interval = setInterval(() => setAdvanceTimerTick((t) => t + 1), 1000);
+    return () => clearInterval(interval);
+  }, [advancePaymentEndsAt]);
+
+  // Iniciar timer de 24 h para saldo cuando se abre el modal en estado BALANCE_PENDING
+  useEffect(() => {
+    if (isOpen && request?.status === 'BALANCE_PENDING') {
+      setBalancePaymentEndsAt(Date.now() + BALANCE_DEADLINE_HOURS * 60 * 60 * 1000);
+    } else {
+      setBalancePaymentEndsAt(null);
+    }
+  }, [isOpen, request?.id, request?.status]);
+
+  // Actualizar countdown del saldo cada segundo
+  useEffect(() => {
+    if (balancePaymentEndsAt == null) return;
+    const interval = setInterval(() => setBalanceTimerTick((t) => t + 1), 1000);
+    return () => clearInterval(interval);
+  }, [balancePaymentEndsAt]);
 
   // Inicializar liquidación desde la solicitud al abrir
   useEffect(() => {
@@ -181,10 +246,29 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
     return () => URL.revokeObjectURL(url);
   }, [advanceProofFile]);
 
+  // Vista previa de la imagen del comprobante de saldo
+  useEffect(() => {
+    if (!balanceProofFile) {
+      setBalanceProofPreviewUrl((prev) => {
+        if (prev) URL.revokeObjectURL(prev);
+        return null;
+      });
+      return;
+    }
+    if (!balanceProofFile.type.startsWith('image/')) {
+      setBalanceProofPreviewUrl(null);
+      return;
+    }
+    const url = URL.createObjectURL(balanceProofFile);
+    setBalanceProofPreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [balanceProofFile]);
+
   // Resetear el formulario cuando se cierra el modal
   useEffect(() => {
     if (!isOpen) {
       setRejectNotes('');
+      setSelectedRejectionReason('');
       setShowRejectForm(false);
       setMessageText('');
       setExpanded(defaultExpanded);
@@ -196,6 +280,13 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
         return null;
       });
       setSelectedBankIndex(0);
+      setAdvancePaymentEndsAt(null);
+      setBalancePaymentEndsAt(null);
+      setBalanceProofFile(null);
+      setBalanceProofPreviewUrl((prev) => {
+        if (prev) URL.revokeObjectURL(prev);
+        return null;
+      });
     }
   }, [isOpen]);
 
@@ -208,8 +299,10 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
 
   const handleReject = () => {
     if (showRejectForm) {
-      onReject(request.id, rejectNotes || undefined);
+      const reasonLabel = REJECTION_REASONS.find((r) => r.value === selectedRejectionReason)?.label ?? selectedRejectionReason;
+      onReject(request.id, reasonLabel || undefined, rejectNotes || undefined);
       setRejectNotes('');
+      setSelectedRejectionReason('');
       setShowRejectForm(false);
       onClose();
     } else {
@@ -220,7 +313,12 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
   const handleCancelReject = () => {
     setShowRejectForm(false);
     setRejectNotes('');
+    setSelectedRejectionReason('');
   };
+
+  const canConfirmReject = selectedRejectionReason !== '';
+
+  const rejectionReasonDisplay = rejectionReasons?.[request.id] ?? request.rejectionReason ?? request.packerNotes;
 
   const handleSendSettlement = () => {
     if (!request || !onSendSettlement) return;
@@ -240,6 +338,12 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
   const handleSendAdvanceProof = () => {
     if (!request || !onSendAdvanceProof) return;
     onSendAdvanceProof(request.id);
+    onClose();
+  };
+
+  const handleSendBalanceProof = () => {
+    if (!request || !onSendBalanceProof) return;
+    onSendBalanceProof(request.id);
     onClose();
   };
 
@@ -557,9 +661,34 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
                   const advanceTerm = linkedOffer?.paymentTerms.find((p) => p.termType === 'ADVANCE');
                   const advancePercent = advanceTerm?.percent ?? 0;
                   const advanceAmount = (advancePercent / 100) * totalValor;
+                  const now = Date.now();
+                  const remainingMs = advancePaymentEndsAt ? Math.max(0, advancePaymentEndsAt - now) : 0;
+                  const totalSeconds = Math.floor(remainingMs / 1000);
+                  const hours = Math.floor(totalSeconds / 3600);
+                  const minutes = Math.floor((totalSeconds % 3600) / 60);
+                  const seconds = totalSeconds % 60;
+                  const formatTwo = (n: number) => n.toString().padStart(2, '0');
+                  const isExpired = advancePaymentEndsAt != null && remainingMs === 0;
+
                   return (
                 <div className="px-6 pb-6">
                   <div className="bg-white border border-sky-200 rounded-xl p-6 space-y-8 shadow-sm">
+                    {/* Timer: tiempo restante para pagar el anticipo */}
+                    <div className={`rounded-xl border-2 p-4 ${isExpired ? 'border-red-200 bg-red-50' : 'border-sky-200 bg-sky-50/50'}`}>
+                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Plazo para pagar el anticipo</p>
+                      <p className="text-sm text-gray-600 mb-2">Tiene {ADVANCE_DEADLINE_HOURS} horas para realizar la transferencia y subir la prueba.</p>
+                      {isExpired ? (
+                        <p className="text-lg font-bold text-red-700">Tiempo agotado</p>
+                      ) : (
+                        <>
+                          <p className="text-2xl font-bold text-red-600 tabular-nums" aria-live="polite">
+                            {formatTwo(hours)}:{formatTwo(minutes)}:{formatTwo(seconds)}
+                          </p>
+                          <span className="sr-only" aria-hidden>{advanceTimerTick}</span>
+                        </>
+                      )}
+                    </div>
+
                     {/* Información del productor y banco para transferencia */}
                     <div className="space-y-4">
                       <h4 className="text-base font-semibold text-sky-800 tracking-tight border-b border-sky-200 pb-2">Información del productor</h4>
@@ -675,6 +804,464 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
                             />
                           </div>
                         )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                  );
+                })()}
+            </section>
+          </>
+        )}
+
+        {/* Saldo restante pendiente: Liquidación (solo lectura) + Anticipo (solo lectura) + Pago del saldo */}
+        {request.status === 'BALANCE_PENDING' && (
+          <>
+            {/* Liquidación de pesca - solo lectura */}
+            {request.catchSettlement && (
+              <section className="rounded-xl border-2 border-sky-400/60 bg-sky-50 shadow-sm overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => toggleSection('settlementReadOnly')}
+                  className="w-full flex items-center justify-between p-4 text-left text-gray-900 hover:bg-sky-100/50 transition-colors"
+                >
+                  <h3 className="text-lg font-semibold text-gray-900">Liquidación de pesca</h3>
+                  <span className="text-gray-700"><ChevronIcon expanded={expanded.settlementReadOnly} /></span>
+                </button>
+                {expanded.settlementReadOnly && (() => {
+                  const s = normalizeSettlement(request.catchSettlement as Parameters<typeof normalizeSettlement>[0]);
+                  const allLines = [...s.colaDirectaALines, ...s.colaDirectaBLines, ...s.ventaLocalLines];
+                  const totalValor = allLines.reduce((sum, l) => sum + l.pounds * l.unitPrice, 0);
+                  const remitidasLb = request.catchInfo.estimatedQuantityLb;
+                  const recibidasReferencial = Math.max(0, remitidasLb - s.basuraColaDirectaLb);
+                  const procesadasReales = allLines.reduce((sum, l) => sum + l.pounds, 0);
+                  const rendimientoPct = recibidasReferencial > 0 ? (procesadasReales / recibidasReferencial) * 100 : 0;
+                  const mermaPct = 100 - rendimientoPct;
+                  return (
+                    <div className="px-6 pb-6">
+                      <div className="bg-white border border-sky-200 rounded-lg p-4 space-y-6">
+                        <div>
+                          <h4 className="text-sm font-semibold text-gray-700 mb-3">Datos del ingreso</h4>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm text-gray-900">
+                            <FormRow labelClassName="font-medium text-gray-700" label="Fecha ing."><span>{s.entryDate}</span></FormRow>
+                            <FormRow labelClassName="font-medium text-gray-700" label="No. Lote"><span>{s.lotNumber || '—'}</span></FormRow>
+                            <FormRow labelClassName="font-medium text-gray-700" label="Guía rem."><span>{s.remissionGuide || '—'}</span></FormRow>
+                            <FormRow labelClassName="font-medium text-gray-700" label="Piscina"><span>{s.pond || '—'}</span></FormRow>
+                            <FormRow labelClassName="font-medium text-gray-700" label="Aguaje"><span>{s.aguaje || '—'}</span></FormRow>
+                          </div>
+                        </div>
+                        <div className="space-y-4">
+                          <h4 className="text-sm font-semibold text-gray-700">Detalle por clase y talla</h4>
+                          {[
+                            { key: 'colaDirectaALines' as const, title: CATCH_SETTLEMENT_CLASSES.COLA_DIRECTA_A },
+                            { key: 'colaDirectaBLines' as const, title: CATCH_SETTLEMENT_CLASSES.COLA_DIRECTA_B },
+                            { key: 'ventaLocalLines' as const, title: CATCH_SETTLEMENT_CLASSES.VENTA_LOCAL },
+                          ].map(({ key, title }) => (
+                            <div key={key}>
+                              <div className="text-sm font-semibold text-gray-700 mb-2">{title}</div>
+                              <div className="overflow-x-auto">
+                                <table className="w-full text-sm border border-gray-200 rounded-lg">
+                                  <thead>
+                                    <tr className="bg-gray-100 text-left">
+                                      <th className="px-2 py-2 font-medium text-gray-700">Talla / Descripción</th>
+                                      <th className="px-2 py-2 font-medium text-gray-700">Libras</th>
+                                      <th className="px-2 py-2 font-medium text-gray-700">P. unit.</th>
+                                      <th className="px-2 py-2 font-medium text-gray-700">Valor total</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {s[key].length === 0 ? (
+                                      <tr><td colSpan={4} className="px-2 py-3 text-center text-gray-500">Sin líneas</td></tr>
+                                    ) : (
+                                      s[key].map((line) => (
+                                        <tr key={line.id} className="border-t border-gray-100">
+                                          <td className="px-2 py-1.5 text-gray-900">{line.sizeOrDesc || '—'}</td>
+                                          <td className="px-2 py-1.5 text-gray-900">{line.pounds}</td>
+                                          <td className="px-2 py-1.5 text-gray-900">{line.unitPrice}</td>
+                                          <td className="px-2 py-1.5 font-medium text-gray-800">{(line.pounds * line.unitPrice).toFixed(2)}</td>
+                                        </tr>
+                                      ))
+                                    )}
+                                  </tbody>
+                                </table>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-sky-200 text-sm text-gray-900">
+                          <div><span className="font-medium text-gray-700">Remitidas referencial (lb): </span>{remitidasLb}</div>
+                          <div><span className="font-medium text-gray-700">Basura cola directa (lb): </span>{s.basuraColaDirectaLb}</div>
+                          <div><span className="font-medium text-gray-700">Recibidas referencial (lb): </span>{recibidasReferencial.toFixed(2)}</div>
+                          <div><span className="font-medium text-gray-700">Procesadas reales (lb): </span>{procesadasReales.toFixed(2)}</div>
+                          <div><span className="font-medium text-gray-700">Total valor: </span>$ {totalValor.toFixed(2)}</div>
+                          <div><span className="font-medium text-gray-700">Rendimiento: </span>{rendimientoPct.toFixed(2)}%</div>
+                          <div><span className="font-medium text-gray-700">Merma: </span>{mermaPct.toFixed(2)}%</div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </section>
+            )}
+
+            {/* Anticipo - solo lectura (comprobante e información dummy) */}
+            <section className="rounded-xl border-2 border-sky-400/60 bg-sky-50 shadow-sm overflow-hidden">
+              <button
+                type="button"
+                onClick={() => toggleSection('advanceReadOnly')}
+                className="w-full flex items-center justify-between p-4 text-left text-gray-900 hover:bg-sky-100/50 transition-colors"
+              >
+                <h3 className="text-lg font-semibold text-gray-900">Anticipo pagado</h3>
+                <span className="text-gray-700"><ChevronIcon expanded={expanded.advanceReadOnly} /></span>
+              </button>
+              {expanded.advanceReadOnly && (
+                <div className="px-6 pb-6">
+                  <div className="bg-white border border-sky-200 rounded-xl p-6 space-y-4 shadow-sm">
+                    <h4 className="text-base font-semibold text-sky-800 tracking-tight border-b border-sky-200 pb-2">Comprobante de anticipo</h4>
+                    <div className="border border-sky-200 rounded-lg overflow-hidden bg-gray-100 max-w-sm">
+                      <img src={DUMMY_ADVANCE_PROOF_IMAGE} alt="Comprobante de anticipo (ejemplo)" className="w-full h-auto max-h-48 object-contain" />
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                      <div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Fecha de envío</p><p className="text-gray-900">15 Feb 2024, 10:30</p></div>
+                      <div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Monto del anticipo</p><p className="text-gray-900 font-semibold">$ 588.00</p></div>
+                      <div className="md:col-span-2"><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Estado</p><p className="text-gray-900 font-medium text-green-700">Anticipo enviado y confirmado</p></div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </section>
+
+            {/* Pago del saldo restante */}
+            <section className="rounded-xl border-2 border-sky-400/60 bg-sky-50 shadow-sm overflow-hidden">
+              <button
+                type="button"
+                onClick={() => toggleSection('balanceTransfer')}
+                className="w-full flex items-center justify-between p-4 text-left text-gray-900 hover:bg-sky-100/50 transition-colors"
+              >
+                <h3 className="text-lg font-semibold text-gray-900 tracking-tight">Pago del saldo restante al productor</h3>
+                <span className="text-gray-700"><ChevronIcon expanded={expanded.balanceTransfer} /></span>
+              </button>
+              {expanded.balanceTransfer && (() => {
+                  const settlementForBalance = request.catchSettlement
+                    ? normalizeSettlement(request.catchSettlement as Parameters<typeof normalizeSettlement>[0])
+                    : null;
+                  const totalValor = settlementForBalance
+                    ? [...settlementForBalance.colaDirectaALines, ...settlementForBalance.colaDirectaBLines, ...settlementForBalance.ventaLocalLines].reduce(
+                        (sum, l) => sum + l.pounds * l.unitPrice,
+                        0
+                      )
+                    : 0;
+                  const balanceTerm = linkedOffer?.paymentTerms.find((p) => p.termType === 'BALANCE');
+                  const balancePercent = balanceTerm?.percent ?? 70;
+                  const balanceAmount = (balancePercent / 100) * totalValor;
+                  const nowBalance = Date.now();
+                  const remainingBalanceMs = balancePaymentEndsAt ? Math.max(0, balancePaymentEndsAt - nowBalance) : 0;
+                  const totalBalanceSeconds = Math.floor(remainingBalanceMs / 1000);
+                  const balanceHours = Math.floor(totalBalanceSeconds / 3600);
+                  const balanceMinutes = Math.floor((totalBalanceSeconds % 3600) / 60);
+                  const balanceSeconds = totalBalanceSeconds % 60;
+                  const formatTwoBalance = (n: number) => n.toString().padStart(2, '0');
+                  const isBalanceExpired = balancePaymentEndsAt != null && remainingBalanceMs === 0;
+
+                  return (
+                <div className="px-6 pb-6">
+                  <div className="bg-white border border-sky-200 rounded-xl p-6 space-y-8 shadow-sm">
+                    {/* Timer: tiempo restante para pagar el saldo */}
+                    <div className={`rounded-xl border-2 p-4 ${isBalanceExpired ? 'border-red-200 bg-red-50' : 'border-sky-200 bg-sky-50/50'}`}>
+                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Plazo para pagar el saldo restante</p>
+                      <p className="text-sm text-gray-600 mb-2">Tiene {BALANCE_DEADLINE_HOURS} horas para realizar la transferencia y subir la prueba.</p>
+                      {isBalanceExpired ? (
+                        <p className="text-lg font-bold text-red-700">Tiempo agotado</p>
+                      ) : (
+                        <>
+                          <p className="text-2xl font-bold text-red-600 tabular-nums" aria-live="polite">
+                            {formatTwoBalance(balanceHours)}:{formatTwoBalance(balanceMinutes)}:{formatTwoBalance(balanceSeconds)}
+                          </p>
+                          <span className="sr-only" aria-hidden>{balanceTimerTick}</span>
+                        </>
+                      )}
+                    </div>
+
+                    <div className="space-y-4">
+                      <h4 className="text-base font-semibold text-sky-800 tracking-tight border-b border-sky-200 pb-2">Información del productor</h4>
+                      <div>
+                        <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Productor</p>
+                        <p className="text-base text-gray-900 font-medium leading-snug">{request.producerName}</p>
+                      </div>
+                      {request.producerBankAccounts && request.producerBankAccounts.length > 0 ? (
+                        <>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">Banco para transferencia</label>
+                            <select
+                              value={selectedBankIndex >= (request.producerBankAccounts?.length ?? 0) ? 0 : selectedBankIndex}
+                              onChange={(e) => setSelectedBankIndex(Number(e.target.value))}
+                              className="w-full md:max-w-sm px-4 py-2.5 border border-sky-200 rounded-lg text-sm font-medium text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-shadow"
+                            >
+                              {request.producerBankAccounts.map((account, idx) => (
+                                <option key={idx} value={idx}>{account.bankName}</option>
+                              ))}
+                            </select>
+                          </div>
+                          {(() => {
+                            const account = request.producerBankAccounts[selectedBankIndex >= request.producerBankAccounts.length ? 0 : selectedBankIndex] as ProducerBankAccount;
+                            if (!account) return null;
+                            return (
+                              <div className="mt-4 p-5 border border-sky-100 rounded-xl bg-sky-50/50 space-y-4">
+                                <h5 className="text-sm font-semibold text-sky-800 tracking-tight">Datos de la cuenta seleccionada</h5>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 text-sm">
+                                  <div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Banco</p><p className="text-gray-900 font-medium">{account.bankName}</p></div>
+                                  <div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Tipo de cuenta</p><p className="text-gray-900">{account.accountType}</p></div>
+                                  <div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Número de cuenta</p><p className="text-gray-900 font-semibold tabular-nums">{account.accountNumber}</p></div>
+                                  <div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Titular</p><p className="text-gray-900 font-medium">{account.accountHolderName}</p></div>
+                                  <div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Cédula / Identificación</p><p className="text-gray-900 tabular-nums">{account.identification}</p></div>
+                                  {account.email && (
+                                    <div className="md:col-span-2"><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Correo</p><p className="text-gray-900">{account.email}</p></div>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })()}
+                        </>
+                      ) : (
+                        <p className="text-sm text-gray-500 italic">No hay datos bancarios registrados para este productor.</p>
+                      )}
+                    </div>
+
+                    <div className="border border-sky-200 rounded-xl p-5 bg-sky-50/30 print:bg-white">
+                      <h4 className="text-base font-semibold text-sky-800 tracking-tight border-b border-sky-200 pb-2 mb-4">Datos para la transferencia del saldo restante</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 text-sm">
+                        <div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Beneficiario (productor)</p><p className="text-gray-900 font-medium">{request.producerName}</p></div>
+                        <div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">ID Solicitud</p><p className="text-gray-900 font-medium tabular-nums">#{request.id.split('-')[1]}</p></div>
+                        <div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Concepto</p><p className="text-gray-900">Saldo restante por compra de pesca</p></div>
+                        <div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Valor total (liquidación)</p><p className="text-gray-900 font-medium tabular-nums">$ {totalValor.toFixed(2)}</p></div>
+                        <div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Porcentaje de saldo (oferta)</p><p className="text-gray-900 tabular-nums">{balancePercent}%</p></div>
+                        <div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Monto del saldo restante</p><p className="text-lg font-bold text-sky-700 tabular-nums">$ {balanceAmount.toFixed(2)}</p></div>
+                      </div>
+                      <p className="text-sm text-gray-600 mt-4 leading-relaxed">Realice la transferencia del saldo según los datos acordados con el productor y adjunte la prueba de pago abajo.</p>
+                    </div>
+
+                    <div className="space-y-3">
+                      <h4 className="text-base font-semibold text-sky-800 tracking-tight border-b border-sky-200 pb-2">Prueba del pago del saldo</h4>
+                      <input
+                        ref={balanceProofInputRef}
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        aria-hidden
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file && file.type.startsWith('image/')) setBalanceProofFile(file);
+                          e.target.value = '';
+                        }}
+                      />
+                      <div className="flex flex-col gap-4">
+                        <div className="flex flex-wrap items-center gap-3">
+                          <button
+                            type="button"
+                            onClick={() => requestAnimationFrame(() => balanceProofInputRef.current?.click())}
+                            className="flex items-center gap-2 px-5 py-2.5 bg-sky-600 text-white rounded-lg hover:bg-sky-700 font-medium text-sm transition-colors shadow-sm"
+                          >
+                            <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                            </svg>
+                            Subir imagen
+                          </button>
+                          {balanceProofFile && (
+                            <>
+                              <span className="font-medium text-gray-700 text-sm">{balanceProofFile.name}</span>
+                              <button type="button" onClick={() => setBalanceProofFile(null)} className="text-red-600 hover:text-red-700 text-sm font-medium underline underline-offset-2">Quitar</button>
+                            </>
+                          )}
+                        </div>
+                        {balanceProofPreviewUrl && (
+                          <div className="border border-sky-200 rounded-lg overflow-hidden bg-gray-100 max-w-xs">
+                            <img src={balanceProofPreviewUrl} alt="Vista previa del comprobante de saldo" className="w-full h-auto max-h-64 object-contain" />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                  );
+                })()}
+            </section>
+          </>
+        )}
+
+        {/* Venta finalizada: mismas secciones que saldo restante, solo lectura; solo botón Cerrar */}
+        {request.status === 'SALE_COMPLETED' && (
+          <>
+            {/* Liquidación de pesca - solo lectura */}
+            {request.catchSettlement && (
+              <section className="rounded-xl border-2 border-sky-400/60 bg-sky-50 shadow-sm overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => toggleSection('settlementReadOnly')}
+                  className="w-full flex items-center justify-between p-4 text-left text-gray-900 hover:bg-sky-100/50 transition-colors"
+                >
+                  <h3 className="text-lg font-semibold text-gray-900">Liquidación de pesca</h3>
+                  <span className="text-gray-700"><ChevronIcon expanded={expanded.settlementReadOnly} /></span>
+                </button>
+                {expanded.settlementReadOnly && (() => {
+                  const s = normalizeSettlement(request.catchSettlement as Parameters<typeof normalizeSettlement>[0]);
+                  const allLines = [...s.colaDirectaALines, ...s.colaDirectaBLines, ...s.ventaLocalLines];
+                  const totalValor = allLines.reduce((sum, l) => sum + l.pounds * l.unitPrice, 0);
+                  const remitidasLb = request.catchInfo.estimatedQuantityLb;
+                  const recibidasReferencial = Math.max(0, remitidasLb - s.basuraColaDirectaLb);
+                  const procesadasReales = allLines.reduce((sum, l) => sum + l.pounds, 0);
+                  const rendimientoPct = recibidasReferencial > 0 ? (procesadasReales / recibidasReferencial) * 100 : 0;
+                  const mermaPct = 100 - rendimientoPct;
+                  return (
+                    <div className="px-6 pb-6">
+                      <div className="bg-white border border-sky-200 rounded-lg p-4 space-y-6">
+                        <div>
+                          <h4 className="text-sm font-semibold text-gray-700 mb-3">Datos del ingreso</h4>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm text-gray-900">
+                            <FormRow labelClassName="font-medium text-gray-700" label="Fecha ing."><span>{s.entryDate}</span></FormRow>
+                            <FormRow labelClassName="font-medium text-gray-700" label="No. Lote"><span>{s.lotNumber || '—'}</span></FormRow>
+                            <FormRow labelClassName="font-medium text-gray-700" label="Guía rem."><span>{s.remissionGuide || '—'}</span></FormRow>
+                            <FormRow labelClassName="font-medium text-gray-700" label="Piscina"><span>{s.pond || '—'}</span></FormRow>
+                            <FormRow labelClassName="font-medium text-gray-700" label="Aguaje"><span>{s.aguaje || '—'}</span></FormRow>
+                          </div>
+                        </div>
+                        <div className="space-y-4">
+                          <h4 className="text-sm font-semibold text-gray-700">Detalle por clase y talla</h4>
+                          {[
+                            { key: 'colaDirectaALines' as const, title: CATCH_SETTLEMENT_CLASSES.COLA_DIRECTA_A },
+                            { key: 'colaDirectaBLines' as const, title: CATCH_SETTLEMENT_CLASSES.COLA_DIRECTA_B },
+                            { key: 'ventaLocalLines' as const, title: CATCH_SETTLEMENT_CLASSES.VENTA_LOCAL },
+                          ].map(({ key, title }) => (
+                            <div key={key}>
+                              <div className="text-sm font-semibold text-gray-700 mb-2">{title}</div>
+                              <div className="overflow-x-auto">
+                                <table className="w-full text-sm border border-gray-200 rounded-lg">
+                                  <thead>
+                                    <tr className="bg-gray-100 text-left">
+                                      <th className="px-2 py-2 font-medium text-gray-700">Talla / Descripción</th>
+                                      <th className="px-2 py-2 font-medium text-gray-700">Libras</th>
+                                      <th className="px-2 py-2 font-medium text-gray-700">P. unit.</th>
+                                      <th className="px-2 py-2 font-medium text-gray-700">Valor total</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {s[key].length === 0 ? (
+                                      <tr><td colSpan={4} className="px-2 py-3 text-center text-gray-500">Sin líneas</td></tr>
+                                    ) : (
+                                      s[key].map((line) => (
+                                        <tr key={line.id} className="border-t border-gray-100">
+                                          <td className="px-2 py-1.5 text-gray-900">{line.sizeOrDesc || '—'}</td>
+                                          <td className="px-2 py-1.5 text-gray-900">{line.pounds}</td>
+                                          <td className="px-2 py-1.5 text-gray-900">{line.unitPrice}</td>
+                                          <td className="px-2 py-1.5 font-medium text-gray-800">{(line.pounds * line.unitPrice).toFixed(2)}</td>
+                                        </tr>
+                                      ))
+                                    )}
+                                  </tbody>
+                                </table>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-sky-200 text-sm text-gray-900">
+                          <div><span className="font-medium text-gray-700">Remitidas referencial (lb): </span>{remitidasLb}</div>
+                          <div><span className="font-medium text-gray-700">Basura cola directa (lb): </span>{s.basuraColaDirectaLb}</div>
+                          <div><span className="font-medium text-gray-700">Recibidas referencial (lb): </span>{recibidasReferencial.toFixed(2)}</div>
+                          <div><span className="font-medium text-gray-700">Procesadas reales (lb): </span>{procesadasReales.toFixed(2)}</div>
+                          <div><span className="font-medium text-gray-700">Total valor: </span>$ {totalValor.toFixed(2)}</div>
+                          <div><span className="font-medium text-gray-700">Rendimiento: </span>{rendimientoPct.toFixed(2)}%</div>
+                          <div><span className="font-medium text-gray-700">Merma: </span>{mermaPct.toFixed(2)}%</div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </section>
+            )}
+
+            {/* Anticipo pagado - solo lectura */}
+            <section className="rounded-xl border-2 border-sky-400/60 bg-sky-50 shadow-sm overflow-hidden">
+              <button
+                type="button"
+                onClick={() => toggleSection('advanceReadOnly')}
+                className="w-full flex items-center justify-between p-4 text-left text-gray-900 hover:bg-sky-100/50 transition-colors"
+              >
+                <h3 className="text-lg font-semibold text-gray-900">Anticipo pagado</h3>
+                <span className="text-gray-700"><ChevronIcon expanded={expanded.advanceReadOnly} /></span>
+              </button>
+              {expanded.advanceReadOnly && (
+                <div className="px-6 pb-6">
+                  <div className="bg-white border border-sky-200 rounded-xl p-6 space-y-4 shadow-sm">
+                    <h4 className="text-base font-semibold text-sky-800 tracking-tight border-b border-sky-200 pb-2">Comprobante de anticipo</h4>
+                    <div className="border border-sky-200 rounded-lg overflow-hidden bg-gray-100 max-w-sm">
+                      <img src={DUMMY_ADVANCE_PROOF_IMAGE} alt="Comprobante de anticipo (ejemplo)" className="w-full h-auto max-h-48 object-contain" />
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                      <div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Fecha de envío</p><p className="text-gray-900">15 Feb 2024, 10:30</p></div>
+                      <div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Monto del anticipo</p><p className="text-gray-900 font-semibold">$ 588.00</p></div>
+                      <div className="md:col-span-2"><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Estado</p><p className="text-gray-900 font-medium text-green-700">Anticipo enviado y confirmado</p></div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </section>
+
+            {/* Saldo restante pagado - solo lectura */}
+            <section className="rounded-xl border-2 border-sky-400/60 bg-sky-50 shadow-sm overflow-hidden">
+              <button
+                type="button"
+                onClick={() => toggleSection('balanceReadOnly')}
+                className="w-full flex items-center justify-between p-4 text-left text-gray-900 hover:bg-sky-100/50 transition-colors"
+              >
+                <h3 className="text-lg font-semibold text-gray-900 tracking-tight">Saldo restante pagado</h3>
+                <span className="text-gray-700"><ChevronIcon expanded={expanded.balanceReadOnly} /></span>
+              </button>
+              {expanded.balanceReadOnly && (() => {
+                  const settlementForReadOnly = request.catchSettlement
+                    ? normalizeSettlement(request.catchSettlement as Parameters<typeof normalizeSettlement>[0])
+                    : null;
+                  const totalValorRO = settlementForReadOnly
+                    ? [...settlementForReadOnly.colaDirectaALines, ...settlementForReadOnly.colaDirectaBLines, ...settlementForReadOnly.ventaLocalLines].reduce(
+                        (sum, l) => sum + l.pounds * l.unitPrice,
+                        0
+                      )
+                    : 0;
+                  const balanceTermRO = linkedOffer?.paymentTerms.find((p) => p.termType === 'BALANCE');
+                  const balancePercentRO = balanceTermRO?.percent ?? 70;
+                  const balanceAmountRO = (balancePercentRO / 100) * totalValorRO;
+                  const firstAccount = request.producerBankAccounts?.[0];
+                  return (
+                <div className="px-6 pb-6">
+                  <div className="bg-white border border-sky-200 rounded-xl p-6 space-y-8 shadow-sm">
+                    <div className="space-y-4">
+                      <h4 className="text-base font-semibold text-sky-800 tracking-tight border-b border-sky-200 pb-2">Información del productor</h4>
+                      <div>
+                        <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Productor</p>
+                        <p className="text-base text-gray-900 font-medium leading-snug">{request.producerName}</p>
+                      </div>
+                      {firstAccount && (
+                        <div className="p-5 border border-sky-100 rounded-xl bg-sky-50/50 space-y-4">
+                          <h5 className="text-sm font-semibold text-sky-800 tracking-tight">Datos de la cuenta utilizada</h5>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 text-sm">
+                            <div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Banco</p><p className="text-gray-900 font-medium">{firstAccount.bankName}</p></div>
+                            <div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Número de cuenta</p><p className="text-gray-900 font-semibold tabular-nums">{firstAccount.accountNumber}</p></div>
+                            <div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Titular</p><p className="text-gray-900 font-medium">{firstAccount.accountHolderName}</p></div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    <div className="border border-sky-200 rounded-xl p-5 bg-sky-50/30">
+                      <h4 className="text-base font-semibold text-sky-800 tracking-tight border-b border-sky-200 pb-2 mb-4">Resumen del pago del saldo</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 text-sm">
+                        <div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Beneficiario</p><p className="text-gray-900 font-medium">{request.producerName}</p></div>
+                        <div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Valor total (liquidación)</p><p className="text-gray-900 font-medium tabular-nums">$ {totalValorRO.toFixed(2)}</p></div>
+                        <div><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Monto del saldo pagado</p><p className="text-lg font-bold text-sky-700 tabular-nums">$ {balanceAmountRO.toFixed(2)}</p></div>
+                        <div className="md:col-span-2"><p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Estado</p><p className="text-gray-900 font-medium text-green-700">Saldo enviado y confirmado</p></div>
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      <h4 className="text-base font-semibold text-sky-800 tracking-tight border-b border-sky-200 pb-2">Comprobante del pago del saldo</h4>
+                      <div className="border border-sky-200 rounded-lg overflow-hidden bg-gray-100 max-w-sm">
+                        <img src={DUMMY_BALANCE_PROOF_IMAGE} alt="Comprobante de saldo (ejemplo)" className="w-full h-auto max-h-48 object-contain" />
                       </div>
                     </div>
                   </div>
@@ -983,7 +1570,7 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
 
         {/* Sección de Chat */}
         {(() => {
-          const isMessagesActive = request.status === 'PENDING_ACCEPTANCE' || request.status === 'CATCH_SETTLEMENT_PENDING';
+          const isMessagesActive = request.status === 'PENDING_ACCEPTANCE' || request.status === 'CATCH_SETTLEMENT_PENDING' || request.status === 'ADVANCE_PENDING' || request.status === 'BALANCE_PENDING';
           return (
             <section className="rounded-xl border-2 border-sky-400/60 bg-sky-50 shadow-sm overflow-hidden">
               <button
@@ -1078,7 +1665,7 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
                               }
                             }}
                             placeholder="Escribe tu mensaje..."
-                            className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                            className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent resize-none"
                             rows={2}
                           />
                           <button
@@ -1087,7 +1674,7 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
                             disabled={
                               !messageText.trim() || messageText.length > MAX_MESSAGE_LENGTH
                             }
-                            className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed self-end"
+                            className="px-4 py-2 bg-sky-600 text-white rounded-md hover:bg-sky-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed self-end"
                           >
                             Enviar
                           </button>
@@ -1104,7 +1691,7 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
           );
         })()}
 
-        {/* Formulario de Rechazo */}
+        {/* Formulario de Rechazo (dropdown de motivo + notas opcionales) */}
         {showRejectForm && (
           <section className="rounded-xl border-2 border-sky-400/60 bg-sky-50 overflow-hidden shadow-sm">
             <button
@@ -1112,18 +1699,56 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
               onClick={() => toggleSection('rejectForm')}
               className="w-full flex items-center justify-between p-4 text-left text-gray-900 hover:bg-sky-100/50 transition-colors"
             >
-              <h3 className="text-lg font-semibold text-gray-900">Motivo del Rechazo (Opcional)</h3>
+              <h3 className="text-lg font-semibold text-gray-900">Motivo del rechazo</h3>
               <span className="text-gray-700"><ChevronIcon expanded={expanded.rejectForm} /></span>
             </button>
             {expanded.rejectForm && (
-              <div className="px-4 pb-4">
-            <textarea
-              value={rejectNotes}
-              onChange={(e) => setRejectNotes(e.target.value)}
-              placeholder="Ingrese el motivo del rechazo..."
-              className="w-full px-3 py-2 border border-red-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-              rows={3}
-            />
+              <div className="px-6 pb-6 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Seleccione el motivo del rechazo</label>
+                  <select
+                    value={selectedRejectionReason}
+                    onChange={(e) => setSelectedRejectionReason(e.target.value)}
+                    className="w-full px-3 py-2 border border-red-300 rounded-md text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  >
+                    {REJECTION_REASONS.map((opt) => (
+                      <option key={opt.value || 'empty'} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Comentarios adicionales (opcional)</label>
+                  <textarea
+                    value={rejectNotes}
+                    onChange={(e) => setRejectNotes(e.target.value)}
+                    placeholder="Ingrese comentarios adicionales..."
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    rows={3}
+                  />
+                </div>
+              </div>
+            )}
+          </section>
+        )}
+
+        {/* Motivo del rechazo (solo cuando la solicitud está rechazada) */}
+        {request.status === 'REJECTED' && rejectionReasonDisplay && (
+          <section className="rounded-xl border-2 border-red-200 bg-red-50/50 shadow-sm overflow-hidden">
+            <button
+              type="button"
+              onClick={() => toggleSection('rejectForm')}
+              className="w-full flex items-center justify-between p-4 text-left text-gray-900 hover:bg-red-100/50 transition-colors"
+            >
+              <h3 className="text-lg font-semibold text-gray-900">Motivo del rechazo</h3>
+              <span className="text-gray-700"><ChevronIcon expanded={expanded.rejectForm} /></span>
+            </button>
+            {expanded.rejectForm && (
+              <div className="px-6 pb-6">
+                <div className="bg-white border border-red-200 rounded-lg p-4">
+                  <p className="text-gray-900">{rejectionReasonDisplay}</p>
+                </div>
               </div>
             )}
           </section>
@@ -1168,7 +1793,8 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
               <button
                 type="button"
                 onClick={handleReject}
-                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 font-medium transition-colors"
+                disabled={!canConfirmReject}
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Confirmar rechazo de solicitud de compra
               </button>
@@ -1225,6 +1851,20 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
                       className="px-4 py-2 border border-red-300 text-red-700 rounded-md hover:bg-red-50 font-medium transition-colors"
                     >
                       Cancelar compra
+                    </button>
+                  )}
+                </>
+              )}
+              {request.status === 'BALANCE_PENDING' && (
+                <>
+                  {onSendBalanceProof && (
+                    <button
+                      type="button"
+                      onClick={handleSendBalanceProof}
+                      disabled={!balanceProofFile}
+                      className="px-4 py-2 bg-sky-600 text-white rounded-md hover:bg-sky-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-sky-600"
+                    >
+                      Enviar prueba de saldo
                     </button>
                   )}
                 </>

@@ -62,8 +62,11 @@ export const PackerSales: React.FC = () => {
     // En producción, aquí actualizarías el estado de la solicitud
   };
 
-  const handleReject = (requestId: string, notes?: string) => {
-    alert(`Solicitud ${requestId} rechazada${notes ? `: ${notes}` : ''} (simulado)`);
+  const [rejectionReasons, setRejectionReasons] = useState<Record<string, string>>({});
+
+  const handleReject = (requestId: string, reason?: string, notes?: string) => {
+    if (reason) setRejectionReasons((prev) => ({ ...prev, [requestId]: reason }));
+    alert(`Solicitud ${requestId} rechazada${reason ? `: ${reason}` : ''}${notes ? ` | ${notes}` : ''} (simulado)`);
     // En producción, aquí actualizarías el estado de la solicitud
   };
 
@@ -78,6 +81,11 @@ export const PackerSales: React.FC = () => {
 
   const handleSendAdvanceProof = (requestId: string) => {
     alert(`Prueba de anticipo enviada para solicitud ${requestId} (simulado)`);
+    // En producción, aquí subirías el archivo y actualizarías el estado
+  };
+
+  const handleSendBalanceProof = (requestId: string) => {
+    alert(`Prueba de saldo enviada para solicitud ${requestId} (simulado)`);
     // En producción, aquí subirías el archivo y actualizarías el estado
   };
 
@@ -228,9 +236,11 @@ export const PackerSales: React.FC = () => {
         request={selectedRequest}
         onAccept={handleAccept}
         onReject={handleReject}
+        rejectionReasons={rejectionReasons}
         onSendSettlement={handleSendSettlement}
         onCancelPurchase={handleCancelPurchase}
         onSendAdvanceProof={handleSendAdvanceProof}
+        onSendBalanceProof={handleSendBalanceProof}
       />
     </div>
   );

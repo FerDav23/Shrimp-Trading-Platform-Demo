@@ -87,6 +87,7 @@ export const dummySaleRequests: SaleRequest[] = [
     createdAt: '2024-02-12T09:00:00Z',
     respondedAt: '2024-02-13T11:00:00Z',
     packerNotes: 'No cumple con el rango de tallas requerido para esta oferta.',
+    rejectionReason: 'No cumple con el rango de tallas requerido para esta oferta.',
   },
   {
     id: 'request-5',
@@ -174,6 +175,25 @@ export const dummySaleRequests: SaleRequest[] = [
     respondedAt: '2024-02-08T12:00:00Z',
     packerNotes: 'Aceptada y convertida a venta.',
     saleId: 'sale-7',
+    producerBankAccounts: [
+      { bankName: 'Banco Pichincha', accountType: 'Cta. Ahorros', accountNumber: '2100123456', accountHolderName: 'Acuícola del Pacífico S.A.', identification: '0190123456001' },
+    ],
+    catchSettlement: {
+      entryDate: '2024-02-24',
+      lotNumber: 'L-2024-018',
+      remissionGuide: 'GR-007',
+      pond: '1',
+      aguaje: '2024-06',
+      colaDirectaALines: [
+        { id: 'sl-1', sizeOrDesc: '31-40', pounds: 620, unitPrice: 2.05 },
+      ],
+      colaDirectaBLines: [],
+      ventaLocalLines: [
+        { id: 'sl-2', sizeOrDesc: 'Quebrado', pounds: 95, unitPrice: 0.82 },
+      ],
+      remitidasReferencialLb: 800,
+      basuraColaDirectaLb: 22,
+    },
   },
   {
     id: 'request-8',
@@ -197,6 +217,27 @@ export const dummySaleRequests: SaleRequest[] = [
     respondedAt: '2024-02-15T09:00:00Z',
     packerNotes: 'Aceptada. Anticipo enviado, pendiente saldo.',
     saleId: 'sale-8',
+    producerBankAccounts: [
+      { bankName: 'Banco Bolivariano', accountType: 'Cta. Ahorros', accountNumber: '0841427955', accountHolderName: 'Luis Andres Asanza Castro', identification: '0926219924' },
+      { bankName: 'Banco Guayaquil', accountType: 'Ahorro', accountNumber: '0015076369', accountHolderName: 'Asanza Castro Luis Andres', identification: '0926219924', email: 'luisao232@gmail.com' },
+      { bankName: 'Banco del Pacífico', accountType: 'Cuenta de Ahorros', accountNumber: '1058247939', accountHolderName: 'Luis Andrés Asanza Castro', identification: '0926219924', email: 'luisao232@gmail.com' },
+    ],
+    catchSettlement: {
+      entryDate: '2024-03-05',
+      lotNumber: 'L-2024-031',
+      remissionGuide: 'GR-002',
+      pond: '2',
+      aguaje: '2024-10',
+      colaDirectaALines: [
+        { id: 'bl-1', sizeOrDesc: '21-25', pounds: 320, unitPrice: 2.25 },
+      ],
+      colaDirectaBLines: [],
+      ventaLocalLines: [
+        { id: 'bl-2', sizeOrDesc: 'Quebrado', pounds: 62, unitPrice: 0.88 },
+      ],
+      remitidasReferencialLb: 450,
+      basuraColaDirectaLb: 18,
+    },
   },
   {
     id: 'request-9',

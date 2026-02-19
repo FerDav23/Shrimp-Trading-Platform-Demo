@@ -228,6 +228,8 @@ export interface SaleRequest {
   respondedAt?: string;
   /** Comentarios del packer al responder */
   packerNotes?: string;
+  /** Motivo del rechazo (cuando estado es REJECTED), seleccionado del dropdown al rechazar */
+  rejectionReason?: string;
   /** ID de la venta creada si fue aceptada y convertida */
   saleId?: string;
   /** Liquidación de pesca registrada (cuando estado es CATCH_SETTLEMENT_PENDING) */
