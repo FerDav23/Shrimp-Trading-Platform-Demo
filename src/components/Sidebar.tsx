@@ -37,7 +37,6 @@ const getNavItems = (role: string): (NavItem | NavItemWithChildren)[] => {
             path: statusToPath(item.status),
           })),
         },
-        { label: 'Mensajes', path: '/packer/messages' },
       ];
     case 'LOGISTICS':
       return [

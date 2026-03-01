@@ -197,7 +197,7 @@ export const dummySaleRequests: SaleRequest[] = [
   },
   {
     id: 'request-8',
-    offerId: 'offer-4',
+    offerId: 'offer-1',
     producerId: 'user-producer-2',
     producerName: 'Camarones del Sur C.A.',
     packingCompanyId: 'packer-rosasud',
@@ -241,7 +241,7 @@ export const dummySaleRequests: SaleRequest[] = [
   },
   {
     id: 'request-9',
-    offerId: 'offer-5',
+    offerId: 'offer-3',
     producerId: 'user-producer-4',
     producerName: 'Piscicultura Costera',
     packingCompanyId: 'packer-rosasud',

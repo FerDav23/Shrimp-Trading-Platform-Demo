@@ -13,7 +13,6 @@ import { ProducerProfile } from './pages/producer/ProducerProfile';
 import { PackerDashboard } from './pages/packer/PackerDashboard';
 import { PackerOffers } from './pages/packer/PackerOffers';
 import { PackerSales } from './pages/packer/PackerSales';
-import { PackerChat } from './pages/packer/PackerChat';
 import { LogisticsDashboard } from './pages/logistics/LogisticsDashboard';
 import { LogisticsShipments } from './pages/logistics/LogisticsShipments';
 import { LogisticsPricing } from './pages/logistics/LogisticsPricing';
@@ -58,7 +57,6 @@ function App() {
                     <Route path="offers" element={<PackerOffers />} />
                     <Route path="sales" element={<PackerSales />} />
                     <Route path="sales/:statusFilter" element={<PackerSales />} />
-                    <Route path="messages" element={<PackerChat />} />
                     <Route path="*" element={<Navigate to="/packer/dashboard" replace />} />
                   </Routes>
                 </MainLayout>
