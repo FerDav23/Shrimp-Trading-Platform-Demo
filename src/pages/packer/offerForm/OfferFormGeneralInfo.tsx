@@ -32,26 +32,26 @@ export const OfferFormGeneralInfo: React.FC<OfferFormGeneralInfoProps> = ({
   updateData,
   inputProps,
 }) => (
-  <section className="mb-8 p-6 rounded-xl border-2 border-sky-400/60 bg-[#4aa3e0] shadow-sm">
-    <h3 className="text-lg font-semibold text-white mb-1 pb-3 border-b border-white/30">
+  <section className="mb-4 p-3 rounded-xl border-2 border-sky-400/60 bg-[#4aa3e0] shadow-sm">
+    <h3 className="text-lg font-semibold text-white mb-0.5 pb-2 border-b border-white/30">
       Información General
     </h3>
-    <div className="bg-white/70 border border-sky-300/60 rounded-lg p-4">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div className="bg-white/70 border border-sky-300/60 rounded-lg p-3">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
         <FormRow labelClassName={FORM_ROW_SUBTITLE_LABEL} label="Producto">
-          <p className="py-2 text-slate-800">{getOfferLabel(formType)}</p>
+          <p className="py-1 text-slate-800">{getOfferLabel(formType)}</p>
         </FormRow>
         <FormRow labelClassName={FORM_ROW_SUBTITLE_LABEL} label="Unidad de Precio">
-          <p className="py-2 text-slate-800">{getPriceUnitLabel(formType)}</p>
+          <p className="py-1 text-slate-800">{getPriceUnitLabel(formType)}</p>
         </FormRow>
         <FormRow labelClassName={FORM_ROW_SUBTITLE_LABEL} label="Ciudad de la planta">
-          <p className="py-2 text-slate-800">{data.plantCity || '-'}</p>
+          <p className="py-1 text-slate-800">{data.plantCity || '-'}</p>
         </FormRow>
         <FormRow labelClassName={FORM_ROW_SUBTITLE_LABEL} label="Dirección de la planta">
-          <p className="py-2 text-slate-800">{data.plantAddress || '-'}</p>
+          <p className="py-1 text-slate-800">{data.plantAddress || '-'}</p>
         </FormRow>
         <FormRow labelClassName={FORM_ROW_SUBTITLE_LABEL} label="Tolerancia Logística (%)">
-          <p className="py-2 text-slate-800">{data.logisticsTolerancePct}%</p>
+          <p className="py-1 text-slate-800">{data.logisticsTolerancePct}%</p>
         </FormRow>
         <div />
         <FormRow
@@ -59,7 +59,7 @@ export const OfferFormGeneralInfo: React.FC<OfferFormGeneralInfoProps> = ({
           label="Porcentaje de Garantía clase A"
           required
         >
-          <div className="space-y-1">
+          <div className="space-y-0.5">
             <p className="text-xs text-slate-500">
               Porcentaje mínimo de rendimiento entero clase A que garantiza la oferta (entre{' '}
               {GUARANTIA_CLASE_A_MIN}% y {GUARANTIA_CLASE_A_MAX}%). Obligatorio.
@@ -102,11 +102,11 @@ export const OfferFormGeneralInfo: React.FC<OfferFormGeneralInfoProps> = ({
           </div>
         </FormRow>
         <FormRow labelClassName={FORM_ROW_SUBTITLE_LABEL} label="Vigencia de la oferta" required>
-          <div className="space-y-3">
+          <div className="space-y-1.5">
             <p className="text-xs text-slate-500">
               Seleccione fecha de inicio y fin. El período no puede superar {VIGENCIA_MAX_DIAS} días.
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">Desde</label>
                 <input

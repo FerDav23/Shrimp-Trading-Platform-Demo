@@ -34,18 +34,18 @@ export const PublishPreviewModal: React.FC<PublishPreviewModalProps> = ({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Vista previa antes de publicar" size="xl">
-      <div className="space-y-6">
-        <p className="text-sm text-gray-600 bg-sky-50 border border-sky-200 rounded-lg p-4">
+      <div className="space-y-3">
+        <p className="text-sm text-gray-600 bg-sky-50 border border-sky-200 rounded-lg p-3">
           Esto es una vista previa de cómo el productor verá la oferta. Desplázate hacia abajo para
           revisar el contenido, acepta el checklist y pulsa Publicar para que la oferta pase a
           estado publicado.
         </p>
 
-        <div className="max-h-[50vh] overflow-y-auto border border-gray-200 rounded-lg p-4 bg-gray-50">
+        <div className="max-h-[50vh] overflow-y-auto border border-gray-200 rounded-lg p-3 bg-gray-50">
           <OfferPreviewContent offer={previewOffer} />
         </div>
 
-        <div className="border-t border-gray-200 pt-4 space-y-4">
+        <div className="border-t border-gray-200 pt-3 space-y-2">
           <p className="text-sm text-gray-700">
             Al publicar, usted confirma que la información de la oferta es correcta y que cumple con
             las condiciones de uso de la plataforma. (Aquí irán las condiciones de publicación de
@@ -63,7 +63,7 @@ export const PublishPreviewModal: React.FC<PublishPreviewModalProps> = ({
             </span>
           </label>
 
-          <div className="flex justify-end gap-3 pt-2">
+          <div className="flex justify-end gap-2 pt-1">
             <button
               type="button"
               onClick={onClose}

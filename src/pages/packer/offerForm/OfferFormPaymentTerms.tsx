@@ -36,18 +36,18 @@ export const OfferFormPaymentTerms: React.FC<OfferFormPaymentTermsProps> = ({
   setIncompleteNumBlur,
   inputProps,
 }) => (
-  <section className="mb-8 p-6 rounded-xl border-2 border-sky-400/60 bg-[#4aa3e0] shadow-sm">
-    <h3 className="text-lg font-semibold text-white mb-4 pb-3 border-b border-white/30">
+  <section className="mb-4 p-3 rounded-xl border-2 border-sky-400/60 bg-[#4aa3e0] shadow-sm">
+    <h3 className="text-lg font-semibold text-white mb-2 pb-2 border-b border-white/30">
       Términos de Pago
     </h3>
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="space-y-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
         {data.paymentTerms.map((term, idx) => {
           if (term.termType === 'ADVANCE') {
             return (
-              <div key="advance" className="border border-sky-300/60 rounded-lg p-4 bg-white/70">
-                <h4 className="font-semibold text-slate-800 mb-3">Anticipo (requerido)</h4>
-                <div className="space-y-4">
+              <div key="advance" className="border border-sky-300/60 rounded-lg p-3 bg-white/70">
+                <h4 className="font-semibold text-slate-800 mb-2">Anticipo (requerido)</h4>
+                <div className="space-y-2">
                   <FormRow labelClassName={FORM_ROW_SUBTITLE_LABEL} label="Porcentaje (%)" required>
                     <input
                       type="number"
@@ -104,12 +104,12 @@ export const OfferFormPaymentTerms: React.FC<OfferFormPaymentTermsProps> = ({
             const advancePercent = data.paymentTerms.find((p) => p.termType === 'ADVANCE')?.percent ?? 0;
             const balancePercent = 100 - advancePercent;
             return (
-              <div key="balance" className="border border-sky-300/60 rounded-lg p-4 bg-white/70">
-                <h4 className="font-semibold text-slate-800 mb-3">Saldo restante (requerido)</h4>
-                <p className="text-sm text-slate-600 mb-3">
+              <div key="balance" className="border border-sky-300/60 rounded-lg p-3 bg-white/70">
+                <h4 className="font-semibold text-slate-800 mb-2">Saldo restante (requerido)</h4>
+                <p className="text-sm text-slate-600 mb-2">
                   Porcentaje: {balancePercent}% (lo faltante después del anticipo)
                 </p>
-                <div className="space-y-4">
+                <div className="space-y-2">
                   <FormRow labelClassName={FORM_ROW_SUBTITLE_LABEL} label="Vence en (horas)">
                     <input
                       type="number"
@@ -150,8 +150,8 @@ export const OfferFormPaymentTerms: React.FC<OfferFormPaymentTermsProps> = ({
       {data.paymentTerms.map((term, idx) => {
         if (term.termType === 'ADVANCE' || term.termType === 'BALANCE') return null;
         return (
-          <div key={idx} className="border border-sky-300/60 rounded-lg p-4 bg-white/70">
-            <div className="flex justify-between items-center mb-2">
+          <div key={idx} className="border border-sky-300/60 rounded-lg p-3 bg-white/70">
+            <div className="flex justify-between items-center mb-1">
               <h4 className="font-semibold text-slate-800">Término opcional</h4>
               {!isLocked && (
                 <button
@@ -181,7 +181,7 @@ export const OfferFormPaymentTerms: React.FC<OfferFormPaymentTermsProps> = ({
       })}
     </div>
     {!isLocked && (
-      <div className="mt-4 pt-4 border-t border-sky-400/40">
+      <div className="mt-2 pt-2 border-t border-sky-400/40">
         <button
           type="button"
           onClick={addPaymentTerm}

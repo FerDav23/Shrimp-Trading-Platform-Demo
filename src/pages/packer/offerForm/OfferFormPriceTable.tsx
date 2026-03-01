@@ -29,13 +29,13 @@ export const OfferFormPriceTable: React.FC<OfferFormPriceTableProps> = ({
 }) => (
   <section
     ref={sectionRef as React.RefObject<HTMLElement> | undefined}
-    className="p-6 rounded-xl border-2 border-sky-400/60 bg-[#4aa3e0] shadow-sm self-start"
+    className="p-3 rounded-xl border-2 border-sky-400/60 bg-[#4aa3e0] shadow-sm self-start"
   >
-    <h3 className="text-lg font-semibold text-white mb-4 pb-3 border-b border-white/30">
+    <h3 className="text-lg font-semibold text-white mb-2 pb-2 border-b border-white/30">
       Tabla de Precios
     </h3>
-    <div className="bg-white/70 border border-sky-300/60 rounded-lg p-4">
-      <p className="text-sm text-slate-600 mb-4">
+    <div className="bg-white/70 border border-sky-300/60 rounded-lg p-3">
+      <p className="text-sm text-slate-600 mb-2">
         Las tallas son fijas por tipo de producto. Indique el precio (USD) para cada talla que desee
         ofrecer; debe haber al menos una con precio. Las tallas sin precio no se mostrarán al
         productor en la oferta.
@@ -44,10 +44,10 @@ export const OfferFormPriceTable: React.FC<OfferFormPriceTableProps> = ({
         <table className="min-w-full divide-y divide-sky-300/50">
           <thead className="bg-sky-500/25">
             <tr>
-              <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-800 uppercase tracking-wide">
+              <th className="px-2 py-1.5 text-left text-xs font-semibold text-slate-800 uppercase tracking-wide">
                 Talla
               </th>
-              <th className="px-4 py-2.5 text-left text-xs font-semibold text-slate-800 uppercase tracking-wide">
+              <th className="px-2 py-1.5 text-left text-xs font-semibold text-slate-800 uppercase tracking-wide">
                 Precio (USD/{data.priceUnit === 'PER_KG' ? 'kg' : 'lb'})
               </th>
             </tr>
@@ -55,12 +55,12 @@ export const OfferFormPriceTable: React.FC<OfferFormPriceTableProps> = ({
           <tbody className="bg-white divide-y divide-sky-200/50">
             {data.priceTiers.map((tier, idx) => (
               <tr key={idx} className="hover:bg-white/80">
-                <td className="px-4 py-2">
+                <td className="px-2 py-1">
                   <span className="py-1 text-slate-800 font-medium">
                     {formatTalla(tier.sizeMin, tier.sizeMax)}
                   </span>
                 </td>
-                <td className="px-4 py-2">
+                <td className="px-2 py-1">
                   <input
                     type="number"
                     min="0"

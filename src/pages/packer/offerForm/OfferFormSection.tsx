@@ -253,16 +253,16 @@ export const OfferFormSection: React.FC<OfferFormSectionProps> = ({
     ? {
         readOnly: true,
         className:
-          'w-full border border-sky-300 rounded-md px-3 py-2 bg-white/80 cursor-not-allowed text-slate-800',
+          'w-full border border-sky-300 rounded-md px-2 py-1.5 bg-white/80 cursor-not-allowed text-slate-800',
       }
     : {
         className:
-          'w-full border border-sky-300 rounded-md px-3 py-2 bg-white focus:ring-2 focus:ring-sky-400 focus:border-sky-400 text-slate-800',
+          'w-full border border-sky-300 rounded-md px-2 py-1.5 bg-white focus:ring-2 focus:ring-sky-400 focus:border-sky-400 text-slate-800',
       };
 
   return (
-    <Card className="mt-2.5 mb-6">
-      <div className="flex justify-between items-center mb-6">
+    <Card className="mt-1 mb-3">
+      <div className="flex justify-between items-center mb-3">
         <h2 className="text-xl font-bold text-gray-900">
           Oferta - {getOfferLabel(formType)}
         </h2>
@@ -288,7 +288,7 @@ export const OfferFormSection: React.FC<OfferFormSectionProps> = ({
           description="Complete las siguientes secciones para activar el switch de oferta publicada:"
           items={getIncompleteSections(data)}
           onDismiss={() => setShowPublishAlert(false)}
-          className="mb-6"
+          className="mb-3"
         />
       )}
 
@@ -314,7 +314,7 @@ export const OfferFormSection: React.FC<OfferFormSectionProps> = ({
         inputProps={inputProps}
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 items-stretch">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4 items-stretch">
         <OfferFormPriceTable
           data={data}
           isLocked={isLocked}
@@ -365,7 +365,7 @@ export const OfferFormSection: React.FC<OfferFormSectionProps> = ({
         removeAdditionalCondition={removeAdditionalCondition}
       />
 
-      <div className="mt-6 pt-6 border-t border-sky-400/40">
+      <div className="mt-4 pt-4 border-t border-sky-400/40">
         {showPublishAlert && (
           <Alert
             variant="warning"
@@ -373,13 +373,13 @@ export const OfferFormSection: React.FC<OfferFormSectionProps> = ({
             description="Complete las siguientes secciones para poder publicar la oferta:"
             items={getIncompleteSections(data)}
             onDismiss={() => setShowPublishAlert(false)}
-            className="mb-4"
+            className="mb-2"
           />
         )}
         <button
           type="button"
           onClick={() => handleVisibilityChange(true)}
-          className="bg-sky-600 text-white px-6 py-2.5 rounded-lg hover:bg-sky-700 font-medium disabled:opacity-50 shadow-sm transition-colors"
+          className="bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 font-medium disabled:opacity-50 shadow-sm transition-colors"
           disabled={isLocked}
         >
           Publicar oferta
