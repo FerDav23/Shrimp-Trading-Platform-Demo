@@ -38,7 +38,7 @@ export const OfferFormPaymentTerms: React.FC<OfferFormPaymentTermsProps> = ({
 }) => (
   <section className="mb-4 p-3 rounded-xl border-2 border-sky-400/60 bg-[#4aa3e0] shadow-sm">
     <h3 className="text-lg font-semibold text-white mb-2 pb-2 border-b border-white/30">
-      Términos de Pago
+      Condiciones de Pago
     </h3>
     <div className="space-y-2">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
