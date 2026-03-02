@@ -1,6 +1,7 @@
 import React from 'react';
 import type { OfferFormData } from './types';
 import { ADDITIONAL_CONDITION_MAX_LENGTH } from './constants';
+import { InputWithInfo } from '../../../components/InputWithInfo';
 import { offerSection, button, form } from '../../../styles';
 
 interface OfferFormAdditionalConditionsProps {
@@ -61,15 +62,17 @@ export const OfferFormAdditionalConditions: React.FC<OfferFormAdditionalConditio
                     <span className={offerSection.textBold}>{idx + 1}</span>
                   </td>
                   <td className={offerSection.tableCell}>
-                    <input
-                      type="text"
-                      value={item}
-                      onChange={(e) => updateAdditionalCondition(idx, e.target.value)}
-                      placeholder="Escriba la condición (máx. 100 caracteres)"
-                      maxLength={ADDITIONAL_CONDITION_MAX_LENGTH}
-                      readOnly={isLocked}
-                      className={'w-full ' + form.inputSmall}
-                    />
+                    <InputWithInfo className="block w-full">
+                      <input
+                        type="text"
+                        value={item}
+                        onChange={(e) => updateAdditionalCondition(idx, e.target.value)}
+                        placeholder="Escriba la condición (máx. 100 caracteres)"
+                        maxLength={ADDITIONAL_CONDITION_MAX_LENGTH}
+                        readOnly={isLocked}
+                        className={'w-full ' + form.inputSmall}
+                      />
+                    </InputWithInfo>
                     <span className={offerSection.textMuted + ' mt-0.5 block'}>
                       {item.length}/{ADDITIONAL_CONDITION_MAX_LENGTH}
                     </span>

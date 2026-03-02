@@ -1,5 +1,6 @@
 import React from 'react';
 import { FormRow } from '../../../components/FormRow';
+import { InputWithInfo } from '../../../components/InputWithInfo';
 import type { OfferFormData, OfferFormType } from './types';
 import { offerSection, form } from '../../../styles';
 import {
@@ -66,22 +67,24 @@ export const OfferFormGeneralInfo: React.FC<OfferFormGeneralInfoProps> = ({
               {GUARANTIA_CLASE_A_MIN}% y {GUARANTIA_CLASE_A_MAX}%). Obligatorio.
             </p>
             <div className="flex items-center gap-2">
-              <input
-                type="number"
-                min={GUARANTIA_CLASE_A_MIN}
-                max={GUARANTIA_CLASE_A_MAX}
-                step="0.01"
-                value={data.guaranteeClassAPct}
-                onKeyDown={blockNegativeAndExponentKeys}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  if (v === '') updateData({ guaranteeClassAPct: '' });
-                  else updateData({ guaranteeClassAPct: sanitizePositiveDecimalInput(v) });
-                }}
-                readOnly={isLocked}
-                className={form.inputW24}
-                placeholder={`${GUARANTIA_CLASE_A_MIN}-${GUARANTIA_CLASE_A_MAX}`}
-              />
+              <InputWithInfo className="inline-block">
+                <input
+                  type="number"
+                  min={GUARANTIA_CLASE_A_MIN}
+                  max={GUARANTIA_CLASE_A_MAX}
+                  step="0.01"
+                  value={data.guaranteeClassAPct}
+                  onKeyDown={blockNegativeAndExponentKeys}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    if (v === '') updateData({ guaranteeClassAPct: '' });
+                    else updateData({ guaranteeClassAPct: sanitizePositiveDecimalInput(v) });
+                  }}
+                  readOnly={isLocked}
+                  className={form.inputW24}
+                  placeholder={`${GUARANTIA_CLASE_A_MIN}-${GUARANTIA_CLASE_A_MAX}`}
+                />
+              </InputWithInfo>
               <span className={offerSection.textMedium}>%</span>
             </div>
             {data.guaranteeClassAPct !== '' &&
@@ -110,21 +113,25 @@ export const OfferFormGeneralInfo: React.FC<OfferFormGeneralInfoProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <div>
                 <label className={offerSection.labelSmall}>Desde</label>
-                <input
-                  type="date"
-                  value={getTodayISO()}
-                  readOnly
-                  className={offerSection.inputReadonly}
-                />
+                <InputWithInfo className="block">
+                  <input
+                    type="date"
+                    value={getTodayISO()}
+                    readOnly
+                    className={offerSection.inputReadonly}
+                  />
+                </InputWithInfo>
               </div>
               <div>
                 <label className={offerSection.labelSmall}>Hasta</label>
-                <input
-                  type="date"
-                  value={data.validTo}
-                  onChange={(e) => updateData({ validTo: e.target.value })}
-                  {...inputProps}
-                />
+                <InputWithInfo className="block">
+                  <input
+                    type="date"
+                    value={data.validTo}
+                    onChange={(e) => updateData({ validTo: e.target.value })}
+                    {...inputProps}
+                  />
+                </InputWithInfo>
               </div>
             </div>
             {data.validTo && !isVigenciaValid(data) &&

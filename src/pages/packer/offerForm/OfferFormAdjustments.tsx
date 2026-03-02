@@ -3,6 +3,7 @@ import type { OfferFormData, OfferFormType, PriceTier, Adjustment } from './type
 import { VENTA_LOCAL_ROWS } from './constants';
 import { formatTalla } from './utils';
 import { blockNegativeAndExponentKeys } from './utils';
+import { InputWithInfo } from '../../../components/InputWithInfo';
 import { offerSection } from '../../../styles';
 
 type VentaLocalKey = keyof OfferFormData['ventaLocalPrices'];
@@ -86,46 +87,50 @@ export const OfferFormAdjustments: React.FC<OfferFormAdjustmentsProps> = ({
                   <div className={`${offerSection.textBold} w-20`}>Clase {adj.appliesToClass}</div>
                   <div className="flex items-center gap-2">
                     <span className={offerSection.textLabel}>Tipo de descuento:</span>
-                    <select
-                      value={adj.unit}
-                      onChange={(e) => {
-                        const newUnit = e.target.value as 'USD' | 'PERCENT';
-                        const newAmount =
-                          newUnit === 'PERCENT' && (adj.amount ?? 0) > 100 ? 100 : adj.amount;
-                        const newAdj = [...data.adjustments];
-                        newAdj[idx] = { ...newAdj[idx], unit: newUnit, amount: newAmount ?? 0 };
-                        onChange({ ...data, adjustments: newAdj });
-                      }}
-                      disabled={isLocked}
-                      className={offerSection.select}
-                    >
-                      <option value="USD">
-                        Dólar por {data.priceUnit === 'PER_KG' ? 'kg' : 'libra'}
-                      </option>
-                      <option value="PERCENT">
-                        Porcentaje por {data.priceUnit === 'PER_KG' ? 'kg' : 'libra'}
-                      </option>
-                    </select>
+                    <InputWithInfo className="inline-block">
+                      <select
+                        value={adj.unit}
+                        onChange={(e) => {
+                          const newUnit = e.target.value as 'USD' | 'PERCENT';
+                          const newAmount =
+                            newUnit === 'PERCENT' && (adj.amount ?? 0) > 100 ? 100 : adj.amount;
+                          const newAdj = [...data.adjustments];
+                          newAdj[idx] = { ...newAdj[idx], unit: newUnit, amount: newAmount ?? 0 };
+                          onChange({ ...data, adjustments: newAdj });
+                        }}
+                        disabled={isLocked}
+                        className={offerSection.select}
+                      >
+                        <option value="USD">
+                          Dólar por {data.priceUnit === 'PER_KG' ? 'kg' : 'libra'}
+                        </option>
+                        <option value="PERCENT">
+                          Porcentaje por {data.priceUnit === 'PER_KG' ? 'kg' : 'libra'}
+                        </option>
+                      </select>
+                    </InputWithInfo>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className={offerSection.textLabel}>Monto:</span>
-                    <input
-                      type="number"
-                      min="0"
-                      max={adj.unit === 'PERCENT' ? 100 : undefined}
-                      step="0.01"
-                      value={numDisplay(`adj-enter-${idx}`, adj.amount)}
-                      onKeyDown={blockNegativeAndExponentKeys}
-                      onChange={(e) =>
-                        setNumInput(`adj-enter-${idx}`, e.target.value, (n) =>
-                          updateAdjustment(idx, 'amount', n ?? 0),
-                          adj.unit === 'PERCENT' ? { max: 100 } : undefined
-                        )
-                      }
-                      onBlur={() => setIncompleteNumBlur(`adj-enter-${idx}`)}
-                      readOnly={isLocked}
-                      className={offerSection.inputWide}
-                    />
+                    <InputWithInfo className="inline-block">
+                      <input
+                        type="number"
+                        min="0"
+                        max={adj.unit === 'PERCENT' ? 100 : undefined}
+                        step="0.01"
+                        value={numDisplay(`adj-enter-${idx}`, adj.amount)}
+                        onKeyDown={blockNegativeAndExponentKeys}
+                        onChange={(e) =>
+                          setNumInput(`adj-enter-${idx}`, e.target.value, (n) =>
+                            updateAdjustment(idx, 'amount', n ?? 0),
+                            adj.unit === 'PERCENT' ? { max: 100 } : undefined
+                          )
+                        }
+                        onBlur={() => setIncompleteNumBlur(`adj-enter-${idx}`)}
+                        readOnly={isLocked}
+                        className={offerSection.inputWide}
+                      />
+                    </InputWithInfo>
                     <span className={offerSection.textUnit}>
                       {adj.unit === 'USD' ? 'USD' : '%'}
                     </span>
@@ -165,6 +170,7 @@ export const OfferFormAdjustments: React.FC<OfferFormAdjustmentsProps> = ({
                           </span>
                         </td>
                         <td className={offerSection.tableCell}>
+                          <InputWithInfo className="inline-block">
                           <input
                             type="number"
                             min="0"
@@ -180,6 +186,7 @@ export const OfferFormAdjustments: React.FC<OfferFormAdjustmentsProps> = ({
                             readOnly={isLocked}
                             className={offerSection.input}
                           />
+                          </InputWithInfo>
                         </td>
                       </tr>
                     ))}
@@ -205,6 +212,7 @@ export const OfferFormAdjustments: React.FC<OfferFormAdjustmentsProps> = ({
                           <span className={`${offerSection.tableCellText} font-medium`}>{label}</span>
                         </td>
                         <td className={offerSection.tableCell}>
+                          <InputWithInfo className="inline-block">
                           <input
                             type="number"
                             min="0"
@@ -220,6 +228,7 @@ export const OfferFormAdjustments: React.FC<OfferFormAdjustmentsProps> = ({
                             readOnly={isLocked}
                             className={offerSection.input}
                           />
+                          </InputWithInfo>
                         </td>
                       </tr>
                     ))}
@@ -244,46 +253,50 @@ export const OfferFormAdjustments: React.FC<OfferFormAdjustmentsProps> = ({
                 <div className={`${offerSection.textBold} w-20`}>Clase {adj.appliesToClass}</div>
                 <div className="flex items-center gap-2">
                   <span className={offerSection.textLabel}>Tipo de descuento:</span>
-                  <select
-                    value={adj.unit}
-                    onChange={(e) => {
-                      const newUnit = e.target.value as 'USD' | 'PERCENT';
-                      const newAmount =
-                        newUnit === 'PERCENT' && (adj.amount ?? 0) > 100 ? 100 : adj.amount;
-                      const newAdj = [...data.adjustments];
-                      newAdj[idx] = { ...newAdj[idx], unit: newUnit, amount: newAmount ?? 0 };
-                      onChange({ ...data, adjustments: newAdj });
-                    }}
-                    disabled={isLocked}
-                    className={offerSection.select}
-                  >
-                    <option value="USD">
-                      Dólar por {data.priceUnit === 'PER_KG' ? 'kg' : 'libra'}
-                    </option>
-                    <option value="PERCENT">
-                      Porcentaje por {data.priceUnit === 'PER_KG' ? 'kg' : 'libra'}
-                    </option>
-                  </select>
+                  <InputWithInfo className="inline-block">
+                    <select
+                      value={adj.unit}
+                      onChange={(e) => {
+                        const newUnit = e.target.value as 'USD' | 'PERCENT';
+                        const newAmount =
+                          newUnit === 'PERCENT' && (adj.amount ?? 0) > 100 ? 100 : adj.amount;
+                        const newAdj = [...data.adjustments];
+                        newAdj[idx] = { ...newAdj[idx], unit: newUnit, amount: newAmount ?? 0 };
+                        onChange({ ...data, adjustments: newAdj });
+                      }}
+                      disabled={isLocked}
+                      className={offerSection.select}
+                    >
+                      <option value="USD">
+                        Dólar por {data.priceUnit === 'PER_KG' ? 'kg' : 'libra'}
+                      </option>
+                      <option value="PERCENT">
+                        Porcentaje por {data.priceUnit === 'PER_KG' ? 'kg' : 'libra'}
+                      </option>
+                    </select>
+                  </InputWithInfo>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className={offerSection.textLabel}>Monto:</span>
-                  <input
-                    type="number"
-                    min="0"
-                    max={adj.unit === 'PERCENT' ? 100 : undefined}
-                    step="0.01"
-                    value={numDisplay(`adj-cola-${idx}`, adj.amount)}
-                    onKeyDown={blockNegativeAndExponentKeys}
-                    onChange={(e) =>
-                      setNumInput(`adj-cola-${idx}`, e.target.value, (n) =>
-                        updateAdjustment(idx, 'amount', n ?? 0),
-                        adj.unit === 'PERCENT' ? { max: 100 } : undefined
-                      )
-                    }
-                    onBlur={() => setIncompleteNumBlur(`adj-cola-${idx}`)}
-                    readOnly={isLocked}
-                    className={offerSection.inputWide}
-                  />
+                  <InputWithInfo className="inline-block">
+                    <input
+                      type="number"
+                      min="0"
+                      max={adj.unit === 'PERCENT' ? 100 : undefined}
+                      step="0.01"
+                      value={numDisplay(`adj-cola-${idx}`, adj.amount)}
+                      onKeyDown={blockNegativeAndExponentKeys}
+                      onChange={(e) =>
+                        setNumInput(`adj-cola-${idx}`, e.target.value, (n) =>
+                          updateAdjustment(idx, 'amount', n ?? 0),
+                          adj.unit === 'PERCENT' ? { max: 100 } : undefined
+                        )
+                      }
+                      onBlur={() => setIncompleteNumBlur(`adj-cola-${idx}`)}
+                      readOnly={isLocked}
+                      className={offerSection.inputWide}
+                    />
+                  </InputWithInfo>
                   <span className={offerSection.textUnit}>
                     {adj.unit === 'USD' ? 'USD' : '%'}
                   </span>

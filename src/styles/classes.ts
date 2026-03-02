@@ -221,6 +221,14 @@ export const toggle = {
   knob: 'absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow-sm border border-gray-200 transition-all peer-checked:left-6',
 } as const;
 
+/** Cuadro de información al mantener cursor sobre input (3+ segundos) */
+export const inputInfoTooltip = {
+  wrapper: 'relative',
+  /** Usa position:fixed vía inline style cuando se renderiza en portal */
+  box: 'z-[9999] min-w-[200px] max-w-[280px] px-3 py-2.5 rounded-lg shadow-lg border-2 border-sky-400/60 bg-white/95 backdrop-blur-sm text-sm text-slate-700',
+  arrow: 'absolute -top-2 left-4 w-3 h-3 rotate-45 border-l border-t border-sky-400/60 bg-white/95',
+} as const;
+
 /** Sidebar navegación */
 export const sidebar = {
   navItem: 'block px-6 py-3 text-sm font-medium transition-colors',

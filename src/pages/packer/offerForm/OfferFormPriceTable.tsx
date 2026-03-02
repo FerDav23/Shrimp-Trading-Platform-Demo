@@ -2,6 +2,7 @@ import React from 'react';
 import type { OfferFormData, PriceTier } from './types';
 import { formatTalla } from './utils';
 import { blockNegativeAndExponentKeys } from './utils';
+import { InputWithInfo } from '../../../components/InputWithInfo';
 import { offerSection } from '../../../styles';
 
 interface OfferFormPriceTableProps {
@@ -62,21 +63,23 @@ export const OfferFormPriceTable: React.FC<OfferFormPriceTableProps> = ({
                   </span>
                 </td>
                 <td className={offerSection.tableCell}>
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={numDisplay(`priceTier-${idx}`, tier.price)}
-                    onKeyDown={blockNegativeAndExponentKeys}
-                    onChange={(e) =>
-                      setNumInput(`priceTier-${idx}`, e.target.value, (n) =>
-                        updatePriceTier(idx, 'price', n ?? 0)
-                      )
-                    }
-                    onBlur={() => setIncompleteNumBlur(`priceTier-${idx}`)}
-                    readOnly={isLocked}
-                    className={offerSection.input}
-                  />
+                  <InputWithInfo className="inline-block">
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={numDisplay(`priceTier-${idx}`, tier.price)}
+                      onKeyDown={blockNegativeAndExponentKeys}
+                      onChange={(e) =>
+                        setNumInput(`priceTier-${idx}`, e.target.value, (n) =>
+                          updatePriceTier(idx, 'price', n ?? 0)
+                        )
+                      }
+                      onBlur={() => setIncompleteNumBlur(`priceTier-${idx}`)}
+                      readOnly={isLocked}
+                      className={offerSection.input}
+                    />
+                  </InputWithInfo>
                 </td>
               </tr>
             ))}

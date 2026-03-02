@@ -1,5 +1,6 @@
 import React from 'react';
 import { FormRow } from '../../../components/FormRow';
+import { InputWithInfo } from '../../../components/InputWithInfo';
 import type { OfferFormData, PaymentTerm } from './types';
 import { FORM_ROW_SUBTITLE_LABEL, STRING_INPUT_MAX_LENGTH, TRIGGER_MAX_LENGTH } from './constants';
 import { blockNegativeAndExponentKeys } from './utils';
@@ -50,52 +51,58 @@ export const OfferFormPaymentTerms: React.FC<OfferFormPaymentTermsProps> = ({
                 <h4 className={offerSection.textBold + ' mb-2'}>Anticipo (requerido)</h4>
                 <div className="space-y-2">
                   <FormRow labelClassName={FORM_ROW_SUBTITLE_LABEL} label="Porcentaje (%)" required>
-                    <input
-                      type="number"
-                      min="0"
-                      max="100"
-                      step="0.01"
-                      value={numDisplay('percent-adv', term.percent)}
-                      onKeyDown={blockNegativeAndExponentKeys}
-                      onChange={(e) =>
-                        setNumInput('percent-adv', e.target.value, (n) =>
-                          updatePaymentTerm(idx, 'percent', n ?? 0),
-                          { max: 100 }
-                        )
-                      }
-                      onBlur={() => setIncompleteNumBlur('percent-adv')}
-                      {...inputProps}
-                    />
+                    <InputWithInfo className="block w-full">
+                      <input
+                        type="number"
+                        min="0"
+                        max="100"
+                        step="0.01"
+                        value={numDisplay('percent-adv', term.percent)}
+                        onKeyDown={blockNegativeAndExponentKeys}
+                        onChange={(e) =>
+                          setNumInput('percent-adv', e.target.value, (n) =>
+                            updatePaymentTerm(idx, 'percent', n ?? 0),
+                            { max: 100 }
+                          )
+                        }
+                        onBlur={() => setIncompleteNumBlur('percent-adv')}
+                        {...inputProps}
+                      />
+                    </InputWithInfo>
                   </FormRow>
                   <FormRow labelClassName={FORM_ROW_SUBTITLE_LABEL} label="Vence en (horas)">
-                    <input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={numDisplay('dueInHours-adv', term.dueInHours)}
-                      onKeyDown={blockNegativeAndExponentKeys}
-                      onChange={(e) =>
-                        setNumInput('dueInHours-adv', e.target.value, (n) =>
-                          updatePaymentTerm(idx, 'dueInHours', n),
-                          { emptyValue: undefined }
-                        )
-                      }
-                      onBlur={() => setIncompleteNumBlur('dueInHours-adv')}
-                      placeholder="Ej: 24"
-                      {...inputProps}
-                    />
+                    <InputWithInfo className="block w-full">
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={numDisplay('dueInHours-adv', term.dueInHours)}
+                        onKeyDown={blockNegativeAndExponentKeys}
+                        onChange={(e) =>
+                          setNumInput('dueInHours-adv', e.target.value, (n) =>
+                            updatePaymentTerm(idx, 'dueInHours', n),
+                            { emptyValue: undefined }
+                          )
+                        }
+                        onBlur={() => setIncompleteNumBlur('dueInHours-adv')}
+                        placeholder="Ej: 24"
+                        {...inputProps}
+                      />
+                    </InputWithInfo>
                   </FormRow>
                   <FormRow labelClassName={FORM_ROW_SUBTITLE_LABEL} label="Condición/Trigger">
-                    <input
-                      type="text"
-                      value={term.trigger ?? ''}
-                      maxLength={TRIGGER_MAX_LENGTH}
-                      onChange={(e) =>
-                        updatePaymentTerm(idx, 'trigger', e.target.value.slice(0, TRIGGER_MAX_LENGTH))
-                      }
-                      placeholder="Ej: Confirmación de compra"
-                      {...inputProps}
-                    />
+                    <InputWithInfo className="block w-full">
+                      <input
+                        type="text"
+                        value={term.trigger ?? ''}
+                        maxLength={TRIGGER_MAX_LENGTH}
+                        onChange={(e) =>
+                          updatePaymentTerm(idx, 'trigger', e.target.value.slice(0, TRIGGER_MAX_LENGTH))
+                        }
+                        placeholder="Ej: Confirmación de compra"
+                        {...inputProps}
+                      />
+                    </InputWithInfo>
                   </FormRow>
                 </div>
               </div>
@@ -112,34 +119,38 @@ export const OfferFormPaymentTerms: React.FC<OfferFormPaymentTermsProps> = ({
                 </p>
                 <div className="space-y-2">
                   <FormRow labelClassName={FORM_ROW_SUBTITLE_LABEL} label="Vence en (horas)">
-                    <input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={numDisplay('dueInHours-bal', term.dueInHours)}
-                      onKeyDown={blockNegativeAndExponentKeys}
-                      onChange={(e) =>
-                        setNumInput('dueInHours-bal', e.target.value, (n) =>
-                          updatePaymentTerm(idx, 'dueInHours', n),
-                          { emptyValue: undefined }
-                        )
-                      }
-                      onBlur={() => setIncompleteNumBlur('dueInHours-bal')}
-                      placeholder="Ej: 168 (7 días)"
-                      {...inputProps}
-                    />
+                    <InputWithInfo className="block w-full">
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={numDisplay('dueInHours-bal', term.dueInHours)}
+                        onKeyDown={blockNegativeAndExponentKeys}
+                        onChange={(e) =>
+                          setNumInput('dueInHours-bal', e.target.value, (n) =>
+                            updatePaymentTerm(idx, 'dueInHours', n),
+                            { emptyValue: undefined }
+                          )
+                        }
+                        onBlur={() => setIncompleteNumBlur('dueInHours-bal')}
+                        placeholder="Ej: 168 (7 días)"
+                        {...inputProps}
+                      />
+                    </InputWithInfo>
                   </FormRow>
                   <FormRow labelClassName={FORM_ROW_SUBTITLE_LABEL} label="Condición/Trigger">
-                    <input
-                      type="text"
-                      value={term.trigger ?? ''}
-                      maxLength={TRIGGER_MAX_LENGTH}
-                      onChange={(e) =>
-                        updatePaymentTerm(idx, 'trigger', e.target.value.slice(0, TRIGGER_MAX_LENGTH))
-                      }
-                      placeholder="Ej: Entrega en planta"
-                      {...inputProps}
-                    />
+                    <InputWithInfo className="block w-full">
+                      <input
+                        type="text"
+                        value={term.trigger ?? ''}
+                        maxLength={TRIGGER_MAX_LENGTH}
+                        onChange={(e) =>
+                          updatePaymentTerm(idx, 'trigger', e.target.value.slice(0, TRIGGER_MAX_LENGTH))
+                        }
+                        placeholder="Ej: Entrega en planta"
+                        {...inputProps}
+                      />
+                    </InputWithInfo>
                   </FormRow>
                 </div>
               </div>
@@ -165,17 +176,19 @@ export const OfferFormPaymentTerms: React.FC<OfferFormPaymentTermsProps> = ({
               )}
             </div>
             <FormRow labelClassName={FORM_ROW_SUBTITLE_LABEL} label="Descripción (texto libre)">
-              <textarea
-                value={term.text ?? ''}
-                maxLength={STRING_INPUT_MAX_LENGTH}
-                onChange={(e) =>
-                  updatePaymentTerm(idx, 'text', e.target.value.slice(0, STRING_INPUT_MAX_LENGTH))
-                }
-                placeholder="Escriba cualquier término o condición adicional..."
-                readOnly={isLocked}
-                className={offerSection.textarea}
-                rows={3}
-              />
+              <InputWithInfo className="block w-full">
+                <textarea
+                  value={term.text ?? ''}
+                  maxLength={STRING_INPUT_MAX_LENGTH}
+                  onChange={(e) =>
+                    updatePaymentTerm(idx, 'text', e.target.value.slice(0, STRING_INPUT_MAX_LENGTH))
+                  }
+                  placeholder="Escriba cualquier término o condición adicional..."
+                  readOnly={isLocked}
+                  className={offerSection.textarea}
+                  rows={3}
+                />
+              </InputWithInfo>
             </FormRow>
           </div>
         );
