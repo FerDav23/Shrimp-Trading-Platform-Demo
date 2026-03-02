@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import clsx from 'clsx';
 import { SALES_NAV_ITEMS, statusToPath } from '../pages/packer/salesRoutes';
+import { layout, sidebar } from '../styles';
 
 interface NavItem {
   label: string;
@@ -74,7 +75,7 @@ export const Sidebar: React.FC = () => {
   const navItems = getNavItems(user.role);
 
   return (
-    <div className="w-64 bg-gray-900 text-white min-h-screen">
+    <div className={layout.sidebar}>
       <div className="p-6">
         <h1 className="text-xl font-bold">Camarón Platform</h1>
         <p className="text-sm text-gray-400 mt-1">{user.role}</p>
@@ -91,7 +92,7 @@ export const Sidebar: React.FC = () => {
                   type="button"
                   onClick={() => item.path === '/packer/sales' && setExpandedCompras((e) => !e)}
                   className={clsx(
-                    'w-full flex items-center justify-between px-6 py-3 text-sm font-medium transition-colors text-left',
+                    sidebar.navItemWithChildren,
                     isParentActive
                       ? 'bg-gray-800 text-white'
                       : 'text-gray-300 hover:bg-gray-800 hover:text-white'
@@ -108,7 +109,7 @@ export const Sidebar: React.FC = () => {
                   </svg>
                 </button>
                 {isExpanded && (
-                  <div className="bg-gray-800/50">
+                  <div className={sidebar.submenu}>
                     {item.children.map((child) => {
                       const isChildActive = location.pathname === child.path;
                       return (
@@ -116,10 +117,8 @@ export const Sidebar: React.FC = () => {
                           key={child.path}
                           to={child.path}
                           className={clsx(
-                            'block py-2 pl-10 pr-6 text-sm transition-colors',
-                            isChildActive
-                              ? 'text-primary-400 font-medium border-r-2 border-primary-500 bg-gray-800/80'
-                              : 'text-gray-400 hover:text-white hover:bg-gray-800/80'
+                            sidebar.navChild,
+                            isChildActive ? sidebar.navChildActive : sidebar.navChildInactive
                           )}
                         >
                           {child.label}
@@ -137,10 +136,8 @@ export const Sidebar: React.FC = () => {
               key={item.path}
               to={item.path}
               className={clsx(
-                'block px-6 py-3 text-sm font-medium transition-colors',
-                isActive
-                  ? 'bg-gray-800 text-white border-r-2 border-primary-500'
-                  : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                sidebar.navItem,
+                isActive ? sidebar.navItemActive : sidebar.navItemInactive
               )}
             >
               {item.label}

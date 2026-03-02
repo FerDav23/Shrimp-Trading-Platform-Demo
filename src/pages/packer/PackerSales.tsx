@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { page } from '../../styles';
 import { dummySaleRequests } from '../../data/saleRequests';
 import { SaleRequest } from '../../types';
 import { SaleRequestDetailModal } from './saleRequestDetailModal';
@@ -159,9 +160,9 @@ export const PackerSales: React.FC = () => {
   return (
     <div>
       {/* Header con título de la sección actual */}
-      <div className="sticky top-0 z-10 -mx-6 -mt-6 px-6 pt-6 pb-4 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Compras</h1>
-        <p className="text-sm text-gray-600 mt-1">{getSectionTitle(activeFilter)}</p>
+      <div className={page.headerWithSubtitle}>
+        <h1 className={page.headerTitle}>Compras</h1>
+        <p className={page.headerSubtitle}>{getSectionTitle(activeFilter)}</p>
       </div>
 
       {/* Tabla de solicitudes */}

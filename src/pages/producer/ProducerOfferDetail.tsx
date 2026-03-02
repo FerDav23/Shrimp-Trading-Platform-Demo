@@ -5,6 +5,7 @@ import { Card } from '../../components/Card';
 import { StatusBadge } from '../../components/StatusBadge';
 import { Breadcrumbs } from '../../components/Breadcrumbs';
 import { OfferPreviewContent } from '../../components/OfferPreviewContent';
+import { page, typography, button } from '../../styles';
 
 export const ProducerOfferDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -14,8 +15,8 @@ export const ProducerOfferDetail: React.FC = () => {
   if (!offer) {
     return (
       <div>
-        <p>Oferta no encontrada</p>
-        <Link to="/producer/offers">Volver a ofertas</Link>
+        <p className={typography.body}>Oferta no encontrada</p>
+        <Link to="/producer/offers" className={typography.linkPrimary}>Volver a ofertas</Link>
       </div>
     );
   }
@@ -35,8 +36,8 @@ export const ProducerOfferDetail: React.FC = () => {
       <div className="mt-6">
         <div className="flex justify-between items-start mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">{offer.offerCode}</h1>
-            <p className="text-gray-600 mt-1">
+            <h1 className={page.headerTitle}>{offer.offerCode}</h1>
+            <p className={`${typography.body} mt-1`}>
               {offer.packingCompany.name} - {offer.productForm}
             </p>
           </div>
@@ -50,16 +51,11 @@ export const ProducerOfferDetail: React.FC = () => {
 
           <div className="lg:col-span-1">
             <Card className="sticky top-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Iniciar Venta
-              </h3>
-              <p className="text-sm text-gray-600 mb-4">
+              <h3 className={`${page.cardTitle} mb-4`}>Iniciar Venta</h3>
+              <p className={`${typography.body} mb-4`}>
                 Completa el formulario para iniciar una nueva venta con esta oferta.
               </p>
-              <button
-                onClick={handleStartSale}
-                className="w-full bg-primary-600 text-white py-2 px-4 rounded-md hover:bg-primary-700 transition-colors font-medium"
-              >
+              <button onClick={handleStartSale} className={button.primaryFull}>
                 Iniciar Venta
               </button>
             </Card>

@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { table } from '../styles';
 
 interface Column<T> {
   header: string;
@@ -18,31 +19,27 @@ export function DataTable<T extends Record<string, any>>({
   className,
 }: DataTableProps<T>) {
   return (
-    <div className={`overflow-x-auto ${className || ''}`}>
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
+    <div className={`${table.wrapper} ${className || ''}`}>
+      <table className={table.base}>
+        <thead className={table.thead}>
           <tr>
             {columns.map((column, idx) => (
               <th
                 key={idx}
-                className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${
-                  column.className || ''
-                }`}
+                className={`${table.th} ${column.className || ''}`}
               >
                 {column.header}
               </th>
             ))}
           </tr>
         </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
+        <tbody className={table.tbody}>
           {data.map((row, rowIdx) => (
-            <tr key={rowIdx} className="hover:bg-gray-50">
+            <tr key={rowIdx} className={table.tr}>
               {columns.map((column, colIdx) => (
                 <td
                   key={colIdx}
-                  className={`px-6 py-4 whitespace-nowrap text-sm text-gray-900 ${
-                    column.className || ''
-                  }`}
+                  className={`${table.td} ${column.className || ''}`}
                 >
                   {typeof column.accessor === 'function'
                     ? column.accessor(row)

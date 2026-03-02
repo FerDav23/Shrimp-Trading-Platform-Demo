@@ -3,6 +3,7 @@ import { FormRow } from '../../../components/FormRow';
 import type { OfferFormData, PaymentTerm } from './types';
 import { FORM_ROW_SUBTITLE_LABEL, STRING_INPUT_MAX_LENGTH, TRIGGER_MAX_LENGTH } from './constants';
 import { blockNegativeAndExponentKeys } from './utils';
+import { offerSection, button } from '../../../styles';
 
 interface OfferFormPaymentTermsProps {
   data: OfferFormData;
@@ -36,8 +37,8 @@ export const OfferFormPaymentTerms: React.FC<OfferFormPaymentTermsProps> = ({
   setIncompleteNumBlur,
   inputProps,
 }) => (
-  <section className="mb-4 p-3 rounded-xl border-2 border-sky-400/60 bg-[#4aa3e0] shadow-sm">
-    <h3 className="text-lg font-semibold text-white mb-2 pb-2 border-b border-white/30">
+  <section className={offerSection.container}>
+    <h3 className={offerSection.titleMb2}>
       Condiciones de Pago
     </h3>
     <div className="space-y-2">
@@ -45,8 +46,8 @@ export const OfferFormPaymentTerms: React.FC<OfferFormPaymentTermsProps> = ({
         {data.paymentTerms.map((term, idx) => {
           if (term.termType === 'ADVANCE') {
             return (
-              <div key="advance" className="border border-sky-300/60 rounded-lg p-3 bg-white/70">
-                <h4 className="font-semibold text-slate-800 mb-2">Anticipo (requerido)</h4>
+              <div key="advance" className={offerSection.block}>
+                <h4 className={offerSection.textBold + ' mb-2'}>Anticipo (requerido)</h4>
                 <div className="space-y-2">
                   <FormRow labelClassName={FORM_ROW_SUBTITLE_LABEL} label="Porcentaje (%)" required>
                     <input
@@ -104,9 +105,9 @@ export const OfferFormPaymentTerms: React.FC<OfferFormPaymentTermsProps> = ({
             const advancePercent = data.paymentTerms.find((p) => p.termType === 'ADVANCE')?.percent ?? 0;
             const balancePercent = 100 - advancePercent;
             return (
-              <div key="balance" className="border border-sky-300/60 rounded-lg p-3 bg-white/70">
-                <h4 className="font-semibold text-slate-800 mb-2">Saldo restante (requerido)</h4>
-                <p className="text-sm text-slate-600 mb-2">
+              <div key="balance" className={offerSection.block}>
+                <h4 className={offerSection.textBold + ' mb-2'}>Saldo restante (requerido)</h4>
+                <p className={offerSection.textSm + ' mb-2'}>
                   Porcentaje: {balancePercent}% (lo faltante después del anticipo)
                 </p>
                 <div className="space-y-2">
@@ -150,14 +151,14 @@ export const OfferFormPaymentTerms: React.FC<OfferFormPaymentTermsProps> = ({
       {data.paymentTerms.map((term, idx) => {
         if (term.termType === 'ADVANCE' || term.termType === 'BALANCE') return null;
         return (
-          <div key={idx} className="border border-sky-300/60 rounded-lg p-3 bg-white/70">
+          <div key={idx} className={offerSection.block}>
             <div className="flex justify-between items-center mb-1">
-              <h4 className="font-semibold text-slate-800">Término opcional</h4>
+              <h4 className={offerSection.textBold}>Término opcional</h4>
               {!isLocked && (
                 <button
                   type="button"
                   onClick={() => removePaymentTerm(idx)}
-                  className="text-red-600 hover:text-red-700 hover:bg-red-50 rounded px-2 py-1 text-sm font-medium transition-colors"
+                  className={button.delete}
                 >
                   Eliminar
                 </button>
@@ -172,7 +173,7 @@ export const OfferFormPaymentTerms: React.FC<OfferFormPaymentTermsProps> = ({
                 }
                 placeholder="Escriba cualquier término o condición adicional..."
                 readOnly={isLocked}
-                className="w-full border border-sky-300 rounded-md px-3 py-2 min-h-[80px] bg-white focus:ring-2 focus:ring-sky-400 focus:border-sky-400 text-slate-800 placeholder-slate-500"
+                className={offerSection.textarea}
                 rows={3}
               />
             </FormRow>
@@ -181,11 +182,11 @@ export const OfferFormPaymentTerms: React.FC<OfferFormPaymentTermsProps> = ({
       })}
     </div>
     {!isLocked && (
-      <div className="mt-2 pt-2 border-t border-sky-400/40">
+      <div className={offerSection.footer}>
         <button
           type="button"
           onClick={addPaymentTerm}
-          className="bg-white text-sky-700 border border-sky-300 hover:bg-sky-50 hover:text-sky-800 rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
+          className={button.addSecondary}
         >
           + Añadir término opcional
         </button>

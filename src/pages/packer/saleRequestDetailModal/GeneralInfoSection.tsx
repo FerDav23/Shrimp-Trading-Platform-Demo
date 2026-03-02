@@ -1,6 +1,7 @@
 import React from 'react';
 import { FormRow } from '../../../components/FormRow';
 import { StatusBadge } from '../../../components/StatusBadge';
+import { collapsible } from '../../../styles';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import type { SaleRequest } from '../../../types';
@@ -22,8 +23,8 @@ export const GeneralInfoSection: React.FC<GeneralInfoSectionProps> = ({
   onOpenOfferModal,
 }) => (
   <CollapsibleSection title="Información General" expanded={expanded} onToggle={onToggle}>
-    <div className="px-6 pb-6">
-      <div className="bg-white border border-sky-200 rounded-lg p-4">
+    <div className={collapsible.content}>
+      <div className={collapsible.innerBox}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormRow labelClassName="text-sm font-medium text-gray-700" label="ID Solicitud">
             <p className="py-2 text-sm text-gray-900 font-medium">#{request.id.split('-')[1]}</p>
@@ -60,7 +61,7 @@ export const GeneralInfoSection: React.FC<GeneralInfoSectionProps> = ({
                     <button
                       type="button"
                       onClick={onOpenOfferModal}
-                      className="text-sm px-3 py-1.5 bg-sky-600 text-white rounded-md hover:bg-sky-700 font-medium transition-colors"
+                      className={collapsible.skyButton}
                     >
                       Ver oferta
                     </button>

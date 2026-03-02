@@ -7,16 +7,14 @@ import { DataTable } from '../../components/DataTable';
 import { Offer } from '../../types';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { page, typography } from '../../styles';
 
 export const ManagerOffers: React.FC = () => {
   const columns = [
     {
       header: 'Código',
       accessor: (offer: Offer) => (
-        <Link
-          to={`/packer/offers/${offer.id}`}
-          className="text-primary-600 hover:text-primary-700 font-medium"
-        >
+        <Link to={`/packer/offers/${offer.id}`} className={typography.linkPrimary}>
           {offer.offerCode}
         </Link>
       ),
@@ -46,7 +44,7 @@ export const ManagerOffers: React.FC = () => {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Todas las Ofertas</h1>
+      <h1 className={page.title}>Todas las Ofertas</h1>
       <Card>
         <DataTable data={dummyOffers} columns={columns} />
       </Card>

@@ -1,5 +1,6 @@
 import React, { RefObject } from 'react';
 import type { SaleRequest, ProducerBankAccount } from '../../../types';
+import { collapsible, button } from '../../../styles';
 import type { Offer } from '../../../types';
 import { normalizeSettlement } from './utils';
 import { CollapsibleSection } from './CollapsibleSection';
@@ -67,22 +68,22 @@ export const AdvanceTransferSection: React.FC<AdvanceTransferSectionProps> = ({
       expanded={expanded}
       onToggle={onToggle}
     >
-      <div className="px-6 pb-6">
-        <div className="bg-white border border-sky-200 rounded-xl p-6 space-y-8 shadow-sm">
+      <div className={collapsible.content}>
+        <div className={collapsible.innerBoxXl}>
           <div
-            className={`rounded-xl border-2 p-4 ${isExpired ? 'border-red-200 bg-red-50' : 'border-sky-200 bg-sky-50/50'}`}
+            className={isExpired ? collapsible.timerExpired : collapsible.timerActive}
           >
-            <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">
+            <p className={`${collapsible.fieldLabel} mb-1`}>
               Plazo para pagar el anticipo
             </p>
             <p className="text-sm text-gray-600 mb-2">
               Tiene {ADVANCE_DEADLINE_HOURS} horas para realizar la transferencia y subir la prueba.
             </p>
             {isExpired ? (
-              <p className="text-lg font-bold text-red-700">Tiempo agotado</p>
+              <p className={collapsible.timerTextExpired}>Tiempo agotado</p>
             ) : (
               <>
-                <p className="text-2xl font-bold text-red-600 tabular-nums" aria-live="polite">
+                <p className={collapsible.timerDigits} aria-live="polite">
                   {formatTwo(hours)}:{formatTwo(minutes)}:{formatTwo(seconds)}
                 </p>
                 <span className="sr-only" aria-hidden>
@@ -93,23 +94,23 @@ export const AdvanceTransferSection: React.FC<AdvanceTransferSectionProps> = ({
           </div>
 
           <div className="space-y-4">
-            <h4 className="text-base font-semibold text-sky-800 tracking-tight border-b border-sky-200 pb-2">
+            <h4 className={collapsible.subsectionTitle}>
               Información del productor
             </h4>
             <div>
-              <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Productor</p>
+              <p className={`${collapsible.fieldLabel} mb-1`}>Productor</p>
               <p className="text-base text-gray-900 font-medium leading-snug">{request.producerName}</p>
             </div>
             {producerBankAccounts.length > 0 ? (
               <>
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+                  <label className={`block ${collapsible.fieldLabel} mb-2`}>
                     Banco para transferencia
                   </label>
                   <select
                     value={safeBankIndex}
                     onChange={(e) => onSelectedBankIndexChange(Number(e.target.value))}
-                    className="w-full md:max-w-sm px-4 py-2.5 border border-sky-200 rounded-lg text-sm font-medium text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-shadow"
+                    className={collapsible.selectSky}
                   >
                     {producerBankAccounts.map((acc, idx) => (
                       <option key={idx} value={idx}>
@@ -119,7 +120,7 @@ export const AdvanceTransferSection: React.FC<AdvanceTransferSectionProps> = ({
                   </select>
                 </div>
                 {account && (
-                  <div className="mt-4 p-5 border border-sky-100 rounded-xl bg-sky-50/50 space-y-4">
+                  <div className={collapsible.bankCard}>
                     <h5 className="text-sm font-semibold text-sky-800 tracking-tight">
                       Datos de la cuenta seleccionada
                     </h5>
@@ -169,8 +170,8 @@ export const AdvanceTransferSection: React.FC<AdvanceTransferSectionProps> = ({
             )}
           </div>
 
-          <div className="border border-sky-200 rounded-xl p-5 bg-sky-50/30 print:bg-white">
-            <h4 className="text-base font-semibold text-sky-800 tracking-tight border-b border-sky-200 pb-2 mb-4">
+          <div className={collapsible.transferBox}>
+            <h4 className={collapsible.subsectionTitleMb}>
               Datos para la transferencia del anticipo
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 text-sm">
@@ -214,7 +215,7 @@ export const AdvanceTransferSection: React.FC<AdvanceTransferSectionProps> = ({
           </div>
 
           <div className="space-y-3">
-            <h4 className="text-base font-semibold text-sky-800 tracking-tight border-b border-sky-200 pb-2">
+            <h4 className={collapsible.subsectionTitle}>
               Prueba del anticipo
             </h4>
             <input
@@ -234,7 +235,7 @@ export const AdvanceTransferSection: React.FC<AdvanceTransferSectionProps> = ({
                 <button
                   type="button"
                   onClick={() => requestAnimationFrame(() => advanceProofInputRef.current?.click())}
-                  className="flex items-center gap-2 px-5 py-2.5 bg-sky-600 text-white rounded-lg hover:bg-sky-700 font-medium text-sm transition-colors shadow-sm"
+                  className={button.skyUpload}
                 >
                   <svg
                     className="w-5 h-5 shrink-0"
@@ -257,7 +258,7 @@ export const AdvanceTransferSection: React.FC<AdvanceTransferSectionProps> = ({
                     <button
                       type="button"
                       onClick={() => onAdvanceProofFileChange(null)}
-                      className="text-red-600 hover:text-red-700 text-sm font-medium underline underline-offset-2"
+                      className={button.linkRemove}
                     >
                       Quitar
                     </button>
@@ -265,7 +266,7 @@ export const AdvanceTransferSection: React.FC<AdvanceTransferSectionProps> = ({
                 )}
               </div>
               {advanceProofPreviewUrl && (
-                <div className="border border-sky-200 rounded-lg overflow-hidden bg-gray-100 max-w-xs">
+                <div className={collapsible.proofImageLg}>
                   <img
                     src={advanceProofPreviewUrl}
                     alt="Vista previa del comprobante"

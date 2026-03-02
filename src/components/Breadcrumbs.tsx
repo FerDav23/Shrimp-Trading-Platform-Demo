@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { typography } from '../styles';
 
 interface BreadcrumbItem {
   label: string;
@@ -32,12 +33,12 @@ export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ items }) => {
             {item.path ? (
               <Link
                 to={item.path}
-                className="text-sm font-medium text-gray-500 hover:text-gray-700"
+                className={typography.link}
               >
                 {item.label}
               </Link>
             ) : (
-              <span className="text-sm font-medium text-gray-900">{item.label}</span>
+              <span className={typography.linkActive}>{item.label}</span>
             )}
           </li>
         ))}

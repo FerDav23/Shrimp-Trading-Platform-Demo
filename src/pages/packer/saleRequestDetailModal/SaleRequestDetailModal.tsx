@@ -271,7 +271,7 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
   return (
     <>
       <Modal isOpen={isOpen} onClose={onClose} title="Detalles de Solicitud de Compra" size="xl">
-        <div className="space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto pr-2">
+        <div className={`space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto pr-2`}>
           <GeneralInfoSection
             request={request}
             expanded={expanded.general}

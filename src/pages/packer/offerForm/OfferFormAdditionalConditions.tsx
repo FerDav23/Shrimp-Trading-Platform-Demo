@@ -1,6 +1,7 @@
 import React from 'react';
 import type { OfferFormData } from './types';
 import { ADDITIONAL_CONDITION_MAX_LENGTH } from './constants';
+import { offerSection, button, form } from '../../../styles';
 
 interface OfferFormAdditionalConditionsProps {
   data: OfferFormData;
@@ -17,49 +18,49 @@ export const OfferFormAdditionalConditions: React.FC<OfferFormAdditionalConditio
   updateAdditionalCondition,
   removeAdditionalCondition,
 }) => (
-  <section className="mb-4 p-3 rounded-xl border-2 border-sky-400/60 bg-[#4aa3e0] shadow-sm">
-    <h3 className="text-lg font-semibold text-white mb-2 pb-2 border-b border-white/30">
+  <section className={offerSection.container}>
+    <h3 className={offerSection.titleMb2}>
       Condiciones adicionales
     </h3>
-    <div className="bg-white/70 border border-sky-300/60 rounded-lg p-3">
-      <p className="text-sm text-slate-600 mb-2">
+    <div className={offerSection.inner}>
+      <p className={offerSection.textSm + ' mb-2'}>
         Items de texto (máximo {ADDITIONAL_CONDITION_MAX_LENGTH} caracteres por item). Añada las
         condiciones que apliquen a esta oferta.
       </p>
-      <div className="overflow-x-auto rounded-lg border border-sky-300/40 overflow-hidden">
-        <table className="min-w-full divide-y divide-sky-300/50">
-          <thead className="bg-sky-500/25">
+      <div className={offerSection.tableWrapperFull}>
+        <table className={offerSection.table}>
+          <thead className={offerSection.tableHead}>
             <tr>
-              <th className="px-2 py-1.5 text-left text-xs font-semibold text-slate-800 uppercase tracking-wide w-12">
+              <th className={offerSection.tableTh + ' w-12'}>
                 #
               </th>
-              <th className="px-2 py-1.5 text-left text-xs font-semibold text-slate-800 uppercase tracking-wide">
+              <th className={offerSection.tableTh}>
                 Condición
               </th>
               {!isLocked && (
-                <th className="px-2 py-1.5 text-right text-xs font-semibold text-slate-800 uppercase tracking-wide w-24">
+                <th className={offerSection.tableTh + ' text-right w-24'}>
                   Acción
                 </th>
               )}
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-sky-200/50">
+          <tbody className={offerSection.tableBody}>
             {data.additionalConditions.length === 0 ? (
               <tr>
                 <td
                   colSpan={isLocked ? 2 : 3}
-                  className="px-2 py-3 text-center text-slate-500 text-sm"
+                  className={offerSection.tableEmpty}
                 >
                   No hay condiciones. Use el botón para añadir.
                 </td>
               </tr>
             ) : (
               data.additionalConditions.map((item, idx) => (
-                <tr key={idx} className="hover:bg-white/80">
-                  <td className="px-2 py-1">
-                    <span className="text-slate-800 font-medium">{idx + 1}</span>
+                <tr key={idx} className={offerSection.tableRow}>
+                  <td className={offerSection.tableCell}>
+                    <span className={offerSection.textBold}>{idx + 1}</span>
                   </td>
-                  <td className="px-2 py-1">
+                  <td className={offerSection.tableCell}>
                     <input
                       type="text"
                       value={item}
@@ -67,18 +68,18 @@ export const OfferFormAdditionalConditions: React.FC<OfferFormAdditionalConditio
                       placeholder="Escriba la condición (máx. 100 caracteres)"
                       maxLength={ADDITIONAL_CONDITION_MAX_LENGTH}
                       readOnly={isLocked}
-                      className="w-full border border-sky-300 rounded px-2 py-1.5 bg-white focus:ring-2 focus:ring-sky-400 focus:border-sky-400 text-slate-800 placeholder-slate-400"
+                      className={'w-full ' + form.inputSmall}
                     />
-                    <span className="text-xs text-slate-500 mt-0.5 block">
+                    <span className={offerSection.textMuted + ' mt-0.5 block'}>
                       {item.length}/{ADDITIONAL_CONDITION_MAX_LENGTH}
                     </span>
                   </td>
                   {!isLocked && (
-                    <td className="px-2 py-1 text-right">
+                    <td className={offerSection.tableCellRight}>
                       <button
                         type="button"
                         onClick={() => removeAdditionalCondition(idx)}
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50 rounded px-2 py-1 text-sm font-medium transition-colors"
+                        className={button.delete}
                       >
                         Eliminar
                       </button>
@@ -91,11 +92,11 @@ export const OfferFormAdditionalConditions: React.FC<OfferFormAdditionalConditio
         </table>
       </div>
       {!isLocked && (
-        <div className="mt-2 pt-2 border-t border-sky-400/40">
+        <div className={offerSection.footer}>
           <button
             type="button"
             onClick={addAdditionalCondition}
-            className="bg-white text-sky-700 border border-sky-300 hover:bg-sky-50 hover:text-sky-800 rounded-md px-3 py-1.5 text-sm font-medium transition-colors"
+            className={button.addSecondary}
           >
             + Añadir item
           </button>

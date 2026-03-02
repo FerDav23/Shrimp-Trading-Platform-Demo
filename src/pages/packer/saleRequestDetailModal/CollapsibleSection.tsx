@@ -1,9 +1,10 @@
 import React from 'react';
+import { collapsible } from '../../../styles';
 
 function ChevronIcon({ expanded }: { expanded: boolean }) {
   return (
     <svg
-      className={`w-5 h-5 transition-transform ${expanded ? 'rotate-180' : ''}`}
+      className={`${collapsible.chevron} ${expanded ? collapsible.chevronExpanded : ''}`}
       fill="none"
       stroke="currentColor"
       viewBox="0 0 24 24"
@@ -29,19 +30,13 @@ export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
   children,
   variant = 'default',
 }) => {
-  const sectionClass =
-    variant === 'rejection'
-      ? 'rounded-xl border-2 border-red-200 bg-red-50/50 shadow-sm overflow-hidden'
-      : 'rounded-xl border-2 border-sky-400/60 bg-sky-50 shadow-sm overflow-hidden';
-  const buttonClass =
-    variant === 'rejection'
-      ? 'w-full flex items-center justify-between p-4 text-left text-gray-900 hover:bg-red-100/50 transition-colors'
-      : 'w-full flex items-center justify-between p-4 text-left text-gray-900 hover:bg-sky-100/50 transition-colors';
+  const sectionClass = variant === 'rejection' ? collapsible.sectionRejection : collapsible.sectionDefault;
+  const buttonClass = variant === 'rejection' ? collapsible.buttonRejection : collapsible.buttonDefault;
 
   return (
     <section className={sectionClass}>
       <button type="button" onClick={onToggle} className={buttonClass}>
-        <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+        <h3 className={collapsible.title}>{title}</h3>
         <span className="text-gray-700">
           <ChevronIcon expanded={expanded} />
         </span>

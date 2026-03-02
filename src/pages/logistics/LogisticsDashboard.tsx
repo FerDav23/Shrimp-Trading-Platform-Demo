@@ -5,6 +5,7 @@ import { Card } from '../../components/Card';
 import { StatusBadge } from '../../components/StatusBadge';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { page, typography } from '../../styles';
 
 export const LogisticsDashboard: React.FC = () => {
   const allSales = dummySales;
@@ -14,51 +15,45 @@ export const LogisticsDashboard: React.FC = () => {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Dashboard Logística</h1>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <h1 className={page.title}>Dashboard Logística</h1>
+      <div className={page.gridStats3}>
         <Card>
-          <div className="text-sm text-gray-600 mb-1">Pendientes de Recolección</div>
-          <div className="text-3xl font-bold text-yellow-600">{pendingPickup.length}</div>
+          <div className={page.statLabel}>Pendientes de Recolección</div>
+          <div className={page.statValueYellow}>{pendingPickup.length}</div>
         </Card>
         <Card>
-          <div className="text-sm text-gray-600 mb-1">En Tránsito</div>
-          <div className="text-3xl font-bold text-blue-600">{inTransit.length}</div>
+          <div className={page.statLabel}>En Tránsito</div>
+          <div className={page.statValueBlue}>{inTransit.length}</div>
         </Card>
         <Card>
-          <div className="text-sm text-gray-600 mb-1">Entregados</div>
-          <div className="text-3xl font-bold text-green-600">{delivered.length}</div>
+          <div className={page.statLabel}>Entregados</div>
+          <div className={page.statValueGreen}>{delivered.length}</div>
         </Card>
       </div>
 
       <Card>
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">Envíos Recientes</h2>
-          <Link
-            to="/logistics/shipments"
-            className="text-sm text-primary-600 hover:text-primary-700"
-          >
+        <div className={page.cardHeader}>
+          <h2 className={page.cardTitle}>Envíos Recientes</h2>
+          <Link to="/logistics/shipments" className={page.cardLinkPrimary}>
             Ver todos
           </Link>
         </div>
         <div className="space-y-3">
           {allSales.slice(0, 5).map((sale) => (
-            <div
-              key={sale.id}
-              className="border-b border-gray-200 pb-3 last:border-0"
-            >
+            <div key={sale.id} className={page.listItemBorder}>
               <div className="flex justify-between items-start">
                 <div>
                   <Link
                     to={`/logistics/shipments/${sale.id}`}
-                    className="font-medium text-gray-900 hover:text-primary-600"
+                    className={page.listItemLink}
                   >
                     Envío #{sale.id.split('-')[1]}
                   </Link>
-                  <p className="text-sm text-gray-600">
+                  <p className={typography.body}>
                     {sale.quantityLb} lb - {sale.pickupLocation.city} →{' '}
                     {sale.deliveryPlant.city}
                   </p>
-                  <p className="text-xs text-gray-500">
+                  <p className={typography.bodyMuted}>
                     {format(new Date(sale.createdAt), 'dd MMM yyyy', { locale: es })}
                   </p>
                 </div>

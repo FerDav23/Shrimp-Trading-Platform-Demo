@@ -1,5 +1,6 @@
 import React from 'react';
 import { FormRow } from '../../../components/FormRow';
+import { collapsible, settlementTable } from '../../../styles';
 import { CATCH_SETTLEMENT_CLASSES } from '../../../types';
 import type { CatchSettlement } from '../../../types';
 import { normalizeSettlement } from './utils';
@@ -32,8 +33,8 @@ export const SettlementReadOnlySection: React.FC<SettlementReadOnlySectionProps>
 
   return (
     <CollapsibleSection title="Liquidación de pesca" expanded={expanded} onToggle={onToggle}>
-      <div className="px-6 pb-6">
-        <div className="bg-white border border-sky-200 rounded-lg p-4 space-y-6">
+      <div className={collapsible.content}>
+        <div className={`${collapsible.innerBox} space-y-6`}>
           <div>
             <h4 className="text-sm font-semibold text-gray-700 mb-3">Datos del ingreso</h4>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm text-gray-900">
@@ -64,29 +65,29 @@ export const SettlementReadOnlySection: React.FC<SettlementReadOnlySectionProps>
               <div key={key}>
                 <div className="text-sm font-semibold text-gray-700 mb-2">{title}</div>
                 <div className="overflow-x-auto">
-                  <table className="w-full text-sm border border-gray-200 rounded-lg">
+                  <table className={settlementTable.table}>
                     <thead>
-                      <tr className="bg-gray-100 text-left">
-                        <th className="px-2 py-2 font-medium text-gray-700">Talla / Descripción</th>
-                        <th className="px-2 py-2 font-medium text-gray-700">Libras</th>
-                        <th className="px-2 py-2 font-medium text-gray-700">P. unit.</th>
-                        <th className="px-2 py-2 font-medium text-gray-700">Valor total</th>
+                      <tr className={settlementTable.thead}>
+                        <th className={settlementTable.th}>Talla / Descripción</th>
+                        <th className={settlementTable.th}>Libras</th>
+                        <th className={settlementTable.th}>P. unit.</th>
+                        <th className={settlementTable.th}>Valor total</th>
                       </tr>
                     </thead>
                     <tbody>
                       {s[key].length === 0 ? (
                         <tr>
-                          <td colSpan={4} className="px-2 py-3 text-center text-gray-500">
+                          <td colSpan={4} className={settlementTable.emptyCell}>
                             Sin líneas
                           </td>
                         </tr>
                       ) : (
                         s[key].map((line) => (
-                          <tr key={line.id} className="border-t border-gray-100">
-                            <td className="px-2 py-1.5 text-gray-900">{line.sizeOrDesc || '—'}</td>
-                            <td className="px-2 py-1.5 text-gray-900">{line.pounds}</td>
-                            <td className="px-2 py-1.5 text-gray-900">{line.unitPrice}</td>
-                            <td className="px-2 py-1.5 font-medium text-gray-800">
+                          <tr key={line.id} className={settlementTable.row}>
+                            <td className={settlementTable.td}>{line.sizeOrDesc || '—'}</td>
+                            <td className={settlementTable.td}>{line.pounds}</td>
+                            <td className={settlementTable.td}>{line.unitPrice}</td>
+                            <td className={settlementTable.tdMedium}>
                               {(line.pounds * line.unitPrice).toFixed(2)}
                             </td>
                           </tr>

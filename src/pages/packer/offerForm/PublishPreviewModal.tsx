@@ -4,6 +4,7 @@ import { OfferPreviewContent } from '../../../components/OfferPreviewContent';
 import type { OfferFormData, OfferFormSectionProps } from './types';
 import type { Offer } from '../../../types';
 import { buildPreviewOffer, getOfferLabel } from './utils';
+import { page } from '../../../styles';
 
 interface PublishPreviewModalProps {
   isOpen: boolean;
@@ -35,28 +36,28 @@ export const PublishPreviewModal: React.FC<PublishPreviewModalProps> = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Vista previa antes de publicar" size="xl">
       <div className="space-y-3">
-        <p className="text-sm text-gray-600 bg-sky-50 border border-sky-200 rounded-lg p-3">
+        <p className={page.infoBox}>
           Esto es una vista previa de cómo el productor verá la oferta. Desplázate hacia abajo para
           revisar el contenido, acepta el checklist y pulsa Publicar para que la oferta pase a
           estado publicado.
         </p>
 
-        <div className="max-h-[50vh] overflow-y-auto border border-gray-200 rounded-lg p-3 bg-gray-50">
+        <div className={page.previewBox}>
           <OfferPreviewContent offer={previewOffer} />
         </div>
 
-        <div className="border-t border-gray-200 pt-3 space-y-2">
+        <div className={page.modalSection}>
           <p className="text-sm text-gray-700">
             Al publicar, usted confirma que la información de la oferta es correcta y que cumple con
             las condiciones de uso de la plataforma. (Aquí irán las condiciones de publicación de
             oferta.)
           </p>
-          <label className="flex items-start gap-3 cursor-pointer">
+          <label className={page.checkboxLabel}>
             <input
               type="checkbox"
               checked={checklistAccepted}
               onChange={(e) => onChecklistChange(e.target.checked)}
-              className="mt-1 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+              className={page.checkboxInput}
             />
             <span className="text-sm text-gray-700">
               Acepto las condiciones anteriores y deseo publicar esta oferta.
@@ -67,7 +68,7 @@ export const PublishPreviewModal: React.FC<PublishPreviewModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 font-medium"
+              className={page.modalCancel}
             >
               Cancelar
             </button>
@@ -75,7 +76,7 @@ export const PublishPreviewModal: React.FC<PublishPreviewModalProps> = ({
               type="button"
               onClick={onConfirmPublish}
               disabled={!checklistAccepted}
-              className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              className={page.modalConfirm}
             >
               Publicar oferta
             </button>

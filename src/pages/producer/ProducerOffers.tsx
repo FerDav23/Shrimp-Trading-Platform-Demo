@@ -7,6 +7,7 @@ import { DataTable } from '../../components/DataTable';
 import { Offer } from '../../types';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { page, form, typography } from '../../styles';
 
 export const ProducerOffers: React.FC = () => {
   const [filterCompany, setFilterCompany] = useState<string>('all');
@@ -36,10 +37,7 @@ export const ProducerOffers: React.FC = () => {
     {
       header: 'Código',
       accessor: (offer: Offer) => (
-        <Link
-          to={`/producer/offers/${offer.id}`}
-          className="text-primary-600 hover:text-primary-700 font-medium"
-        >
+        <Link to={`/producer/offers/${offer.id}`} className={typography.linkPrimary}>
           {offer.offerCode}
         </Link>
       ),
@@ -68,10 +66,7 @@ export const ProducerOffers: React.FC = () => {
     {
       header: 'Acciones',
       accessor: (offer: Offer) => (
-        <Link
-          to={`/producer/offers/${offer.id}`}
-          className="text-primary-600 hover:text-primary-700 text-sm font-medium"
-        >
+        <Link to={`/producer/offers/${offer.id}`} className={typography.linkPrimarySm}>
           Ver
         </Link>
       ),
@@ -81,19 +76,17 @@ export const ProducerOffers: React.FC = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Ofertas Disponibles</h1>
+        <h1 className={page.title}>Ofertas Disponibles</h1>
       </div>
 
       <Card className="mb-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Empacadora
-            </label>
+            <label className={form.label}>Empacadora</label>
             <select
               value={filterCompany}
               onChange={(e) => setFilterCompany(e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+              className={form.selectFilter}
             >
               <option value="all">Todas</option>
               {companies.map((id) => {
@@ -108,13 +101,11 @@ export const ProducerOffers: React.FC = () => {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Producto
-            </label>
+            <label className={form.label}>Producto</label>
             <select
               value={filterProduct}
               onChange={(e) => setFilterProduct(e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+              className={form.selectFilter}
             >
               <option value="all">Todos</option>
               <option value="ENTERO">Entero</option>
@@ -123,13 +114,11 @@ export const ProducerOffers: React.FC = () => {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Unidad
-            </label>
+            <label className={form.label}>Unidad</label>
             <select
               value={filterUnit}
               onChange={(e) => setFilterUnit(e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+              className={form.selectFilter}
             >
               <option value="all">Todas</option>
               <option value="PER_LB">Por libra</option>

@@ -4,6 +4,7 @@ import { Card } from '../../components/Card';
 import { DataTable } from '../../components/DataTable';
 import { Money } from '../../components/Money';
 import { FormRow } from '../../components/FormRow';
+import { page, form } from '../../styles';
 
 export const LogisticsPricing: React.FC = () => {
   const [calculatorLb, setCalculatorLb] = useState<string>('');
@@ -39,25 +40,21 @@ export const LogisticsPricing: React.FC = () => {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Tarifas Logísticas</h1>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <h1 className={page.title}>Tarifas Logísticas</h1>
+      <div className={page.grid2}>
         <Card>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            Tarifas por Sector
-          </h2>
+          <h2 className={`${page.cardTitle} mb-4`}>Tarifas por Sector</h2>
           <DataTable data={dummyLogisticsPricing.sectors} columns={columns} />
         </Card>
 
         <Card>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            Calculadora de Costo
-          </h2>
+          <h2 className={`${page.cardTitle} mb-4`}>Calculadora de Costo</h2>
           <FormRow label="Cantidad (lb)">
             <input
               type="number"
               value={calculatorLb}
               onChange={(e) => setCalculatorLb(e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-3 py-2"
+              className={form.inputGray}
               min="0"
               step="0.01"
             />
@@ -66,7 +63,7 @@ export const LogisticsPricing: React.FC = () => {
             <select
               value={calculatorSector}
               onChange={(e) => setCalculatorSector(e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-3 py-2"
+              className={form.inputGray}
             >
               <option value="">Selecciona un sector</option>
               {dummyLogisticsPricing.sectors.map((sector) => (
@@ -77,7 +74,7 @@ export const LogisticsPricing: React.FC = () => {
             </select>
           </FormRow>
           {calculatorLb && calculatorSector && (
-            <div className="mt-4 p-4 bg-gray-50 rounded-md">
+            <div className={page.calculatorResult}>
               <div className="text-sm text-gray-600 mb-1">Costo Estimado:</div>
               <div className="text-2xl font-bold text-gray-900">
                 <Money amount={calculateCost()} />

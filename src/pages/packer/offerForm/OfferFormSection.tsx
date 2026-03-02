@@ -1,6 +1,7 @@
 import React, { useState, useRef, useLayoutEffect, useEffect } from 'react';
 import { Card } from '../../../components/Card';
 import { Alert } from '../../../components/Alert';
+import { form, typography, button, offerSection, toggle } from '../../../styles';
 import type { OfferFormSectionProps, OfferFormData, PriceTier, Adjustment } from './types';
 import type { PaymentTerm } from '../../../types';
 import {
@@ -252,22 +253,20 @@ export const OfferFormSection: React.FC<OfferFormSectionProps> = ({
   const inputProps = isLocked
     ? {
         readOnly: true,
-        className:
-          'w-full border border-sky-300 rounded-md px-2 py-1.5 bg-white/80 cursor-not-allowed text-slate-800',
+        className: `w-full ${form.inputReadonly}`,
       }
     : {
-        className:
-          'w-full border border-sky-300 rounded-md px-2 py-1.5 bg-white focus:ring-2 focus:ring-sky-400 focus:border-sky-400 text-slate-800',
+        className: `w-full ${form.input}`,
       };
 
   return (
     <Card className="mt-1 mb-3">
       <div className="flex justify-between items-center mb-3">
-        <h2 className="text-xl font-bold text-gray-900">
+        <h2 className={typography.pageTitle}>
           Oferta - {getOfferLabel(formType)}
         </h2>
         <label className="inline-flex items-center gap-3 cursor-pointer">
-          <span className="text-sm font-medium text-gray-700">Oferta publicada</span>
+          <span className={form.label}>Oferta publicada</span>
           <div className="relative inline-block">
             <input
               type="checkbox"
@@ -275,8 +274,8 @@ export const OfferFormSection: React.FC<OfferFormSectionProps> = ({
               onChange={(e) => handleVisibilityChange(e.target.checked)}
               className="sr-only peer"
             />
-            <div className="w-11 h-6 bg-gray-200 rounded-full peer-checked:bg-primary-600 transition-colors" />
-            <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow-sm border border-gray-200 transition-all peer-checked:left-6" />
+            <div className={toggle.track} />
+            <div className={toggle.knob} />
           </div>
         </label>
       </div>
@@ -365,7 +364,7 @@ export const OfferFormSection: React.FC<OfferFormSectionProps> = ({
         removeAdditionalCondition={removeAdditionalCondition}
       />
 
-      <div className="mt-4 pt-4 border-t border-sky-400/40">
+      <div className={offerSection.footerPublish}>
         {showPublishAlert && (
           <Alert
             variant="warning"
@@ -379,7 +378,7 @@ export const OfferFormSection: React.FC<OfferFormSectionProps> = ({
         <button
           type="button"
           onClick={() => handleVisibilityChange(true)}
-          className="bg-sky-600 text-white px-4 py-2 rounded-lg hover:bg-sky-700 font-medium disabled:opacity-50 shadow-sm transition-colors"
+          className={button.primarySky}
           disabled={isLocked}
         >
           Publicar oferta

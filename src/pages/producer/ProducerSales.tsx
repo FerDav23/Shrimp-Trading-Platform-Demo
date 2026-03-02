@@ -8,6 +8,7 @@ import { DataTable } from '../../components/DataTable';
 import { Sale } from '../../types';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { page, typography } from '../../styles';
 
 export const ProducerSales: React.FC = () => {
   const { user } = useAuth();
@@ -17,10 +18,7 @@ export const ProducerSales: React.FC = () => {
     {
       header: 'ID Venta',
       accessor: (sale: Sale) => (
-        <Link
-          to={`/producer/sales/${sale.id}`}
-          className="text-primary-600 hover:text-primary-700 font-medium"
-        >
+        <Link to={`/producer/sales/${sale.id}`} className={typography.linkPrimary}>
           #{sale.id.split('-')[1]}
         </Link>
       ),
@@ -54,7 +52,7 @@ export const ProducerSales: React.FC = () => {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Mis Ventas</h1>
+      <h1 className={page.title}>Mis Ventas</h1>
       <Card>
         <DataTable data={mySales} columns={columns} />
       </Card>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { FormRow } from '../../../components/FormRow';
+import { collapsible, typography } from '../../../styles';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import type { SaleRequest } from '../../../types';
@@ -13,8 +14,8 @@ interface CatchInfoSectionProps {
 
 export const CatchInfoSection: React.FC<CatchInfoSectionProps> = ({ request, expanded, onToggle }) => (
   <CollapsibleSection title="Información de Pesca" expanded={expanded} onToggle={onToggle}>
-    <div className="px-6 pb-6">
-      <div className="bg-white border border-sky-200 rounded-lg p-4">
+    <div className={collapsible.content}>
+      <div className={collapsible.innerBox}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormRow labelClassName="text-sm font-medium text-gray-700" label="Cantidad Estimada">
             <p className="py-2 text-sm text-gray-900 font-medium">{request.catchInfo.estimatedQuantityLb} lb</p>
@@ -37,7 +38,7 @@ export const CatchInfoSection: React.FC<CatchInfoSectionProps> = ({ request, exp
           </FormRow>
           {request.catchInfo.notes && (
             <FormRow labelClassName="text-sm font-medium text-gray-700" label="Notas del Productor" className="md:col-span-2">
-              <p className="py-2 text-sm text-gray-900 bg-gray-50 rounded p-3 border border-gray-200">
+              <p className={collapsible.notesBox}>
                 {request.catchInfo.notes}
               </p>
             </FormRow>
@@ -53,7 +54,7 @@ export const CatchInfoSection: React.FC<CatchInfoSectionProps> = ({ request, exp
                       e.preventDefault();
                       alert(`Descargar ${attachment} (simulado)`);
                     }}
-                    className="text-primary-600 hover:text-primary-700 text-sm flex items-center gap-2"
+                    className={`${typography.linkPrimarySm} flex items-center gap-2`}
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path

@@ -1,5 +1,6 @@
 import React from 'react';
 import type { SaleRequest } from '../../../types';
+import { collapsible } from '../../../styles';
 import { normalizeSettlement } from './utils';
 import { CollapsibleSection } from './CollapsibleSection';
 import { DUMMY_BALANCE_PROOF_IMAGE } from './constants';
@@ -36,10 +37,10 @@ export const BalanceReadOnlySection: React.FC<BalanceReadOnlySectionProps> = ({
 
   return (
     <CollapsibleSection title="Saldo restante pagado" expanded={expanded} onToggle={onToggle}>
-      <div className="px-6 pb-6">
-        <div className="bg-white border border-sky-200 rounded-xl p-6 space-y-8 shadow-sm">
+      <div className={collapsible.content}>
+        <div className={collapsible.innerBoxXl}>
           <div className="space-y-4">
-            <h4 className="text-base font-semibold text-sky-800 tracking-tight border-b border-sky-200 pb-2">
+            <h4 className={collapsible.subsectionTitle}>
               Información del productor
             </h4>
             <div>
@@ -47,7 +48,7 @@ export const BalanceReadOnlySection: React.FC<BalanceReadOnlySectionProps> = ({
               <p className="text-base text-gray-900 font-medium leading-snug">{request.producerName}</p>
             </div>
             {firstAccount && (
-              <div className="p-5 border border-sky-100 rounded-xl bg-sky-50/50 space-y-4">
+              <div className={collapsible.bankCard}>
                 <h5 className="text-sm font-semibold text-sky-800 tracking-tight">
                   Datos de la cuenta utilizada
                 </h5>
@@ -70,8 +71,8 @@ export const BalanceReadOnlySection: React.FC<BalanceReadOnlySectionProps> = ({
               </div>
             )}
           </div>
-          <div className="border border-sky-200 rounded-xl p-5 bg-sky-50/30">
-            <h4 className="text-base font-semibold text-sky-800 tracking-tight border-b border-sky-200 pb-2 mb-4">
+          <div className={collapsible.transferBox}>
+            <h4 className={collapsible.subsectionTitleMb}>
               Resumen del pago del saldo
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 text-sm">
@@ -103,7 +104,7 @@ export const BalanceReadOnlySection: React.FC<BalanceReadOnlySectionProps> = ({
             <h4 className="text-base font-semibold text-sky-800 tracking-tight border-b border-sky-200 pb-2">
               Comprobante del pago del saldo
             </h4>
-            <div className="border border-sky-200 rounded-lg overflow-hidden bg-gray-100 max-w-sm">
+            <div className={collapsible.proofImage}>
               <img
                 src={DUMMY_BALANCE_PROOF_IMAGE}
                 alt="Comprobante de saldo (ejemplo)"

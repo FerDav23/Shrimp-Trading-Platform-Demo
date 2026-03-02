@@ -3,6 +3,7 @@ import { dummyOffers } from '../../data/offers';
 import { dummySales } from '../../data/sales';
 import { dummyUsers } from '../../data/users';
 import { Card } from '../../components/Card';
+import { page } from '../../styles';
 
 export const ManagerDashboard: React.FC = () => {
   const totalSales = dummySales.length;
@@ -16,35 +17,33 @@ export const ManagerDashboard: React.FC = () => {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Dashboard Administrador</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <h1 className={page.title}>Dashboard Administrador</h1>
+      <div className={page.gridStats4}>
         <Card>
-          <div className="text-sm text-gray-600 mb-1">Total Ventas</div>
-          <div className="text-3xl font-bold text-gray-900">{totalSales}</div>
+          <div className={page.statLabel}>Total Ventas</div>
+          <div className={page.statValue}>{totalSales}</div>
         </Card>
         <Card>
-          <div className="text-sm text-gray-600 mb-1">Ventas Pagadas</div>
-          <div className="text-3xl font-bold text-green-600">{paidSales}</div>
+          <div className={page.statLabel}>Ventas Pagadas</div>
+          <div className={page.statValueGreen}>{paidSales}</div>
         </Card>
         <Card>
-          <div className="text-sm text-gray-600 mb-1">Pendientes de Pago</div>
-          <div className="text-3xl font-bold text-yellow-600">{unpaidSales}</div>
+          <div className={page.statLabel}>Pendientes de Pago</div>
+          <div className={page.statValueYellow}>{unpaidSales}</div>
         </Card>
         <Card>
-          <div className="text-sm text-gray-600 mb-1">Volumen Total (lb)</div>
-          <div className="text-3xl font-bold text-blue-600">
-            {totalVolume.toLocaleString()}
-          </div>
+          <div className={page.statLabel}>Volumen Total (lb)</div>
+          <div className={page.statValueBlue}>{totalVolume.toLocaleString()}</div>
         </Card>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card>
-          <div className="text-sm text-gray-600 mb-1">Ofertas Activas</div>
-          <div className="text-3xl font-bold text-primary-600">{activeOffers}</div>
+          <div className={page.statLabel}>Ofertas Activas</div>
+          <div className={page.statValuePrimary}>{activeOffers}</div>
         </Card>
         <Card>
-          <div className="text-sm text-gray-600 mb-1">Total Usuarios</div>
-          <div className="text-3xl font-bold text-purple-600">{totalUsers}</div>
+          <div className={page.statLabel}>Total Usuarios</div>
+          <div className={page.statValuePurple}>{totalUsers}</div>
         </Card>
       </div>
     </div>

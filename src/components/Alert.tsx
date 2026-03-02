@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react';
 import clsx from 'clsx';
+import { alert } from '../styles';
 
 export type AlertVariant = 'info' | 'warning' | 'error' | 'success';
 
@@ -18,26 +19,10 @@ const variantStyles: Record<
   AlertVariant,
   { container: string; title: string; icon: string }
 > = {
-  info: {
-    container: 'bg-sky-50 border-sky-200 text-sky-800',
-    title: 'text-sky-900',
-    icon: 'text-sky-500',
-  },
-  warning: {
-    container: 'bg-amber-50 border-amber-200 text-amber-800',
-    title: 'text-amber-900',
-    icon: 'text-amber-500',
-  },
-  error: {
-    container: 'bg-red-50 border-red-200 text-red-800',
-    title: 'text-red-900',
-    icon: 'text-red-500',
-  },
-  success: {
-    container: 'bg-emerald-50 border-emerald-200 text-emerald-800',
-    title: 'text-emerald-900',
-    icon: 'text-emerald-500',
-  },
+  info: alert.info,
+  warning: alert.warning,
+  error: alert.error,
+  success: alert.success,
 };
 
 const IconWarning = () => (
@@ -60,11 +45,7 @@ export const Alert: React.FC<AlertProps> = ({
   return (
     <div
       role="alert"
-      className={clsx(
-        'rounded-lg border p-4',
-        styles.container,
-        className
-      )}
+      className={clsx(alert.base, styles.container, className)}
     >
       <div className="flex gap-3">
         <div className={clsx('flex-shrink-0', styles.icon)}>
@@ -88,7 +69,7 @@ export const Alert: React.FC<AlertProps> = ({
           <button
             type="button"
             onClick={onDismiss}
-            className="flex-shrink-0 p-1 rounded hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-offset-transparent"
+            className={alert.dismiss}
             aria-label="Cerrar"
           >
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">

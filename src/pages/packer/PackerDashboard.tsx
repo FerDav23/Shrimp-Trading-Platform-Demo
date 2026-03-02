@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { page } from '../../styles';
 import { dummyOffers } from '../../data/offers';
 import { dummySaleRequests } from '../../data/saleRequests';
 import { Card } from '../../components/Card';
@@ -50,15 +51,15 @@ export const PackerDashboard: React.FC = () => {
 
   return (
     <div className="max-w-6xl mx-auto">
-      <h1 className="text-2xl font-bold text-gray-900 mb-8">Dashboard</h1>
+      <h1 className={page.titleLg}>Dashboard</h1>
 
       {/* Tarjetas de resumen */}
       <section className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8" aria-label="Resumen">
         <Link to="/packer/offers" className="block">
           <Card className="h-full transition-shadow hover:shadow-md">
-            <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">Ofertas publicadas</p>
-            <p className="mt-2 text-3xl font-bold text-emerald-600">{publishedOffers.length}</p>
-            <p className="mt-2 text-sm text-gray-600">
+            <p className={page.statLabel}>Ofertas publicadas</p>
+            <p className={page.statValueEmerald}>{publishedOffers.length}</p>
+            <p className={page.statDesc}>
               {publishedOffers.length === 0
                 ? 'Sin ofertas activas'
                 : `${offersEntero} Entero${offersCola > 0 ? ` · ${offersCola} Cola directa` : ''}`}
@@ -67,16 +68,16 @@ export const PackerDashboard: React.FC = () => {
         </Link>
         <Link to={statusToPath('PENDING_ACCEPTANCE')} className="block">
           <Card className="h-full transition-shadow hover:shadow-md">
-            <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">Pendientes de aceptar</p>
-            <p className="mt-2 text-3xl font-bold text-amber-600">{pendingAcceptance}</p>
-            <p className="mt-2 text-sm text-gray-600">Solicitudes por revisar</p>
+            <p className={page.statLabel}>Pendientes de aceptar</p>
+            <p className={page.statValueAmber}>{pendingAcceptance}</p>
+            <p className={page.statDesc}>Solicitudes por revisar</p>
           </Card>
         </Link>
         <Link to="/packer/sales" className="block">
           <Card className="h-full transition-shadow hover:shadow-md">
-            <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">Total solicitudes</p>
-            <p className="mt-2 text-3xl font-bold text-sky-600">{mySaleRequests.length}</p>
-            <p className="mt-2 text-sm text-gray-600">Todas las compras</p>
+            <p className={page.statLabel}>Total solicitudes</p>
+            <p className={page.statValueSky}>{mySaleRequests.length}</p>
+            <p className={page.statDesc}>Todas las compras</p>
           </Card>
         </Link>
       </section>
@@ -84,14 +85,14 @@ export const PackerDashboard: React.FC = () => {
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Mis ofertas (solo del packer actual) */}
         <Card>
-          <div className="flex justify-between items-center mb-5 pb-3 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">Mis ofertas</h2>
-            <Link to="/packer/offers" className="text-sm font-medium text-sky-600 hover:text-sky-700">
+          <div className={page.cardHeader}>
+            <h2 className={page.cardTitle}>Mis ofertas</h2>
+            <Link to="/packer/offers" className={page.cardLink}>
               Gestionar ofertas
             </Link>
           </div>
           {publishedOffers.length === 0 ? (
-            <p className="text-sm text-gray-500 py-4">No tienes ofertas publicadas.</p>
+            <p className={page.cardEmpty}>No tienes ofertas publicadas.</p>
           ) : (
             <ul className="space-y-0 divide-y divide-gray-100">
               {publishedOffers.slice(0, 5).map((offer) => (
@@ -115,15 +116,15 @@ export const PackerDashboard: React.FC = () => {
 
         {/* Compras por estado + recientes */}
         <Card>
-          <div className="flex justify-between items-center mb-5 pb-3 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">Compras</h2>
-            <Link to="/packer/sales" className="text-sm font-medium text-sky-600 hover:text-sky-700">
+          <div className={page.cardHeader}>
+            <h2 className={page.cardTitle}>Compras</h2>
+            <Link to="/packer/sales" className={page.cardLink}>
               Ver todas
             </Link>
           </div>
 
           <div className="mb-6">
-            <h3 className="text-sm font-medium text-gray-700 mb-3">Por estado</h3>
+            <h3 className={page.sectionSubtitle}>Por estado</h3>
             <ul className="space-y-2">
               {SALES_NAV_ITEMS.map(({ status, label }) => {
                 const count = requestsByStatus[status] ?? 0;
@@ -131,10 +132,10 @@ export const PackerDashboard: React.FC = () => {
                   <li key={status}>
                     <Link
                       to={statusToPath(status)}
-                      className="flex justify-between items-center py-2 px-3 rounded-lg bg-gray-50 hover:bg-gray-100 text-left"
+                      className={page.listItem}
                     >
-                      <span className="text-sm text-gray-700 truncate pr-2">{label}</span>
-                      <span className="text-sm font-semibold text-sky-600 tabular-nums">{count}</span>
+                      <span className={page.listItemLabel}>{label}</span>
+                      <span className={page.listItemCount}>{count}</span>
                     </Link>
                   </li>
                 );
@@ -143,7 +144,7 @@ export const PackerDashboard: React.FC = () => {
           </div>
 
           <div className="pt-4 border-t border-gray-200">
-            <h3 className="text-sm font-medium text-gray-700 mb-3">Solicitudes recientes</h3>
+            <h3 className={page.sectionSubtitle}>Solicitudes recientes</h3>
             {recentRequests.length === 0 ? (
               <p className="text-sm text-gray-500 py-2">Ninguna solicitud.</p>
             ) : (

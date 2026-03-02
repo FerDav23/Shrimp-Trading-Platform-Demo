@@ -2,6 +2,7 @@ import React from 'react';
 import type { OfferFormData, PriceTier } from './types';
 import { formatTalla } from './utils';
 import { blockNegativeAndExponentKeys } from './utils';
+import { offerSection } from '../../../styles';
 
 interface OfferFormPriceTableProps {
   data: OfferFormData;
@@ -29,38 +30,38 @@ export const OfferFormPriceTable: React.FC<OfferFormPriceTableProps> = ({
 }) => (
   <section
     ref={sectionRef as React.RefObject<HTMLElement> | undefined}
-    className="p-3 rounded-xl border-2 border-sky-400/60 bg-[#4aa3e0] shadow-sm self-start"
+    className={offerSection.containerStart}
   >
-    <h3 className="text-lg font-semibold text-white mb-2 pb-2 border-b border-white/30">
+    <h3 className={offerSection.titleMb2}>
       Tabla de Precios
     </h3>
-    <div className="bg-white/70 border border-sky-300/60 rounded-lg p-3">
-      <p className="text-sm text-slate-600 mb-2">
+    <div className={offerSection.inner}>
+      <p className={offerSection.textSm + ' mb-2'}>
         Las tallas son fijas por tipo de producto. Indique el precio (USD) para cada talla que desee
         ofrecer; debe haber al menos una con precio. Las tallas sin precio no se mostrarán al
         productor en la oferta.
       </p>
-      <div className="overflow-x-auto rounded-lg border border-sky-300/40 overflow-hidden">
-        <table className="min-w-full divide-y divide-sky-300/50">
-          <thead className="bg-sky-500/25">
+      <div className={offerSection.tableWrapperFull}>
+        <table className={offerSection.table}>
+          <thead className={offerSection.tableHead}>
             <tr>
-              <th className="px-2 py-1.5 text-left text-xs font-semibold text-slate-800 uppercase tracking-wide">
+              <th className={offerSection.tableTh}>
                 Talla
               </th>
-              <th className="px-2 py-1.5 text-left text-xs font-semibold text-slate-800 uppercase tracking-wide">
+              <th className={offerSection.tableTh}>
                 Precio (USD/{data.priceUnit === 'PER_KG' ? 'kg' : 'lb'})
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-sky-200/50">
+          <tbody className={offerSection.tableBody}>
             {data.priceTiers.map((tier, idx) => (
-              <tr key={idx} className="hover:bg-white/80">
-                <td className="px-2 py-1">
-                  <span className="py-1 text-slate-800 font-medium">
+              <tr key={idx} className={offerSection.tableRow}>
+                <td className={offerSection.tableCell}>
+                  <span className={'py-1 ' + offerSection.textBold}>
                     {formatTalla(tier.sizeMin, tier.sizeMax)}
                   </span>
                 </td>
-                <td className="px-2 py-1">
+                <td className={offerSection.tableCell}>
                   <input
                     type="number"
                     min="0"
@@ -74,7 +75,7 @@ export const OfferFormPriceTable: React.FC<OfferFormPriceTableProps> = ({
                     }
                     onBlur={() => setIncompleteNumBlur(`priceTier-${idx}`)}
                     readOnly={isLocked}
-                    className="w-24 border border-sky-300 rounded px-2 py-1.5 bg-white focus:ring-2 focus:ring-sky-400 focus:border-sky-400 text-slate-800"
+                    className={offerSection.input}
                   />
                 </td>
               </tr>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { FormRow } from '../../../components/FormRow';
+import { collapsible, form, settlementTable, button } from '../../../styles';
 import { CATCH_SETTLEMENT_CLASSES } from '../../../types';
 import type { CatchSettlement, CatchSettlementLine } from '../../../types';
 import { createEmptyLine } from './utils';
@@ -47,14 +48,14 @@ export const SettlementFormSection: React.FC<SettlementFormSectionProps> = ({
 
   return (
     <CollapsibleSection title="Liquidación de pesca" expanded={expanded} onToggle={onToggle}>
-      <div className="px-6 pb-6">
-        <div className="bg-white border border-sky-200 rounded-lg p-4 space-y-6">
+      <div className={collapsible.content}>
+        <div className={`${collapsible.innerBox} space-y-6`}>
           <div className="flex justify-end">
             {isSettlementLocked ? (
               <button
                 type="button"
                 onClick={() => onSettlementLockedChange(false)}
-                className="px-4 py-2 bg-sky-600 text-white rounded-md hover:bg-sky-700 font-medium text-sm transition-colors"
+                className={button.skySmall}
               >
                 Editar liquidación
               </button>
@@ -62,7 +63,7 @@ export const SettlementFormSection: React.FC<SettlementFormSectionProps> = ({
               <button
                 type="button"
                 onClick={() => onSettlementLockedChange(true)}
-                className="px-4 py-2 bg-sky-600 text-white rounded-md hover:bg-sky-700 font-medium text-sm transition-colors"
+                className={button.skySmall}
               >
                 Guardar
               </button>
@@ -78,7 +79,7 @@ export const SettlementFormSection: React.FC<SettlementFormSectionProps> = ({
                   value={settlement.entryDate}
                   onChange={(e) => onSettlementChange((s) => ({ ...s, entryDate: e.target.value }))}
                   readOnly={isSettlementLocked}
-                  className={`w-full px-2 py-1.5 border border-gray-300 rounded text-sm ${isSettlementLocked ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                  className={`${form.inputEditable} ${isSettlementLocked ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                 />
               </FormRow>
               <FormRow labelClassName="text-sm font-medium text-gray-700" label="No. Lote">
@@ -88,7 +89,7 @@ export const SettlementFormSection: React.FC<SettlementFormSectionProps> = ({
                   onChange={(e) => onSettlementChange((s) => ({ ...s, lotNumber: e.target.value }))}
                   placeholder="Ej. FC218233"
                   readOnly={isSettlementLocked}
-                  className={`w-full px-2 py-1.5 border border-gray-300 rounded text-sm ${isSettlementLocked ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                  className={`${form.inputEditable} ${isSettlementLocked ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                 />
               </FormRow>
               <FormRow labelClassName="text-sm font-medium text-gray-700" label="Guía rem.">
@@ -98,7 +99,7 @@ export const SettlementFormSection: React.FC<SettlementFormSectionProps> = ({
                   onChange={(e) => onSettlementChange((s) => ({ ...s, remissionGuide: e.target.value }))}
                   placeholder="Ej. 484-483"
                   readOnly={isSettlementLocked}
-                  className={`w-full px-2 py-1.5 border border-gray-300 rounded text-sm ${isSettlementLocked ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                  className={`${form.inputEditable} ${isSettlementLocked ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                 />
               </FormRow>
               <FormRow labelClassName="text-sm font-medium text-gray-700" label="Piscina">
@@ -108,7 +109,7 @@ export const SettlementFormSection: React.FC<SettlementFormSectionProps> = ({
                   onChange={(e) => onSettlementChange((s) => ({ ...s, pond: e.target.value }))}
                   placeholder="Ej. 2"
                   readOnly={isSettlementLocked}
-                  className={`w-full px-2 py-1.5 border border-gray-300 rounded text-sm ${isSettlementLocked ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                  className={`${form.inputEditable} ${isSettlementLocked ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                 />
               </FormRow>
               <FormRow labelClassName="text-sm font-medium text-gray-700" label="Aguaje">
@@ -118,7 +119,7 @@ export const SettlementFormSection: React.FC<SettlementFormSectionProps> = ({
                   onChange={(e) => onSettlementChange((s) => ({ ...s, aguaje: e.target.value }))}
                   placeholder="Ej. 2024-14"
                   readOnly={isSettlementLocked}
-                  className={`w-full px-2 py-1.5 border border-gray-300 rounded text-sm ${isSettlementLocked ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                  className={`${form.inputEditable} ${isSettlementLocked ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                 />
               </FormRow>
             </div>
@@ -153,20 +154,20 @@ export const SettlementFormSection: React.FC<SettlementFormSectionProps> = ({
                       <button
                         type="button"
                         onClick={addLine}
-                        className="text-xs px-2 py-1 bg-sky-600 text-white rounded hover:bg-sky-700"
+                        className={settlementTable.addLineBtn}
                       >
                         + Agregar línea
                       </button>
                     )}
                   </div>
                   <div className="overflow-x-auto">
-                    <table className="w-full text-sm border border-gray-200 rounded-lg overflow-hidden">
+                    <table className={settlementTable.tableOverflow}>
                       <thead>
-                        <tr className="bg-gray-100 text-left">
-                          <th className="px-2 py-2 font-medium text-gray-700">Talla / Descripción</th>
-                          <th className="px-2 py-2 font-medium text-gray-700">Libras</th>
-                          <th className="px-2 py-2 font-medium text-gray-700">P. unit.</th>
-                          <th className="px-2 py-2 font-medium text-gray-700">Valor total</th>
+                        <tr className={settlementTable.thead}>
+                          <th className={settlementTable.th}>Talla / Descripción</th>
+                          <th className={settlementTable.th}>Libras</th>
+                          <th className={settlementTable.th}>P. unit.</th>
+                          <th className={settlementTable.th}>Valor total</th>
                           {!isSettlementLocked && <th className="w-10" />}
                         </tr>
                       </thead>
@@ -175,14 +176,14 @@ export const SettlementFormSection: React.FC<SettlementFormSectionProps> = ({
                           <tr>
                             <td
                               colSpan={isSettlementLocked ? 4 : 5}
-                              className="px-2 py-3 text-center text-gray-500"
+                              className={settlementTable.emptyCell}
                             >
                               Sin líneas
                             </td>
                           </tr>
                         ) : (
                           lines.map((line) => (
-                            <tr key={line.id} className="border-t border-gray-100">
+                            <tr key={line.id} className={settlementTable.row}>
                               <td className="px-2 py-1.5">
                                 {isSettlementLocked ? (
                                   <span className="text-gray-900">{line.sizeOrDesc || '—'}</span>
@@ -192,7 +193,7 @@ export const SettlementFormSection: React.FC<SettlementFormSectionProps> = ({
                                     value={line.sizeOrDesc}
                                     onChange={(e) => updateLine(line.id, 'sizeOrDesc', e.target.value)}
                                     placeholder="31-35, Quebrado..."
-                                    className="w-full px-2 py-1 border border-gray-200 rounded text-sm"
+                                    className={form.inputTableCell}
                                   />
                                 )}
                               </td>
@@ -209,7 +210,7 @@ export const SettlementFormSection: React.FC<SettlementFormSectionProps> = ({
                                       const v = parseFloat(e.target.value);
                                       updateLine(line.id, 'pounds', Number.isNaN(v) ? 0 : v);
                                     }}
-                                    className="w-20 px-2 py-1 border border-gray-200 rounded text-sm"
+                                    className={form.inputSmallGray}
                                   />
                                 )}
                               </td>
@@ -226,7 +227,7 @@ export const SettlementFormSection: React.FC<SettlementFormSectionProps> = ({
                                       const v = parseFloat(e.target.value);
                                       updateLine(line.id, 'unitPrice', Number.isNaN(v) ? 0 : v);
                                     }}
-                                    className="w-20 px-2 py-1 border border-gray-200 rounded text-sm"
+                                    className={form.inputSmallGray}
                                   />
                                 )}
                               </td>
@@ -238,7 +239,7 @@ export const SettlementFormSection: React.FC<SettlementFormSectionProps> = ({
                                   <button
                                     type="button"
                                     onClick={() => removeLine(line.id)}
-                                    className="p-1 text-red-600 hover:bg-red-50 rounded"
+                                    className={settlementTable.removeBtn}
                                     aria-label="Quitar línea"
                                   >
                                     ×
@@ -262,7 +263,7 @@ export const SettlementFormSection: React.FC<SettlementFormSectionProps> = ({
                 type="text"
                 readOnly
                 value={remitidasLb}
-                className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm bg-gray-100 text-gray-700"
+                className={form.inputReadonlyGray}
               />
             </FormRow>
             <FormRow labelClassName="text-sm font-medium text-gray-700" label="Basura cola directa (lb)">
@@ -276,7 +277,7 @@ export const SettlementFormSection: React.FC<SettlementFormSectionProps> = ({
                   onSettlementChange((s) => ({ ...s, basuraColaDirectaLb: Number.isNaN(v) ? 0 : v }));
                 }}
                 readOnly={isSettlementLocked}
-                className={`w-full px-2 py-1.5 border border-gray-300 rounded text-sm ${isSettlementLocked ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                className={`${form.inputEditable} ${isSettlementLocked ? 'bg-gray-100 cursor-not-allowed' : ''}`}
               />
             </FormRow>
             <div className="text-sm text-gray-900">

@@ -1,5 +1,6 @@
 import React from 'react';
 import { CollapsibleSection } from './CollapsibleSection';
+import { collapsible } from '../../../styles';
 import { DUMMY_ADVANCE_PROOF_IMAGE } from './constants';
 
 interface AdvanceReadOnlySectionProps {
@@ -12,12 +13,12 @@ export const AdvanceReadOnlySection: React.FC<AdvanceReadOnlySectionProps> = ({
   onToggle,
 }) => (
   <CollapsibleSection title="Anticipo pagado" expanded={expanded} onToggle={onToggle}>
-    <div className="px-6 pb-6">
-      <div className="bg-white border border-sky-200 rounded-xl p-6 space-y-4 shadow-sm">
-        <h4 className="text-base font-semibold text-sky-800 tracking-tight border-b border-sky-200 pb-2">
+    <div className={collapsible.content}>
+      <div className={collapsible.innerBoxXl}>
+        <h4 className={collapsible.subsectionTitle}>
           Comprobante de anticipo
         </h4>
-        <div className="border border-sky-200 rounded-lg overflow-hidden bg-gray-100 max-w-sm">
+        <div className={collapsible.proofImage}>
           <img
             src={DUMMY_ADVANCE_PROOF_IMAGE}
             alt="Comprobante de anticipo (ejemplo)"
@@ -26,19 +27,19 @@ export const AdvanceReadOnlySection: React.FC<AdvanceReadOnlySectionProps> = ({
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
           <div>
-            <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">
+            <p className={collapsible.fieldLabel}>
               Fecha de envío
             </p>
             <p className="text-gray-900">15 Feb 2024, 10:30</p>
           </div>
           <div>
-            <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">
+            <p className={collapsible.fieldLabel}>
               Monto del anticipo
             </p>
             <p className="text-gray-900 font-semibold">$ 588.00</p>
           </div>
           <div className="md:col-span-2">
-            <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Estado</p>
+            <p className={collapsible.fieldLabel}>Estado</p>
             <p className="text-gray-900 font-medium text-green-700">Anticipo enviado y confirmado</p>
           </div>
         </div>

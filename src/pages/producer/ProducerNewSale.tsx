@@ -6,6 +6,7 @@ import { Card } from '../../components/Card';
 import { FormRow } from '../../components/FormRow';
 import { Money } from '../../components/Money';
 import { Breadcrumbs } from '../../components/Breadcrumbs';
+import { page, form, button, typography } from '../../styles';
 //import { useAuth } from '../../contexts/AuthContext';
 
 export const ProducerNewSale: React.FC = () => {
@@ -85,21 +86,19 @@ export const ProducerNewSale: React.FC = () => {
         ]}
       />
       <div className="mt-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">Nueva Venta</h1>
+        <h1 className={page.title}>Nueva Venta</h1>
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">
               <Card>
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                  Detalles de la Venta
-                </h2>
+                <h2 className={`${page.cardTitle} mb-4`}>Detalles de la Venta</h2>
 
                 <FormRow label="Oferta" required>
                   <input
                     type="text"
                     value={offer.offerCode}
                     disabled
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-50"
+                    className={form.inputDisabled}
                   />
                 </FormRow>
 
@@ -110,7 +109,7 @@ export const ProducerNewSale: React.FC = () => {
                       const [min, max] = e.target.value.split('-').map(Number);
                       setSizeRange({ min, max });
                     }}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2"
+                    className={form.inputGray}
                     required
                   >
                     <option value="">Selecciona una talla</option>
@@ -128,7 +127,7 @@ export const ProducerNewSale: React.FC = () => {
                     type="number"
                     value={quantityLb}
                     onChange={(e) => setQuantityLb(e.target.value)}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2"
+                    className={form.inputGray}
                     min="1"
                     step="0.01"
                     required
@@ -140,7 +139,7 @@ export const ProducerNewSale: React.FC = () => {
                     type="date"
                     value={harvestDate}
                     onChange={(e) => setHarvestDate(e.target.value)}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2"
+                    className={form.inputGray}
                     required
                   />
                 </FormRow>
@@ -150,7 +149,7 @@ export const ProducerNewSale: React.FC = () => {
                     type="text"
                     value={pickupCity}
                     onChange={(e) => setPickupCity(e.target.value)}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2"
+                    className={form.inputGray}
                     placeholder="Ej: Guayaquil"
                     required
                   />
@@ -160,7 +159,7 @@ export const ProducerNewSale: React.FC = () => {
                   <textarea
                     value={pickupAddress}
                     onChange={(e) => setPickupAddress(e.target.value)}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2"
+                    className={form.textareaGray}
                     rows={3}
                     placeholder="Dirección completa de la piscina"
                     required
@@ -171,21 +170,19 @@ export const ProducerNewSale: React.FC = () => {
 
             <div className="lg:col-span-1">
               <Card className="sticky top-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                  Resumen
-                </h3>
+                <h3 className={`${page.cardTitle} mb-4`}>Resumen</h3>
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Empacadora:</span>
+                    <span className={typography.body}>Empacadora:</span>
                     <span className="font-medium">{offer.packingCompany.name}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Producto:</span>
+                    <span className={typography.body}>Producto:</span>
                     <span className="font-medium">{offer.productForm}</span>
                   </div>
                   {sizeRange && (
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Talla:</span>
+                      <span className={typography.body}>Talla:</span>
                       <span className="font-medium">
                         {sizeRange.min}/{sizeRange.max}
                       </span>
@@ -193,7 +190,7 @@ export const ProducerNewSale: React.FC = () => {
                   )}
                   {quantityLb && (
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Cantidad:</span>
+                      <span className={typography.body}>Cantidad:</span>
                       <span className="font-medium">{quantityLb} lb</span>
                     </div>
                   )}
@@ -204,10 +201,7 @@ export const ProducerNewSale: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                <button
-                  type="submit"
-                  className="w-full mt-6 bg-primary-600 text-white py-2 px-4 rounded-md hover:bg-primary-700 transition-colors font-medium"
-                >
+                <button type="submit" className={`${button.primaryFull} mt-6`}>
                   Confirmar Venta
                 </button>
               </Card>

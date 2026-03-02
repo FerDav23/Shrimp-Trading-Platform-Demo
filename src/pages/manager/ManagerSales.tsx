@@ -6,6 +6,7 @@ import { DataTable } from '../../components/DataTable';
 import { Sale } from '../../types';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { page, form } from '../../styles';
 
 export const ManagerSales: React.FC = () => {
   const [filterPayment, setFilterPayment] = useState<string>('all');
@@ -51,17 +52,15 @@ export const ManagerSales: React.FC = () => {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Todas las Ventas</h1>
+      <h1 className={page.title}>Todas las Ventas</h1>
       <Card className="mb-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Filtro por Pago
-            </label>
+            <label className={form.label}>Filtro por Pago</label>
             <select
               value={filterPayment}
               onChange={(e) => setFilterPayment(e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+              className={form.selectFilter}
             >
               <option value="all">Todos</option>
               <option value="PENDING">Pendiente</option>
@@ -71,13 +70,11 @@ export const ManagerSales: React.FC = () => {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Filtro por Logística
-            </label>
+            <label className={form.label}>Filtro por Logística</label>
             <select
               value={filterLogistics}
               onChange={(e) => setFilterLogistics(e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+              className={form.selectFilter}
             >
               <option value="all">Todos</option>
               <option value="PENDING_PICKUP">Pendiente Recolección</option>

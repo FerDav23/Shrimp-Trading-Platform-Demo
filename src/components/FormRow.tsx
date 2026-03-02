@@ -1,4 +1,5 @@
 import React, { ReactNode } from 'react';
+import { form } from '../styles';
 
 interface FormRowProps {
   label: string;
@@ -17,10 +18,10 @@ export const FormRow: React.FC<FormRowProps> = ({
   labelClassName,
 }) => {
   return (
-    <div className={`mb-4 ${className || ''}`}>
-      <label className={labelClassName ?? 'block text-sm font-medium text-gray-700 mb-1'}>
+    <div className={`${form.row} ${className || ''}`}>
+      <label className={labelClassName ?? form.label}>
         {label}
-        {required && <span className="text-red-500 ml-1">*</span>}
+        {required && <span className={form.labelRequired}>*</span>}
       </label>
       {children}
     </div>

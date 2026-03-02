@@ -8,6 +8,7 @@ import { Modal } from '../../components/Modal';
 import { Sale } from '../../types';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { page, form, button } from '../../styles';
 
 export const LogisticsShipments: React.FC = () => {
   const [selectedSale, setSelectedSale] = useState<Sale | null>(null);
@@ -68,13 +69,13 @@ export const LogisticsShipments: React.FC = () => {
             <>
               <button
                 onClick={() => handleAssignTruck(sale)}
-                className="text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700"
+                className={button.actionSmallBlue}
               >
                 Asignar Camión
               </button>
               <button
                 onClick={() => handleStatusChange(sale.id, 'IN_TRANSIT')}
-                className="text-xs bg-green-600 text-white px-2 py-1 rounded hover:bg-green-700"
+                className={button.actionSmallGreen}
               >
                 En Tránsito
               </button>
@@ -83,7 +84,7 @@ export const LogisticsShipments: React.FC = () => {
           {sale.logisticsStatus === 'IN_TRANSIT' && (
             <button
               onClick={() => handleStatusChange(sale.id, 'DELIVERED')}
-              className="text-xs bg-green-600 text-white px-2 py-1 rounded hover:bg-green-700"
+              className={button.actionSmallGreen}
             >
               Marcar Entregado
             </button>
@@ -95,7 +96,7 @@ export const LogisticsShipments: React.FC = () => {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Envíos</h1>
+      <h1 className={page.title}>Envíos</h1>
       <Card>
         <DataTable data={dummySales} columns={columns} />
       </Card>
@@ -111,13 +112,11 @@ export const LogisticsShipments: React.FC = () => {
       >
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Seleccionar Camión
-            </label>
+            <label className={form.label}>Seleccionar Camión</label>
             <select
               value={selectedTruck}
               onChange={(e) => setSelectedTruck(e.target.value)}
-              className="w-full border border-gray-300 rounded-md px-3 py-2"
+              className={form.inputGray}
             >
               <option value="">Selecciona un camión</option>
               {dummyTrucks.map((truck) => (
@@ -134,14 +133,11 @@ export const LogisticsShipments: React.FC = () => {
                 setSelectedSale(null);
                 setSelectedTruck('');
               }}
-              className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+              className={button.cancelOutline}
             >
               Cancelar
             </button>
-            <button
-              onClick={handleConfirmTruck}
-              className="px-4 py-2 bg-primary-600 text-white rounded-md text-sm font-medium hover:bg-primary-700"
-            >
+            <button onClick={handleConfirmTruck} className={button.primaryMd}>
               Confirmar
             </button>
           </div>

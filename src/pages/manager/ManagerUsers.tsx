@@ -3,6 +3,7 @@ import { dummyUsers } from '../../data/users';
 import { Card } from '../../components/Card';
 import { DataTable } from '../../components/DataTable';
 import { User } from '../../types';
+import { page, typography, button } from '../../styles';
 
 export const ManagerUsers: React.FC = () => {
   const columns = [
@@ -31,7 +32,7 @@ export const ManagerUsers: React.FC = () => {
       accessor: (user: User) => (
         <button
           onClick={() => alert(`Editar usuario ${user.id} (simulado)`)}
-          className="text-primary-600 hover:text-primary-700 text-sm font-medium"
+          className={typography.linkPrimarySm}
         >
           Editar
         </button>
@@ -42,10 +43,10 @@ export const ManagerUsers: React.FC = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Usuarios</h1>
+        <h1 className={page.title}>Usuarios</h1>
         <button
           onClick={() => alert('Crear nuevo usuario (simulado)')}
-          className="bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700 transition-colors font-medium"
+          className={button.primaryMd}
         >
           Crear Usuario
         </button>

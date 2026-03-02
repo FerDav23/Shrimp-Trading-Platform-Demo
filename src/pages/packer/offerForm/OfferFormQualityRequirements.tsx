@@ -1,6 +1,7 @@
 import React from 'react';
 import type { OfferFormData } from './types';
 import { REQUISITOS_CALIDAD_BD } from './constants';
+import { offerSection } from '../../../styles';
 
 interface OfferFormQualityRequirementsProps {
   data: OfferFormData;
@@ -17,13 +18,13 @@ export const OfferFormQualityRequirements: React.FC<OfferFormQualityRequirements
 }) => (
   <section
     ref={sectionRef as React.RefObject<HTMLElement> | undefined}
-    className="flex flex-col p-3 rounded-xl border-2 border-sky-400/60 bg-[#4aa3e0] shadow-sm min-h-0 overflow-hidden"
+    className={offerSection.containerFlex}
   >
-    <h3 className="text-lg font-semibold text-white mb-2 pb-2 border-b border-white/30 shrink-0">
+    <h3 className={offerSection.titleShrink}>
       Requisitos de Calidad
     </h3>
-    <div className="bg-white/70 border border-sky-300/60 rounded-lg p-3 flex-1 min-h-0 flex flex-col">
-      <p className="text-sm text-slate-600 mb-2 shrink-0">
+    <div className={offerSection.innerFlex}>
+      <p className={offerSection.textSm + ' mb-2 shrink-0'}>
         Los requisitos se cargan desde el catálogo. Marque con un check los que aplican a esta
         oferta; solo los requisitos marcados se mostrarán al productor en la oferta publicada.
       </p>
@@ -33,19 +34,19 @@ export const OfferFormQualityRequirements: React.FC<OfferFormQualityRequirements
           return (
             <label
               key={req.id}
-              className={`flex items-start gap-2 p-2 rounded-lg border cursor-pointer transition-colors ${
-                isSelected ? 'bg-sky-50/80 border-sky-300' : 'bg-white/50 border-sky-200'
-              } ${isLocked ? 'cursor-not-allowed opacity-80' : ''}`}
+              className={`${offerSection.checkboxItem} ${
+                isSelected ? offerSection.checkboxItemSelected : offerSection.checkboxItemUnselected
+              } ${isLocked ? offerSection.checkboxItemLocked : ''}`}
             >
               <input
                 type="checkbox"
                 checked={isSelected}
                 onChange={() => toggleQualityRequirement(req.id)}
                 disabled={isLocked}
-                className="mt-1 rounded border-sky-300 text-sky-600 focus:ring-sky-400 shrink-0"
+                className={offerSection.checkbox}
               />
               <div className="flex-1 min-w-0">
-                <span className="text-slate-800">{req.text}</span>
+                <span className={offerSection.textBold}>{req.text}</span>
               </div>
             </label>
           );

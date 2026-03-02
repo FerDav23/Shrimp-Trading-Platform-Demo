@@ -2,6 +2,7 @@ import React from 'react';
 import { Card } from '../../components/Card';
 import { DataTable } from '../../components/DataTable';
 import { StatusBadge } from '../../components/StatusBadge';
+import { page, button, typography } from '../../styles';
 
 interface ApprovalItem {
   id: string;
@@ -64,26 +65,26 @@ export const ManagerApprovals: React.FC = () => {
           <div className="flex gap-2">
             <button
               onClick={() => handleAction(item.id, 'APPROVED')}
-              className="text-xs bg-green-600 text-white px-2 py-1 rounded hover:bg-green-700"
+              className={button.actionSmallGreen}
             >
               Aprobar
             </button>
             <button
               onClick={() => handleAction(item.id, 'REJECTED')}
-              className="text-xs bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700"
+              className={button.actionSmallRed}
             >
               Rechazar
             </button>
           </div>
         ) : (
-          <span className="text-sm text-gray-500">-</span>
+          <span className={typography.bodyMuted}>-</span>
         ),
     },
   ];
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Aprobaciones</h1>
+      <h1 className={page.title}>Aprobaciones</h1>
       <Card>
         <DataTable data={dummyApprovals} columns={columns} />
       </Card>

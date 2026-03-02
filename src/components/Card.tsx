@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react';
 import clsx from 'clsx';
+import { card } from '../styles';
 
 interface CardProps {
   children: ReactNode;
@@ -10,11 +11,7 @@ interface CardProps {
 export const Card: React.FC<CardProps> = ({ children, className, onClick }) => {
   return (
     <div
-      className={clsx(
-        'bg-white rounded-lg shadow-sm border border-gray-200 p-6',
-        onClick && 'cursor-pointer hover:shadow-md transition-shadow',
-        className
-      )}
+      className={clsx(card.base, onClick && card.hover, className)}
       onClick={onClick}
     >
       {children}

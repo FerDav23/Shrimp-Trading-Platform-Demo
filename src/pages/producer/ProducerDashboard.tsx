@@ -8,6 +8,7 @@ import { Card } from '../../components/Card';
 import { StatusBadge } from '../../components/StatusBadge';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { page, typography } from '../../styles';
 
 export const ProducerDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -32,56 +33,47 @@ export const ProducerDashboard: React.FC = () => {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Dashboard</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+      <h1 className={page.title}>Dashboard</h1>
+      <div className={page.gridStats}>
         <Card>
-          <div className="text-sm text-gray-600 mb-1">Ofertas Activas</div>
-          <div className="text-3xl font-bold text-gray-900">{activeOffers.length}</div>
+          <div className={page.statLabel}>Ofertas Activas</div>
+          <div className={page.statValue}>{activeOffers.length}</div>
         </Card>
         <Card>
-          <div className="text-sm text-gray-600 mb-1">Ventas en Curso</div>
-          <div className="text-3xl font-bold text-blue-600">{salesInProgress.length}</div>
+          <div className={page.statLabel}>Ventas en Curso</div>
+          <div className={page.statValueBlue}>{salesInProgress.length}</div>
         </Card>
         <Card>
-          <div className="text-sm text-gray-600 mb-1">Ventas Pagadas</div>
-          <div className="text-3xl font-bold text-green-600">{paidSales.length}</div>
+          <div className={page.statLabel}>Ventas Pagadas</div>
+          <div className={page.statValueGreen}>{paidSales.length}</div>
         </Card>
         <Card>
-          <div className="text-sm text-gray-600 mb-1">Pendientes de Pago</div>
-          <div className="text-3xl font-bold text-yellow-600">{unpaidSales.length}</div>
+          <div className={page.statLabel}>Pendientes de Pago</div>
+          <div className={page.statValueYellow}>{unpaidSales.length}</div>
         </Card>
         <Card>
-          <div className="text-sm text-gray-600 mb-1">Mensajes sin leer</div>
-          <div className="text-3xl font-bold text-yellow-600">{unreadMessages.length}</div>
+          <div className={page.statLabel}>Mensajes sin leer</div>
+          <div className={page.statValueYellow}>{unreadMessages.length}</div>
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className={page.gridCards}>
         <Card>
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">Ofertas Recientes</h2>
-            <Link
-              to="/producer/offers"
-              className="text-sm text-primary-600 hover:text-primary-700"
-            >
+          <div className={page.cardHeader}>
+            <h2 className={page.cardTitle}>Ofertas Recientes</h2>
+            <Link to="/producer/offers" className={page.cardLinkPrimary}>
               Ver todas
             </Link>
           </div>
           <div className="space-y-3">
             {activeOffers.slice(0, 3).map((offer) => (
-              <div
-                key={offer.id}
-                className="border-b border-gray-200 pb-3 last:border-0"
-              >
+              <div key={offer.id} className={page.listItemBorder}>
                 <div className="flex justify-between items-start">
                   <div>
-                    <Link
-                      to={`/producer/offers/${offer.id}`}
-                      className="font-medium text-gray-900 hover:text-primary-600"
-                    >
+                    <Link to={`/producer/offers/${offer.id}`} className={page.listItemLink}>
                       {offer.offerCode}
                     </Link>
-                    <p className="text-sm text-gray-600">
+                    <p className={typography.body}>
                       {offer.packingCompany.name} - {offer.productForm}
                     </p>
                   </div>
@@ -93,21 +85,15 @@ export const ProducerDashboard: React.FC = () => {
         </Card>
 
         <Card>
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">Mensajes Recientes</h2>
-            <Link
-              to="/producer/messages"
-              className="text-sm text-primary-600 hover:text-primary-700"
-            >
+          <div className={page.cardHeader}>
+            <h2 className={page.cardTitle}>Mensajes Recientes</h2>
+            <Link to="/producer/messages" className={page.cardLinkPrimary}>
               Ver todos
             </Link>
           </div>
           <div className="space-y-3">
             {recentMessages.map((message) => (
-              <div
-                key={message.id}
-                className="border-b border-gray-200 pb-3 last:border-0"
-              >
+              <div key={message.id} className={page.listItemBorder}>
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
@@ -119,12 +105,10 @@ export const ProducerDashboard: React.FC = () => {
                       >
                         {message.subject}
                       </Link>
-                      {!message.isRead && (
-                        <span className="w-2 h-2 bg-yellow-600 rounded-full"></span>
-                      )}
+                      {!message.isRead && <span className={page.unreadDot} />}
                     </div>
-                    <p className="text-sm text-gray-600">{message.from}</p>
-                    <p className="text-xs text-gray-500 mt-1">{message.preview}</p>
+                    <p className={typography.body}>{message.from}</p>
+                    <p className={`${typography.bodyMuted} mt-1`}>{message.preview}</p>
                     <p className="text-xs text-gray-400 mt-1">
                       {format(new Date(message.createdAt), 'dd MMM yyyy, HH:mm', { locale: es })}
                     </p>
@@ -136,33 +120,24 @@ export const ProducerDashboard: React.FC = () => {
         </Card>
 
         <Card>
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">Ventas Recientes</h2>
-            <Link
-              to="/producer/sales"
-              className="text-sm text-primary-600 hover:text-primary-700"
-            >
+          <div className={page.cardHeader}>
+            <h2 className={page.cardTitle}>Ventas Recientes</h2>
+            <Link to="/producer/sales" className={page.cardLinkPrimary}>
               Ver todas
             </Link>
           </div>
           <div className="space-y-3">
             {mySales.slice(0, 3).map((sale) => (
-              <div
-                key={sale.id}
-                className="border-b border-gray-200 pb-3 last:border-0"
-              >
+              <div key={sale.id} className={page.listItemBorder}>
                 <div className="flex justify-between items-start">
                   <div>
-                    <Link
-                      to={`/producer/sales/${sale.id}`}
-                      className="font-medium text-gray-900 hover:text-primary-600"
-                    >
+                    <Link to={`/producer/sales/${sale.id}`} className={page.listItemLink}>
                       Venta #{sale.id.split('-')[1]}
                     </Link>
-                    <p className="text-sm text-gray-600">
+                    <p className={typography.body}>
                       {sale.quantityLb} lb - {sale.productForm}
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className={typography.bodyMuted}>
                       {format(new Date(sale.createdAt), 'dd MMM yyyy', { locale: es })}
                     </p>
                   </div>

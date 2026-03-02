@@ -1,5 +1,6 @@
 import React from 'react';
 import type { SaleRequestStatus } from '../../../types';
+import { detailActions, button } from '../../../styles';
 
 interface DetailActionsProps {
   status: SaleRequestStatus;
@@ -34,46 +35,30 @@ export const DetailActions: React.FC<DetailActionsProps> = ({
   onSendAdvanceProof,
   onSendBalanceProof,
 }) => (
-  <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
+  <div className={detailActions.container}>
     {status === 'PENDING_ACCEPTANCE' && !showRejectForm && (
       <>
-        <button
-          type="button"
-          onClick={onClose}
-          className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 font-medium transition-colors"
-        >
+        <button type="button" onClick={onClose} className={detailActions.cancel}>
           Cerrar
         </button>
-        <button
-          type="button"
-          onClick={onReject}
-          className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 font-medium transition-colors"
-        >
+        <button type="button" onClick={onReject} className={detailActions.reject}>
           Rechazar solicitud de compra
         </button>
-        <button
-          type="button"
-          onClick={onAccept}
-          className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 font-medium transition-colors"
-        >
+        <button type="button" onClick={onAccept} className={detailActions.accept}>
           Aceptar solicitud de compra
         </button>
       </>
     )}
     {status === 'PENDING_ACCEPTANCE' && showRejectForm && (
       <>
-        <button
-          type="button"
-          onClick={onCancelReject}
-          className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 font-medium transition-colors"
-        >
+        <button type="button" onClick={onCancelReject} className={detailActions.cancel}>
           Cancelar
         </button>
         <button
           type="button"
           onClick={onReject}
           disabled={!canConfirmReject}
-          className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className={detailActions.rejectDisabled}
         >
           Confirmar rechazo de solicitud de compra
         </button>
@@ -81,11 +66,7 @@ export const DetailActions: React.FC<DetailActionsProps> = ({
     )}
     {status !== 'PENDING_ACCEPTANCE' && (
       <>
-        <button
-          type="button"
-          onClick={onClose}
-          className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 font-medium transition-colors"
-        >
+        <button type="button" onClick={onClose} className={detailActions.close}>
           Cerrar
         </button>
         {status === 'CATCH_SETTLEMENT_PENDING' && (
@@ -95,7 +76,7 @@ export const DetailActions: React.FC<DetailActionsProps> = ({
                 type="button"
                 onClick={onSendSettlement}
                 disabled={!isSettlementLocked}
-                className="px-4 py-2 bg-sky-600 text-white rounded-md hover:bg-sky-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-sky-600"
+                className={button.skyPrimary}
               >
                 Enviar liquidación de pesca
               </button>
@@ -104,7 +85,7 @@ export const DetailActions: React.FC<DetailActionsProps> = ({
               <button
                 type="button"
                 onClick={onCancelPurchase}
-                className="px-4 py-2 border border-red-300 text-red-700 rounded-md hover:bg-red-50 font-medium transition-colors"
+                className={button.rejectOutline}
               >
                 Cancelar compra
               </button>
@@ -118,7 +99,7 @@ export const DetailActions: React.FC<DetailActionsProps> = ({
                 type="button"
                 onClick={onSendAdvanceProof}
                 disabled={!advanceProofFile}
-                className="px-4 py-2 bg-sky-600 text-white rounded-md hover:bg-sky-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-sky-600"
+                className={button.skyPrimary}
               >
                 Enviar prueba de anticipo
               </button>
@@ -127,7 +108,7 @@ export const DetailActions: React.FC<DetailActionsProps> = ({
               <button
                 type="button"
                 onClick={onCancelPurchase}
-                className="px-4 py-2 border border-red-300 text-red-700 rounded-md hover:bg-red-50 font-medium transition-colors"
+                className={button.rejectOutline}
               >
                 Cancelar compra
               </button>
@@ -141,7 +122,7 @@ export const DetailActions: React.FC<DetailActionsProps> = ({
                 type="button"
                 onClick={onSendBalanceProof}
                 disabled={!balanceProofFile}
-                className="px-4 py-2 bg-sky-600 text-white rounded-md hover:bg-sky-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-sky-600"
+                className={button.skyPrimary}
               >
                 Enviar prueba de saldo
               </button>
