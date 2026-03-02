@@ -10,7 +10,9 @@ import {
   isFormComplete,
   getIncompleteSections,
   sanitizePositiveDecimalInput,
+  sanitizePositiveIntegerInput,
   toPositiveDecimal,
+  toPositiveInteger,
 } from './utils';
 import { ADDITIONAL_CONDITION_MAX_LENGTH } from './constants';
 import { PublishPreviewModal } from './PublishPreviewModal';
@@ -39,10 +41,12 @@ export const OfferFormSection: React.FC<OfferFormSectionProps> = ({
     key: string,
     raw: string,
     apply: (n: number | undefined) => void,
-    opts?: { max?: number; min?: number; emptyValue?: number }
+    opts?: { max?: number; min?: number; emptyValue?: number; integerOnly?: boolean }
   ) => {
-    const s = sanitizePositiveDecimalInput(raw);
-    if (s === '' || s.endsWith('.')) {
+    const integerOnly = opts?.integerOnly ?? false;
+    const s = integerOnly ? sanitizePositiveIntegerInput(raw) : sanitizePositiveDecimalInput(raw);
+    const isIncomplete = integerOnly ? false : (s === '' || s.endsWith('.'));
+    if (integerOnly ? s === '' : isIncomplete) {
       setIncompleteNum((prev) =>
         s === ''
           ? (() => {
@@ -53,7 +57,11 @@ export const OfferFormSection: React.FC<OfferFormSectionProps> = ({
           : { ...prev, [key]: s }
       );
       apply(
-        s === '' ? (opts?.emptyValue !== undefined ? opts.emptyValue : 0) : toPositiveDecimal(s, opts)
+        s === ''
+          ? (opts?.emptyValue !== undefined ? opts.emptyValue : (integerOnly ? undefined : 0))
+          : integerOnly
+            ? toPositiveInteger(s, opts)
+            : toPositiveDecimal(s, opts)
       );
     } else {
       setIncompleteNum((prev) => {
@@ -61,7 +69,7 @@ export const OfferFormSection: React.FC<OfferFormSectionProps> = ({
         delete next[key];
         return next;
       });
-      apply(toPositiveDecimal(s, opts));
+      apply(integerOnly ? toPositiveInteger(s, opts) : toPositiveDecimal(s, opts));
     }
   };
 

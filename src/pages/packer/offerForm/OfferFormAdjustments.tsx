@@ -87,7 +87,7 @@ export const OfferFormAdjustments: React.FC<OfferFormAdjustmentsProps> = ({
                   <div className={`${offerSection.textBold} w-20`}>Clase {adj.appliesToClass}</div>
                   <div className="flex items-center gap-2">
                     <span className={offerSection.textLabel}>Tipo de descuento:</span>
-                    <InputWithInfo className="inline-block">
+                    <InputWithInfo infoText="Por favor, seleccione el tipo de descuento que desea aplicar." className="inline-block">
                       <select
                         value={adj.unit}
                         onChange={(e) => {
@@ -112,7 +112,7 @@ export const OfferFormAdjustments: React.FC<OfferFormAdjustmentsProps> = ({
                   </div>
                   <div className="flex items-center gap-2">
                     <span className={offerSection.textLabel}>Monto:</span>
-                    <InputWithInfo className="inline-block">
+                    <InputWithInfo infoText="Ingrese el monto del descuento." className="inline-block">
                       <input
                         type="number"
                         min="0"
@@ -170,7 +170,7 @@ export const OfferFormAdjustments: React.FC<OfferFormAdjustmentsProps> = ({
                           </span>
                         </td>
                         <td className={offerSection.tableCell}>
-                          <InputWithInfo className="inline-block">
+                          <InputWithInfo infoText="Ingrese el precio por talla." className="inline-block">
                           <input
                             type="number"
                             min="0"
@@ -212,7 +212,7 @@ export const OfferFormAdjustments: React.FC<OfferFormAdjustmentsProps> = ({
                           <span className={`${offerSection.tableCellText} font-medium`}>{label}</span>
                         </td>
                         <td className={offerSection.tableCell}>
-                          <InputWithInfo className="inline-block">
+                          <InputWithInfo infoText="Ingrese el precio por categoría." className="inline-block">
                           <input
                             type="number"
                             min="0"
@@ -253,7 +253,7 @@ export const OfferFormAdjustments: React.FC<OfferFormAdjustmentsProps> = ({
                 <div className={`${offerSection.textBold} w-20`}>Clase {adj.appliesToClass}</div>
                 <div className="flex items-center gap-2">
                   <span className={offerSection.textLabel}>Tipo de descuento:</span>
-                  <InputWithInfo className="inline-block">
+                  <InputWithInfo infoText="Por favor, seleccione el tipo de descuento que desea aplicar." className="inline-block">
                     <select
                       value={adj.unit}
                       onChange={(e) => {
@@ -278,7 +278,7 @@ export const OfferFormAdjustments: React.FC<OfferFormAdjustmentsProps> = ({
                 </div>
                 <div className="flex items-center gap-2">
                   <span className={offerSection.textLabel}>Monto:</span>
-                  <InputWithInfo className="inline-block">
+                  <InputWithInfo infoText="Ingrese el monto del descuento." className="inline-block">
                     <input
                       type="number"
                       min="0"

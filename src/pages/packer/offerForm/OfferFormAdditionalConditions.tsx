@@ -62,7 +62,7 @@ export const OfferFormAdditionalConditions: React.FC<OfferFormAdditionalConditio
                     <span className={offerSection.textBold}>{idx + 1}</span>
                   </td>
                   <td className={offerSection.tableCell}>
-                    <InputWithInfo className="block w-full">
+                    <InputWithInfo infoText="En esta sección puede agregar condiciones adicionales a la oferta. Por ejemplo, 'El producto debe ser entregado en la fecha y hora acordada' o 'El producto debe ser entregado en la fecha y hora acordada'." className="block w-full">
                       <input
                         type="text"
                         value={item}

@@ -63,7 +63,7 @@ export const OfferFormPriceTable: React.FC<OfferFormPriceTableProps> = ({
                   </span>
                 </td>
                 <td className={offerSection.tableCell}>
-                  <InputWithInfo className="inline-block">
+                  <InputWithInfo infoText="Ingrese el precio por talla." className="inline-block">
                     <input
                       type="number"
                       min="0"

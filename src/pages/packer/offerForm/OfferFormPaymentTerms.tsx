@@ -21,7 +21,7 @@ interface OfferFormPaymentTermsProps {
     key: string,
     raw: string,
     apply: (n: number | undefined) => void,
-    opts?: { max?: number; emptyValue?: number }
+    opts?: { max?: number; min?: number; emptyValue?: number; integerOnly?: boolean }
   ) => void;
   setIncompleteNumBlur: (key: string) => void;
   inputProps: React.InputHTMLAttributes<HTMLInputElement>;
@@ -51,7 +51,7 @@ export const OfferFormPaymentTerms: React.FC<OfferFormPaymentTermsProps> = ({
                 <h4 className={offerSection.textBold + ' mb-2'}>Anticipo (requerido)</h4>
                 <div className="space-y-2">
                   <FormRow labelClassName={FORM_ROW_SUBTITLE_LABEL} label="Porcentaje (%)" required>
-                    <InputWithInfo className="block w-full">
+                    <InputWithInfo infoText="Ingrese el porcentaje de anticipo." className="block w-full">
                       <input
                         type="number"
                         min="0"
@@ -71,7 +71,7 @@ export const OfferFormPaymentTerms: React.FC<OfferFormPaymentTermsProps> = ({
                     </InputWithInfo>
                   </FormRow>
                   <FormRow labelClassName={FORM_ROW_SUBTITLE_LABEL} label="Vence en (horas)">
-                    <InputWithInfo className="block w-full">
+                    <InputWithInfo infoText="Ingrese el número de horas en el anticipo va a ser cancelado." className="block w-full">
                       <input
                         type="number"
                         min="0"
@@ -91,7 +91,7 @@ export const OfferFormPaymentTerms: React.FC<OfferFormPaymentTermsProps> = ({
                     </InputWithInfo>
                   </FormRow>
                   <FormRow labelClassName={FORM_ROW_SUBTITLE_LABEL} label="Condición/Trigger">
-                    <InputWithInfo className="block w-full">
+                    <InputWithInfo infoText="Ingrese la condición o trigger del anticipo." className="block w-full">
                       <input
                         type="text"
                         value={term.trigger ?? ''}
@@ -118,28 +118,28 @@ export const OfferFormPaymentTerms: React.FC<OfferFormPaymentTermsProps> = ({
                   Porcentaje: {balancePercent}% (lo faltante después del anticipo)
                 </p>
                 <div className="space-y-2">
-                  <FormRow labelClassName={FORM_ROW_SUBTITLE_LABEL} label="Vence en (horas)">
-                    <InputWithInfo className="block w-full">
+                  <FormRow labelClassName={FORM_ROW_SUBTITLE_LABEL} label="Vence en (días)">
+                    <InputWithInfo infoText="Ingrese el número de días en que el saldo restante va a ser cancelado." className="block w-full">
                       <input
                         type="number"
                         min="0"
-                        step="0.01"
-                        value={numDisplay('dueInHours-bal', term.dueInHours)}
+                        step="1"
+                        value={numDisplay('dueInDays-bal', term.dueInDays)}
                         onKeyDown={blockNegativeAndExponentKeys}
                         onChange={(e) =>
-                          setNumInput('dueInHours-bal', e.target.value, (n) =>
-                            updatePaymentTerm(idx, 'dueInHours', n),
-                            { emptyValue: undefined }
+                          setNumInput('dueInDays-bal', e.target.value, (n) =>
+                            updatePaymentTerm(idx, 'dueInDays', n),
+                            { emptyValue: undefined, integerOnly: true }
                           )
                         }
-                        onBlur={() => setIncompleteNumBlur('dueInHours-bal')}
-                        placeholder="Ej: 168 (7 días)"
+                        onBlur={() => setIncompleteNumBlur('dueInDays-bal')}
+                        placeholder="Ej: 7"
                         {...inputProps}
                       />
                     </InputWithInfo>
                   </FormRow>
                   <FormRow labelClassName={FORM_ROW_SUBTITLE_LABEL} label="Condición/Trigger">
-                    <InputWithInfo className="block w-full">
+                    <InputWithInfo infoText="Ingrese la condición o trigger del saldo restante." className="block w-full">
                       <input
                         type="text"
                         value={term.trigger ?? ''}
@@ -176,7 +176,7 @@ export const OfferFormPaymentTerms: React.FC<OfferFormPaymentTermsProps> = ({
               )}
             </div>
             <FormRow labelClassName={FORM_ROW_SUBTITLE_LABEL} label="Descripción (texto libre)">
-              <InputWithInfo className="block w-full">
+              <InputWithInfo infoText="Ingrese cualquier término o condición adicional." className="block w-full">
                 <textarea
                   value={term.text ?? ''}
                   maxLength={STRING_INPUT_MAX_LENGTH}

@@ -298,10 +298,8 @@ export const OfferPreviewContent: React.FC<OfferPreviewContentProps> = ({
                           return adv != null ? `${100 - adv}% - ` : '';
                         })()}
                       {(() => {
-                        const horas =
-                          term.dueInHours ??
-                          (term.dueInDays ? term.dueInDays * 24 : undefined);
-                        return horas ? `Vence en ${horas} horas` : '';
+                        const dias = term.dueInDays ?? (term.dueInHours ? Math.floor(term.dueInHours / 24) : undefined);
+                        return dias ? `Vence en ${dias} días` : '';
                       })()}
                     </div>
                     {term.trigger && (

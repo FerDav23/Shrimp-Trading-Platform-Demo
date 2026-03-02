@@ -6,8 +6,8 @@ const HOVER_DELAY_MS = 500;
 
 interface InputWithInfoProps {
   children: React.ReactElement;
-  /** Texto que se muestra en el cuadro de información (dummy por defecto) */
-  infoText?: string;
+  /** Texto que se muestra en el cuadro de información */
+  infoText: string;
   /** Clase adicional para el wrapper */
   className?: string;
 }
@@ -19,7 +19,7 @@ interface InputWithInfoProps {
  */
 export const InputWithInfo: React.FC<InputWithInfoProps> = ({
   children,
-  infoText = 'Texto de ayuda. Mantenga el cursor aquí para ver más información.',
+  infoText,
   className = '',
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);

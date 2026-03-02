@@ -67,7 +67,7 @@ export const OfferFormGeneralInfo: React.FC<OfferFormGeneralInfoProps> = ({
               {GUARANTIA_CLASE_A_MIN}% y {GUARANTIA_CLASE_A_MAX}%). Obligatorio.
             </p>
             <div className="flex items-center gap-2">
-              <InputWithInfo className="inline-block">
+              <InputWithInfo infoText="Ingrese el porcentaje mínimo de rendimiento entero clase A que garantiza la oferta." className="inline-block">
                 <input
                   type="number"
                   min={GUARANTIA_CLASE_A_MIN}
@@ -113,7 +113,7 @@ export const OfferFormGeneralInfo: React.FC<OfferFormGeneralInfoProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <div>
                 <label className={offerSection.labelSmall}>Desde</label>
-                <InputWithInfo className="block">
+                <InputWithInfo infoText="La fecha de inicio de la oferta siempre va a ser la fecha actual." className="block">
                   <input
                     type="date"
                     value={getTodayISO()}
@@ -124,7 +124,7 @@ export const OfferFormGeneralInfo: React.FC<OfferFormGeneralInfoProps> = ({
               </div>
               <div>
                 <label className={offerSection.labelSmall}>Hasta</label>
-                <InputWithInfo className="block">
+                <InputWithInfo infoText={`Ingrese la fecha de fin de la oferta. La vigencia de la oferta no puede superar ${VIGENCIA_MAX_DIAS} días.`} className="block">
                   <input
                     type="date"
                     value={data.validTo}

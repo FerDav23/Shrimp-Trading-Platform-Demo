@@ -89,7 +89,7 @@ export const createEmptyOfferForm = (productForm: ProductForm): OfferFormData =>
   guaranteeClassAPct: '',
   paymentTerms: [
     { termType: 'ADVANCE', percent: 30, dueInHours: 24, trigger: '' },
-    { termType: 'BALANCE', dueInHours: 168, trigger: '' },
+    { termType: 'BALANCE', dueInDays: 7, trigger: '' },
   ],
   enteroAdjustmentsMode: 'CLASS',
   colaDirectaTiers: buildPriceTiersFromTallas('COLA_DIRECTA'),
@@ -120,6 +120,26 @@ export const toPositiveDecimal = (
   const max = opts?.max ?? Infinity;
   const clamped = Math.max(min, Math.min(max, n));
   return Math.round(clamped * 100) / 100;
+};
+
+/** Input numérico solo enteros positivos: dígitos únicamente, sin ceros a la izquierda (01 → 1). */
+export const sanitizePositiveIntegerInput = (raw: string): string => {
+  const cleaned = raw.replace(/\D/g, '');
+  if (cleaned === '') return '';
+  return cleaned.length > 1 ? cleaned.replace(/^0+/, '') || '0' : cleaned;
+};
+
+export const toPositiveInteger = (
+  value: string,
+  opts?: { min?: number; max?: number }
+): number => {
+  const s = sanitizePositiveIntegerInput(value);
+  if (s === '') return opts?.min ?? 0;
+  const n = parseInt(s, 10);
+  if (Number.isNaN(n) || n < 0) return opts?.min ?? 0;
+  const min = opts?.min ?? 0;
+  const max = opts?.max ?? Infinity;
+  return Math.max(min, Math.min(max, Math.floor(n)));
 };
 
 /** En inputs de precios: permite "." pero no "-" ni "e"/"E". */
@@ -341,9 +361,9 @@ export const mergePaymentTerms = (existing: PaymentTerm[]): PaymentTerm[] => {
         ...rawBalance,
         dueInHours:
           rawBalance.dueInHours ?? (rawBalance.dueInDays ? rawBalance.dueInDays * 24 : 168),
-        dueInDays: undefined,
+        dueInDays: rawBalance.dueInDays ?? (rawBalance.dueInHours != null ? Math.floor(rawBalance.dueInHours / 24) : 7),
       }
-    : { termType: 'BALANCE' as const, dueInHours: 168, trigger: '' };
+    : { termType: 'BALANCE' as const, dueInDays: 7, trigger: '' };
   const custom = existing.filter(
     (p) => p.termType !== 'ADVANCE' && p.termType !== 'BALANCE'
   );
