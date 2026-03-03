@@ -1,6 +1,6 @@
 import React from 'react';
 import { FormRow } from '../../../components/FormRow';
-import { collapsible, typography } from '../../../styles';
+import { collapsible, typography, saleRequestDetail } from '../../../styles';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import type { SaleRequest } from '../../../types';
@@ -16,36 +16,36 @@ export const CatchInfoSection: React.FC<CatchInfoSectionProps> = ({ request, exp
   <CollapsibleSection title="Información de Pesca" expanded={expanded} onToggle={onToggle}>
     <div className={collapsible.content}>
       <div className={collapsible.innerBox}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormRow labelClassName="text-sm font-medium text-gray-700" label="Cantidad Estimada">
-            <p className="py-2 text-sm text-gray-900 font-medium">{request.catchInfo.estimatedQuantityLb} lb</p>
+        <div className={saleRequestDetail.gridForm}>
+          <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Cantidad Estimada">
+            <p className={saleRequestDetail.formRowValueBold}>{request.catchInfo.estimatedQuantityLb} lb</p>
           </FormRow>
-          <FormRow labelClassName="text-sm font-medium text-gray-700" label="Rango de Tallas">
-            <p className="py-2 text-sm text-gray-900">
+          <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Rango de Tallas">
+            <p className={saleRequestDetail.formRowValue}>
               {request.catchInfo.sizeRange.min}/{request.catchInfo.sizeRange.max}
             </p>
           </FormRow>
-          <FormRow labelClassName="text-sm font-medium text-gray-700" label="Fecha Estimada de Cosecha">
-            <p className="py-2 text-sm text-gray-900">
+          <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Fecha Estimada de Cosecha">
+            <p className={saleRequestDetail.formRowValue}>
               {format(new Date(request.catchInfo.estimatedHarvestDate), 'dd MMM yyyy', { locale: es })}
             </p>
           </FormRow>
-          <FormRow labelClassName="text-sm font-medium text-gray-700" label="Ciudad">
-            <p className="py-2 text-sm text-gray-900">{request.catchInfo.harvestLocation.city}</p>
+          <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Ciudad">
+            <p className={saleRequestDetail.formRowValue}>{request.catchInfo.harvestLocation.city}</p>
           </FormRow>
-          <FormRow labelClassName="text-sm font-medium text-gray-700" label="Dirección de Cosecha" className="md:col-span-2">
-            <p className="py-2 text-sm text-gray-900">{request.catchInfo.harvestLocation.address}</p>
+          <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Dirección de Cosecha" className="md:col-span-2">
+            <p className={saleRequestDetail.formRowValue}>{request.catchInfo.harvestLocation.address}</p>
           </FormRow>
           {request.catchInfo.notes && (
-            <FormRow labelClassName="text-sm font-medium text-gray-700" label="Notas del Productor" className="md:col-span-2">
+            <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Notas del Productor" className="md:col-span-2">
               <p className={collapsible.notesBox}>
                 {request.catchInfo.notes}
               </p>
             </FormRow>
           )}
           {request.catchInfo.attachments && request.catchInfo.attachments.length > 0 && (
-            <FormRow labelClassName="text-sm font-medium text-gray-700" label="Archivos Adjuntos" className="md:col-span-2">
-              <div className="py-2 space-y-2">
+            <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Archivos Adjuntos" className="md:col-span-2">
+              <div className={`${saleRequestDetail.formRowValue} space-y-2`}>
                 {request.catchInfo.attachments.map((attachment, idx) => (
                   <a
                     key={idx}
@@ -56,7 +56,7 @@ export const CatchInfoSection: React.FC<CatchInfoSectionProps> = ({ request, exp
                     }}
                     className={`${typography.linkPrimarySm} flex items-center gap-2`}
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className={saleRequestDetail.iconSm} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"

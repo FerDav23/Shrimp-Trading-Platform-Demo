@@ -1,6 +1,6 @@
 import React from 'react';
 import { FormRow } from '../../../components/FormRow';
-import { collapsible, settlementTable } from '../../../styles';
+import { collapsible, settlementTable, saleRequestDetail } from '../../../styles';
 import { CATCH_SETTLEMENT_CLASSES } from '../../../types';
 import type { CatchSettlement } from '../../../types';
 import { normalizeSettlement } from './utils';
@@ -34,36 +34,36 @@ export const SettlementReadOnlySection: React.FC<SettlementReadOnlySectionProps>
   return (
     <CollapsibleSection title="Liquidación de pesca" expanded={expanded} onToggle={onToggle}>
       <div className={collapsible.content}>
-        <div className={`${collapsible.innerBox} space-y-6`}>
+        <div className={`${collapsible.innerBox} ${saleRequestDetail.innerBoxSpaceY}`}>
           <div>
-            <h4 className="text-sm font-semibold text-gray-700 mb-3">Datos del ingreso</h4>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm text-gray-900">
-              <FormRow labelClassName="font-medium text-gray-700" label="Fecha ing.">
+            <h4 className={saleRequestDetail.subsectionSmall}>Datos del ingreso</h4>
+            <div className={saleRequestDetail.gridSettlementReadOnly}>
+              <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Fecha ing.">
                 <span>{s.entryDate}</span>
               </FormRow>
-              <FormRow labelClassName="font-medium text-gray-700" label="No. Lote">
+              <FormRow labelClassName={saleRequestDetail.formRowLabel} label="No. Lote">
                 <span>{s.lotNumber || '—'}</span>
               </FormRow>
-              <FormRow labelClassName="font-medium text-gray-700" label="Guía rem.">
+              <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Guía rem.">
                 <span>{s.remissionGuide || '—'}</span>
               </FormRow>
-              <FormRow labelClassName="font-medium text-gray-700" label="Piscina">
+              <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Piscina">
                 <span>{s.pond || '—'}</span>
               </FormRow>
-              <FormRow labelClassName="font-medium text-gray-700" label="Aguaje">
+              <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Aguaje">
                 <span>{s.aguaje || '—'}</span>
               </FormRow>
             </div>
           </div>
           <div className="space-y-4">
-            <h4 className="text-sm font-semibold text-gray-700">Detalle por clase y talla</h4>
+            <h4 className={saleRequestDetail.subsectionSmallPlain}>Detalle por clase y talla</h4>
             {[
               { key: 'colaDirectaALines' as const, title: CATCH_SETTLEMENT_CLASSES.COLA_DIRECTA_A },
               { key: 'colaDirectaBLines' as const, title: CATCH_SETTLEMENT_CLASSES.COLA_DIRECTA_B },
               { key: 'ventaLocalLines' as const, title: CATCH_SETTLEMENT_CLASSES.VENTA_LOCAL },
             ].map(({ key, title }) => (
               <div key={key}>
-                <div className="text-sm font-semibold text-gray-700 mb-2">{title}</div>
+                <div className={`${saleRequestDetail.tableGroupTitle} mb-2`}>{title}</div>
                 <div className="overflow-x-auto">
                   <table className={settlementTable.table}>
                     <thead>
@@ -99,32 +99,32 @@ export const SettlementReadOnlySection: React.FC<SettlementReadOnlySectionProps>
               </div>
             ))}
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-sky-200 text-sm text-gray-900">
+          <div className={`${saleRequestDetail.gridSettlementFooter} ${saleRequestDetail.summaryRow}`}>
             <div>
-              <span className="font-medium text-gray-700">Remitidas referencial (lb): </span>
+              <span className={saleRequestDetail.summaryLabel}>Remitidas referencial (lb): </span>
               {remitidasLb}
             </div>
             <div>
-              <span className="font-medium text-gray-700">Basura cola directa (lb): </span>
+              <span className={saleRequestDetail.summaryLabel}>Basura cola directa (lb): </span>
               {s.basuraColaDirectaLb}
             </div>
             <div>
-              <span className="font-medium text-gray-700">Recibidas referencial (lb): </span>
+              <span className={saleRequestDetail.summaryLabel}>Recibidas referencial (lb): </span>
               {recibidasReferencial.toFixed(2)}
             </div>
             <div>
-              <span className="font-medium text-gray-700">Procesadas reales (lb): </span>
+              <span className={saleRequestDetail.summaryLabel}>Procesadas reales (lb): </span>
               {procesadasReales.toFixed(2)}
             </div>
             <div>
-              <span className="font-medium text-gray-700">Total valor: </span>$ {totalValor.toFixed(2)}
+              <span className={saleRequestDetail.summaryLabel}>Total valor: </span>$ {totalValor.toFixed(2)}
             </div>
             <div>
-              <span className="font-medium text-gray-700">Rendimiento: </span>
+              <span className={saleRequestDetail.summaryLabel}>Rendimiento: </span>
               {rendimientoPct.toFixed(2)}%
             </div>
             <div>
-              <span className="font-medium text-gray-700">Merma: </span>
+              <span className={saleRequestDetail.summaryLabel}>Merma: </span>
               {mermaPct.toFixed(2)}%
             </div>
           </div>

@@ -1,6 +1,6 @@
 import React, { RefObject } from 'react';
 import type { SaleRequest, ProducerBankAccount } from '../../../types';
-import { collapsible, button } from '../../../styles';
+import { collapsible, button, saleRequestDetail } from '../../../styles';
 import type { Offer } from '../../../types';
 import { normalizeSettlement } from './utils';
 import { CollapsibleSection } from './CollapsibleSection';
@@ -72,10 +72,10 @@ export const BalanceTransferSection: React.FC<BalanceTransferSectionProps> = ({
           <div
             className={isBalanceExpired ? collapsible.timerExpired : collapsible.timerActive}
           >
-            <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">
+            <p className={collapsible.timerLabel}>
               Plazo para pagar el saldo restante
             </p>
-            <p className="text-sm text-gray-600 mb-2">
+            <p className={collapsible.timerHelp}>
               Tiene {BALANCE_DEADLINE_HOURS} horas para realizar la transferencia y subir la prueba.
             </p>
             {isBalanceExpired ? (
@@ -98,13 +98,13 @@ export const BalanceTransferSection: React.FC<BalanceTransferSectionProps> = ({
               Información del productor
             </h4>
             <div>
-              <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Productor</p>
+              <p className={collapsible.fieldLabelMb1}>Productor</p>
               <p className="text-base text-gray-900 font-medium leading-snug">{request.producerName}</p>
             </div>
             {producerBankAccounts.length > 0 ? (
               <>
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+                  <label className={`block ${collapsible.fieldLabel} mb-2`}>
                     Banco para transferencia
                   </label>
                   <select
@@ -121,41 +121,33 @@ export const BalanceTransferSection: React.FC<BalanceTransferSectionProps> = ({
                 </div>
                 {account && (
                   <div className={collapsible.bankCard}>
-                    <h5 className="text-sm font-semibold text-sky-800 tracking-tight">
+                    <h5 className={collapsible.bankCardTitle}>
                       Datos de la cuenta seleccionada
                     </h5>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 text-sm">
                       <div>
-                        <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Banco</p>
-                        <p className="text-gray-900 font-medium">{account.bankName}</p>
+                        <p className={collapsible.fieldLabel}>Banco</p>
+                        <p className={collapsible.fieldValue}>{account.bankName}</p>
                       </div>
                       <div>
-                        <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">
-                          Tipo de cuenta
-                        </p>
+                        <p className={collapsible.fieldLabel}>Tipo de cuenta</p>
                         <p className="text-gray-900">{account.accountType}</p>
                       </div>
                       <div>
-                        <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">
-                          Número de cuenta
-                        </p>
+                        <p className={collapsible.fieldLabel}>Número de cuenta</p>
                         <p className="text-gray-900 font-semibold tabular-nums">{account.accountNumber}</p>
                       </div>
                       <div>
-                        <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Titular</p>
-                        <p className="text-gray-900 font-medium">{account.accountHolderName}</p>
+                        <p className={collapsible.fieldLabel}>Titular</p>
+                        <p className={collapsible.fieldValue}>{account.accountHolderName}</p>
                       </div>
                       <div>
-                        <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">
-                          Cédula / Identificación
-                        </p>
+                        <p className={collapsible.fieldLabel}>Cédula / Identificación</p>
                         <p className="text-gray-900 tabular-nums">{account.identification}</p>
                       </div>
                       {account.email && (
                         <div className="md:col-span-2">
-                          <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">
-                            Correo
-                          </p>
+                          <p className={collapsible.fieldLabel}>Correo</p>
                           <p className="text-gray-900">{account.email}</p>
                         </div>
                       )}
@@ -164,51 +156,43 @@ export const BalanceTransferSection: React.FC<BalanceTransferSectionProps> = ({
                 )}
               </>
             ) : (
-              <p className="text-sm text-gray-500 italic">
+              <p className={saleRequestDetail.noBankData}>
                 No hay datos bancarios registrados para este productor.
               </p>
             )}
           </div>
 
           <div className={collapsible.transferBox}>
-            <h4 className="text-base font-semibold text-sky-800 tracking-tight border-b border-sky-200 pb-2 mb-4">
+            <h4 className={collapsible.subsectionTitleMb}>
               Datos para la transferencia del saldo restante
             </h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 text-sm">
+            <div className={saleRequestDetail.gridFormDense}>
               <div>
-                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">
-                  Beneficiario (productor)
-                </p>
-                <p className="text-gray-900 font-medium">{request.producerName}</p>
+                <p className={collapsible.fieldLabel}>Beneficiario (productor)</p>
+                <p className={saleRequestDetail.fieldValue}>{request.producerName}</p>
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">ID Solicitud</p>
-                <p className="text-gray-900 font-medium tabular-nums">#{request.id.split('-')[1]}</p>
+                <p className={collapsible.fieldLabel}>ID Solicitud</p>
+                <p className={saleRequestDetail.fieldValueSemibold}>#{request.id.split('-')[1]}</p>
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Concepto</p>
-                <p className="text-gray-900">Saldo restante por compra de pesca</p>
+                <p className={collapsible.fieldLabel}>Concepto</p>
+                <p className={saleRequestDetail.fieldValueText}>Saldo restante por compra de pesca</p>
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">
-                  Valor total (liquidación)
-                </p>
-                <p className="text-gray-900 font-medium tabular-nums">$ {totalValor.toFixed(2)}</p>
+                <p className={collapsible.fieldLabel}>Valor total (liquidación)</p>
+                <p className={saleRequestDetail.fieldValueSemibold}>$ {totalValor.toFixed(2)}</p>
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">
-                  Porcentaje de saldo (oferta)
-                </p>
+                <p className={collapsible.fieldLabel}>Porcentaje de saldo (oferta)</p>
                 <p className="text-gray-900 tabular-nums">{balancePercent}%</p>
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">
-                  Monto del saldo restante
-                </p>
-                <p className="text-lg font-bold text-sky-700 tabular-nums">$ {balanceAmount.toFixed(2)}</p>
+                <p className={collapsible.fieldLabel}>Monto del saldo restante</p>
+                <p className={saleRequestDetail.amountHighlight}>$ {balanceAmount.toFixed(2)}</p>
               </div>
             </div>
-            <p className="text-sm text-gray-600 mt-4 leading-relaxed">
+            <p className={saleRequestDetail.transferHelp}>
               Realice la transferencia del saldo según los datos acordados con el productor y adjunte la prueba
               de pago abajo.
             </p>
@@ -238,7 +222,7 @@ export const BalanceTransferSection: React.FC<BalanceTransferSectionProps> = ({
                   className={button.skyUpload}
                 >
                   <svg
-                    className="w-5 h-5 shrink-0"
+                    className={saleRequestDetail.iconMd}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -254,7 +238,7 @@ export const BalanceTransferSection: React.FC<BalanceTransferSectionProps> = ({
                 </button>
                 {balanceProofFile && (
                   <>
-                    <span className="font-medium text-gray-700 text-sm">{balanceProofFile.name}</span>
+                    <span className={saleRequestDetail.fileName}>{balanceProofFile.name}</span>
                     <button
                       type="button"
                       onClick={() => onBalanceProofFileChange(null)}
@@ -270,7 +254,7 @@ export const BalanceTransferSection: React.FC<BalanceTransferSectionProps> = ({
                   <img
                     src={balanceProofPreviewUrl}
                     alt="Vista previa del comprobante de saldo"
-                    className="w-full h-auto max-h-64 object-contain"
+                    className={collapsible.proofImg}
                   />
                 </div>
               )}

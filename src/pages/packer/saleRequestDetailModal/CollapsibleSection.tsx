@@ -37,7 +37,7 @@ export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
     <section className={sectionClass}>
       <button type="button" onClick={onToggle} className={buttonClass}>
         <h3 className={collapsible.title}>{title}</h3>
-        <span className="text-gray-700">
+        <span className={collapsible.chevronWrap}>
           <ChevronIcon expanded={expanded} />
         </span>
       </button>

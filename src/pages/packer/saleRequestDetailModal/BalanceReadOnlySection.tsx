@@ -1,6 +1,6 @@
 import React from 'react';
 import type { SaleRequest } from '../../../types';
-import { collapsible } from '../../../styles';
+import { collapsible, saleRequestDetail } from '../../../styles';
 import { normalizeSettlement } from './utils';
 import { CollapsibleSection } from './CollapsibleSection';
 import { DUMMY_BALANCE_PROOF_IMAGE } from './constants';
@@ -44,28 +44,26 @@ export const BalanceReadOnlySection: React.FC<BalanceReadOnlySectionProps> = ({
               Información del productor
             </h4>
             <div>
-              <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Productor</p>
+              <p className={collapsible.fieldLabelMb1}>Productor</p>
               <p className="text-base text-gray-900 font-medium leading-snug">{request.producerName}</p>
             </div>
             {firstAccount && (
               <div className={collapsible.bankCard}>
-                <h5 className="text-sm font-semibold text-sky-800 tracking-tight">
+                <h5 className={collapsible.bankCardTitle}>
                   Datos de la cuenta utilizada
                 </h5>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 text-sm">
+                <div className={saleRequestDetail.gridFormDense}>
                   <div>
-                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Banco</p>
-                    <p className="text-gray-900 font-medium">{firstAccount.bankName}</p>
+                    <p className={collapsible.fieldLabel}>Banco</p>
+                    <p className={saleRequestDetail.fieldValue}>{firstAccount.bankName}</p>
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">
-                      Número de cuenta
-                    </p>
-                    <p className="text-gray-900 font-semibold tabular-nums">{firstAccount.accountNumber}</p>
+                    <p className={collapsible.fieldLabel}>Número de cuenta</p>
+                    <p className={saleRequestDetail.fieldValueSemibold}>{firstAccount.accountNumber}</p>
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Titular</p>
-                    <p className="text-gray-900 font-medium">{firstAccount.accountHolderName}</p>
+                    <p className={collapsible.fieldLabel}>Titular</p>
+                    <p className={saleRequestDetail.fieldValue}>{firstAccount.accountHolderName}</p>
                   </div>
                 </div>
               </div>
@@ -75,40 +73,34 @@ export const BalanceReadOnlySection: React.FC<BalanceReadOnlySectionProps> = ({
             <h4 className={collapsible.subsectionTitleMb}>
               Resumen del pago del saldo
             </h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 text-sm">
+            <div className={saleRequestDetail.gridFormDense}>
               <div>
-                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">
-                  Beneficiario
-                </p>
-                <p className="text-gray-900 font-medium">{request.producerName}</p>
+                <p className={collapsible.fieldLabel}>Beneficiario</p>
+                <p className={saleRequestDetail.fieldValue}>{request.producerName}</p>
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">
-                  Valor total (liquidación)
-                </p>
-                <p className="text-gray-900 font-medium tabular-nums">$ {totalValorRO.toFixed(2)}</p>
+                <p className={collapsible.fieldLabel}>Valor total (liquidación)</p>
+                <p className={saleRequestDetail.fieldValueSemibold}>$ {totalValorRO.toFixed(2)}</p>
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">
-                  Monto del saldo pagado
-                </p>
-                <p className="text-lg font-bold text-sky-700 tabular-nums">$ {balanceAmountRO.toFixed(2)}</p>
+                <p className={collapsible.fieldLabel}>Monto del saldo pagado</p>
+                <p className={saleRequestDetail.amountHighlight}>$ {balanceAmountRO.toFixed(2)}</p>
               </div>
               <div className="md:col-span-2">
-                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Estado</p>
-                <p className="text-gray-900 font-medium text-green-700">Saldo enviado y confirmado</p>
+                <p className={collapsible.fieldLabel}>Estado</p>
+                <p className={`${saleRequestDetail.fieldValue} ${saleRequestDetail.statusSuccess}`}>Saldo enviado y confirmado</p>
               </div>
             </div>
           </div>
           <div className="space-y-3">
-            <h4 className="text-base font-semibold text-sky-800 tracking-tight border-b border-sky-200 pb-2">
+            <h4 className={collapsible.subsectionTitle}>
               Comprobante del pago del saldo
             </h4>
             <div className={collapsible.proofImage}>
               <img
                 src={DUMMY_BALANCE_PROOF_IMAGE}
                 alt="Comprobante de saldo (ejemplo)"
-                className="w-full h-auto max-h-48 object-contain"
+                className={collapsible.proofImgSm}
               />
             </div>
           </div>

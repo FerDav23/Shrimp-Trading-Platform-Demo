@@ -339,46 +339,126 @@ export const collapsible = {
   title: 'text-lg font-semibold text-gray-900',
   chevron: 'w-5 h-5 transition-transform',
   chevronExpanded: 'rotate-180',
+  chevronWrap: 'text-gray-700',
   content: 'px-6 pb-6',
   innerBox: 'bg-white border border-sky-200 rounded-lg p-4',
   innerBoxXl: 'bg-white border border-sky-200 rounded-xl p-6 space-y-8 shadow-sm',
   subsectionTitle: 'text-base font-semibold text-sky-800 tracking-tight border-b border-sky-200 pb-2',
   subsectionTitleMb: 'text-base font-semibold text-sky-800 tracking-tight border-b border-sky-200 pb-2 mb-4',
   fieldLabel: 'text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5',
+  fieldLabelMb1: 'text-xs font-medium text-gray-500 uppercase tracking-wider mb-1',
   fieldValue: 'text-gray-900 font-medium',
   bankCard: 'mt-4 p-5 border border-sky-100 rounded-xl bg-sky-50/50 space-y-4',
+  bankCardTitle: 'text-sm font-semibold text-sky-800 tracking-tight',
   transferBox: 'border border-sky-200 rounded-xl p-5 bg-sky-50/30 print:bg-white',
   timerExpired: 'rounded-xl border-2 p-4 border-red-200 bg-red-50',
   timerActive: 'rounded-xl border-2 p-4 border-sky-200 bg-sky-50/50',
   timerTextExpired: 'text-lg font-bold text-red-700',
   timerDigits: 'text-2xl font-bold text-red-600 tabular-nums',
+  timerLabel: 'text-xs font-medium text-gray-500 uppercase tracking-wider mb-1',
+  timerHelp: 'text-sm text-gray-600 mb-2',
   proofImage: 'border border-sky-200 rounded-lg overflow-hidden bg-gray-100 max-w-sm',
   proofImageLg: 'border border-sky-200 rounded-lg overflow-hidden bg-gray-100 max-w-xs',
+  proofImg: 'w-full h-auto max-h-64 object-contain',
+  proofImgSm: 'w-full h-auto max-h-48 object-contain',
   skyButton: 'text-sm px-3 py-1.5 bg-sky-600 text-white rounded-md hover:bg-sky-700 font-medium transition-colors',
   selectSky: 'w-full md:max-w-sm px-4 py-2.5 border border-sky-200 rounded-lg text-sm font-medium text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-shadow',
   rejectSelect: 'w-full px-3 py-2 border border-red-300 rounded-md text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent',
   rejectTextarea: 'w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent',
   rejectReadonlyBox: 'bg-white border border-red-200 rounded-lg p-4',
   notesBox: 'text-sm text-gray-900 bg-gray-50 rounded p-3 border border-gray-200',
+  /** Content padding (reject form, messages) */
+  contentPad: 'px-6 pb-6',
+  contentPadSpace: 'px-6 pb-6 space-y-4',
+} as const;
+
+/** Sale request detail modal – form rows, grids, repeated UI */
+export const saleRequestDetail = {
+  /** FormRow label (labelClassName) */
+  formRowLabel: 'text-sm font-medium text-gray-700',
+  /** Form row value – normal */
+  formRowValue: 'py-2 text-sm text-gray-900',
+  /** Form row value – bold */
+  formRowValueBold: 'py-2 text-sm text-gray-900 font-medium',
+  /** Row with label + value inline */
+  formRowInline: 'flex items-center gap-2 py-2',
+  /** Grid: 1 col mobile, 2 cols desktop */
+  gridForm: 'grid grid-cols-1 md:grid-cols-2 gap-4',
+  /** Grid: form dense with text-sm */
+  gridFormDense: 'grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 text-sm',
+  /** Grid: settlement 2x4 */
+  gridSettlement: 'grid grid-cols-2 md:grid-cols-4 gap-3',
+  /** Grid: settlement footer with border */
+  gridSettlementFooter: 'grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-sky-200',
+  /** Settlement read-only grid */
+  gridSettlementReadOnly: 'grid grid-cols-2 md:grid-cols-4 gap-3 text-sm text-gray-900',
+  /** Field value text */
+  fieldValue: 'text-gray-900 font-medium',
+  fieldValueSemibold: 'text-gray-900 font-semibold tabular-nums',
+  fieldValueText: 'text-gray-900',
+  /** No bank data message */
+  noBankData: 'text-sm text-gray-500 italic',
+  /** Amount highlight (balance/advance) */
+  amountHighlight: 'text-lg font-bold text-sky-700 tabular-nums',
+  /** Transfer instructions paragraph */
+  transferHelp: 'text-sm text-gray-600 mt-4 leading-relaxed',
+  /** File name next to upload button */
+  fileName: 'font-medium text-gray-700 text-sm',
+  /** Icon sizes */
+  iconSm: 'w-4 h-4',
+  iconMd: 'w-5 h-5 shrink-0',
+  /** Status success (green) */
+  statusSuccess: 'text-green-700',
+  /** Modal body scroll container */
+  modalBody: 'space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto pr-2',
+  /** Subsection title small (Datos del ingreso, etc.) */
+  subsectionSmall: 'text-sm font-semibold text-gray-700 mb-3',
+  subsectionSmallPlain: 'text-sm font-semibold text-gray-700',
+  /** Flex utilities */
+  flexEnd: 'flex justify-end',
+  tableGroupHeader: 'flex items-center justify-between mb-2',
+  tableGroupTitle: 'text-sm font-semibold text-gray-700',
+  /** Summary row label/value */
+  summaryLabel: 'font-medium text-gray-700',
+  summaryValue: 'font-medium',
+  summaryRow: 'text-sm text-gray-900',
+  /** Input when locked */
+  inputLocked: 'bg-gray-100 cursor-not-allowed',
+  /** Inner box with extra space-y */
+  innerBoxSpaceY: 'space-y-6',
+  /** Muted text (e.g. "Oferta no encontrada") */
+  mutedText: 'text-sm text-gray-500',
+  /** Reject readonly text */
+  rejectReadonlyText: 'text-gray-900',
 } as const;
 
 /** Messages section (saleRequestDetailModal) */
 export const messagesSection = {
   container: 'rounded-xl border-2 border-sky-400/60 bg-sky-50 shadow-sm overflow-hidden',
   headerButton: 'w-full flex items-center justify-between p-4 text-left text-gray-900 transition-colors hover:bg-sky-100/50',
+  headerTitleWrap: 'flex items-center gap-2',
   title: 'text-lg font-semibold text-gray-900',
   readOnlyBadge: 'text-xs font-medium text-gray-700 bg-gray-200 px-2 py-0.5 rounded',
+  chevronWrap: 'text-gray-700',
+  chevron: 'w-5 h-5 transition-transform',
+  contentPad: 'px-6 pb-6',
   messagesBox: 'rounded-lg overflow-hidden border bg-white border-sky-200',
   messagesArea: 'h-64 overflow-y-auto p-4 space-y-3',
   messagesAreaReadOnly: 'bg-gray-100/50',
   messagesAreaActive: 'bg-gray-50/50',
   emptyText: 'text-center py-8 text-sm text-gray-500',
   emptyTextReadOnly: 'text-center py-8 text-sm text-gray-400',
+  bubbleWrapEnd: 'flex justify-end',
+  bubbleWrapStart: 'flex justify-start',
   bubblePacker: 'max-w-[75%] rounded-lg p-3 bg-sky-500 text-white',
   bubbleProducer: 'max-w-[75%] rounded-lg p-3 bg-white border border-gray-200 text-gray-900',
   bubblePackerReadOnly: 'max-w-[75%] rounded-lg p-3 bg-gray-400 text-gray-100',
   bubbleProducerReadOnly: 'max-w-[75%] rounded-lg p-3 bg-gray-200 text-gray-700 border border-gray-300',
+  messageSender: 'text-xs font-semibold mb-1 opacity-80',
+  messageText: 'text-sm',
+  messageTime: 'text-xs mt-1 opacity-70',
   inputArea: 'p-4 border-t border-sky-200 bg-white',
+  inputRow: 'flex gap-2',
   textarea: 'flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent resize-none',
   sendButton: 'px-4 py-2 bg-sky-600 text-white rounded-md hover:bg-sky-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed self-end',
   charCount: 'mt-2 text-xs text-gray-500 text-right',
@@ -390,6 +470,7 @@ export const settlementTable = {
   tableOverflow: 'w-full text-sm border border-gray-200 rounded-lg overflow-hidden',
   thead: 'bg-gray-100 text-left',
   th: 'px-2 py-2 font-medium text-gray-700',
+  thActions: 'w-10',
   td: 'px-2 py-1.5 text-gray-900',
   tdMedium: 'px-2 py-1.5 font-medium text-gray-800',
   emptyCell: 'px-2 py-3 text-center text-gray-500',
@@ -410,9 +491,11 @@ export const detailActions = {
 
 /** Linked offer modal */
 export const linkedOfferModal = {
+  wrap: 'space-y-4',
   header: 'flex items-center justify-between border-b border-gray-200 pb-4 mb-2',
   title: 'text-lg font-medium text-gray-900',
   closeBtn: 'p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors',
+  closeIcon: 'text-2xl leading-none',
   footer: 'flex justify-end pt-2 border-t border-gray-200',
 } as const;
 

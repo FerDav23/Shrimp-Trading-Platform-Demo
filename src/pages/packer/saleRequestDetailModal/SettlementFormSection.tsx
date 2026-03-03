@@ -1,6 +1,6 @@
 import React from 'react';
 import { FormRow } from '../../../components/FormRow';
-import { collapsible, form, settlementTable, button } from '../../../styles';
+import { collapsible, form, settlementTable, button, saleRequestDetail } from '../../../styles';
 import { CATCH_SETTLEMENT_CLASSES } from '../../../types';
 import type { CatchSettlement, CatchSettlementLine } from '../../../types';
 import { createEmptyLine } from './utils';
@@ -49,8 +49,8 @@ export const SettlementFormSection: React.FC<SettlementFormSectionProps> = ({
   return (
     <CollapsibleSection title="Liquidación de pesca" expanded={expanded} onToggle={onToggle}>
       <div className={collapsible.content}>
-        <div className={`${collapsible.innerBox} space-y-6`}>
-          <div className="flex justify-end">
+        <div className={`${collapsible.innerBox} ${saleRequestDetail.innerBoxSpaceY}`}>
+          <div className={saleRequestDetail.flexEnd}>
             {isSettlementLocked ? (
               <button
                 type="button"
@@ -71,62 +71,62 @@ export const SettlementFormSection: React.FC<SettlementFormSectionProps> = ({
           </div>
 
           <div>
-            <h4 className="text-sm font-semibold text-gray-700 mb-3">Datos del ingreso</h4>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <FormRow labelClassName="text-sm font-medium text-gray-700" label="Fecha ing.">
+            <h4 className={saleRequestDetail.subsectionSmall}>Datos del ingreso</h4>
+            <div className={saleRequestDetail.gridSettlement}>
+              <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Fecha ing.">
                 <input
                   type="date"
                   value={settlement.entryDate}
                   onChange={(e) => onSettlementChange((s) => ({ ...s, entryDate: e.target.value }))}
                   readOnly={isSettlementLocked}
-                  className={`${form.inputEditable} ${isSettlementLocked ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                  className={`${form.inputEditable} ${isSettlementLocked ? saleRequestDetail.inputLocked : ''}`}
                 />
               </FormRow>
-              <FormRow labelClassName="text-sm font-medium text-gray-700" label="No. Lote">
+              <FormRow labelClassName={saleRequestDetail.formRowLabel} label="No. Lote">
                 <input
                   type="text"
                   value={settlement.lotNumber}
                   onChange={(e) => onSettlementChange((s) => ({ ...s, lotNumber: e.target.value }))}
                   placeholder="Ej. FC218233"
                   readOnly={isSettlementLocked}
-                  className={`${form.inputEditable} ${isSettlementLocked ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                  className={`${form.inputEditable} ${isSettlementLocked ? saleRequestDetail.inputLocked : ''}`}
                 />
               </FormRow>
-              <FormRow labelClassName="text-sm font-medium text-gray-700" label="Guía rem.">
+              <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Guía rem.">
                 <input
                   type="text"
                   value={settlement.remissionGuide}
                   onChange={(e) => onSettlementChange((s) => ({ ...s, remissionGuide: e.target.value }))}
                   placeholder="Ej. 484-483"
                   readOnly={isSettlementLocked}
-                  className={`${form.inputEditable} ${isSettlementLocked ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                  className={`${form.inputEditable} ${isSettlementLocked ? saleRequestDetail.inputLocked : ''}`}
                 />
               </FormRow>
-              <FormRow labelClassName="text-sm font-medium text-gray-700" label="Piscina">
+              <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Piscina">
                 <input
                   type="text"
                   value={settlement.pond}
                   onChange={(e) => onSettlementChange((s) => ({ ...s, pond: e.target.value }))}
                   placeholder="Ej. 2"
                   readOnly={isSettlementLocked}
-                  className={`${form.inputEditable} ${isSettlementLocked ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                  className={`${form.inputEditable} ${isSettlementLocked ? saleRequestDetail.inputLocked : ''}`}
                 />
               </FormRow>
-              <FormRow labelClassName="text-sm font-medium text-gray-700" label="Aguaje">
+              <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Aguaje">
                 <input
                   type="text"
                   value={settlement.aguaje}
                   onChange={(e) => onSettlementChange((s) => ({ ...s, aguaje: e.target.value }))}
                   placeholder="Ej. 2024-14"
                   readOnly={isSettlementLocked}
-                  className={`${form.inputEditable} ${isSettlementLocked ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                  className={`${form.inputEditable} ${isSettlementLocked ? saleRequestDetail.inputLocked : ''}`}
                 />
               </FormRow>
             </div>
           </div>
 
           <div className="space-y-6">
-            <h4 className="text-sm font-semibold text-gray-700">Detalle por clase y talla</h4>
+            <h4 className={saleRequestDetail.subsectionSmallPlain}>Detalle por clase y talla</h4>
             {tableGroups.map(({ key, title }) => {
               const lines = settlement[key];
               const updateLine = (lineId: string, field: keyof CatchSettlementLine, value: string | number) => {
@@ -148,8 +148,8 @@ export const SettlementFormSection: React.FC<SettlementFormSectionProps> = ({
               };
               return (
                 <div key={key}>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-semibold text-gray-700">{title}</span>
+                  <div className={saleRequestDetail.tableGroupHeader}>
+                    <span className={saleRequestDetail.tableGroupTitle}>{title}</span>
                     {!isSettlementLocked && (
                       <button
                         type="button"
@@ -168,7 +168,7 @@ export const SettlementFormSection: React.FC<SettlementFormSectionProps> = ({
                           <th className={settlementTable.th}>Libras</th>
                           <th className={settlementTable.th}>P. unit.</th>
                           <th className={settlementTable.th}>Valor total</th>
-                          {!isSettlementLocked && <th className="w-10" />}
+                            {!isSettlementLocked && <th className={settlementTable.thActions} />}
                         </tr>
                       </thead>
                       <tbody>
@@ -184,9 +184,9 @@ export const SettlementFormSection: React.FC<SettlementFormSectionProps> = ({
                         ) : (
                           lines.map((line) => (
                             <tr key={line.id} className={settlementTable.row}>
-                              <td className="px-2 py-1.5">
+                              <td className={settlementTable.td}>
                                 {isSettlementLocked ? (
-                                  <span className="text-gray-900">{line.sizeOrDesc || '—'}</span>
+                                  <span className={saleRequestDetail.fieldValueText}>{line.sizeOrDesc || '—'}</span>
                                 ) : (
                                   <input
                                     type="text"
@@ -197,9 +197,9 @@ export const SettlementFormSection: React.FC<SettlementFormSectionProps> = ({
                                   />
                                 )}
                               </td>
-                              <td className="px-2 py-1.5">
+                              <td className={settlementTable.td}>
                                 {isSettlementLocked ? (
-                                  <span className="text-gray-900">{line.pounds}</span>
+                                  <span className={saleRequestDetail.fieldValueText}>{line.pounds}</span>
                                 ) : (
                                   <input
                                     type="number"
@@ -214,9 +214,9 @@ export const SettlementFormSection: React.FC<SettlementFormSectionProps> = ({
                                   />
                                 )}
                               </td>
-                              <td className="px-2 py-1.5">
+                              <td className={settlementTable.td}>
                                 {isSettlementLocked ? (
-                                  <span className="text-gray-900">{line.unitPrice}</span>
+                                  <span className={saleRequestDetail.fieldValueText}>{line.unitPrice}</span>
                                 ) : (
                                   <input
                                     type="number"
@@ -231,11 +231,11 @@ export const SettlementFormSection: React.FC<SettlementFormSectionProps> = ({
                                   />
                                 )}
                               </td>
-                              <td className="px-2 py-1.5 font-medium text-gray-800">
+                              <td className={settlementTable.tdMedium}>
                                 {(line.pounds * line.unitPrice).toFixed(2)}
                               </td>
                               {!isSettlementLocked && (
-                                <td className="px-2 py-1.5">
+                                <td className={settlementTable.td}>
                                   <button
                                     type="button"
                                     onClick={() => removeLine(line.id)}
@@ -257,8 +257,8 @@ export const SettlementFormSection: React.FC<SettlementFormSectionProps> = ({
             })}
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-sky-200">
-            <FormRow labelClassName="text-sm font-medium text-gray-700" label="Remitidas referencial (lb)">
+          <div className={saleRequestDetail.gridSettlementFooter}>
+            <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Remitidas referencial (lb)">
               <input
                 type="text"
                 readOnly
@@ -266,7 +266,7 @@ export const SettlementFormSection: React.FC<SettlementFormSectionProps> = ({
                 className={form.inputReadonlyGray}
               />
             </FormRow>
-            <FormRow labelClassName="text-sm font-medium text-gray-700" label="Basura cola directa (lb)">
+            <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Basura cola directa (lb)">
               <input
                 type="number"
                 min={0}
@@ -277,28 +277,28 @@ export const SettlementFormSection: React.FC<SettlementFormSectionProps> = ({
                   onSettlementChange((s) => ({ ...s, basuraColaDirectaLb: Number.isNaN(v) ? 0 : v }));
                 }}
                 readOnly={isSettlementLocked}
-                className={`${form.inputEditable} ${isSettlementLocked ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                className={`${form.inputEditable} ${isSettlementLocked ? saleRequestDetail.inputLocked : ''}`}
               />
             </FormRow>
-            <div className="text-sm text-gray-900">
-              <span className="font-medium text-gray-700">Recibidas referencial (lb): </span>
-              <span className="font-medium">{recibidasReferencial.toFixed(2)}</span>
+            <div className={saleRequestDetail.summaryRow}>
+              <span className={saleRequestDetail.summaryLabel}>Recibidas referencial (lb): </span>
+              <span className={saleRequestDetail.summaryValue}>{recibidasReferencial.toFixed(2)}</span>
             </div>
-            <div className="text-sm text-gray-900">
-              <span className="font-medium text-gray-700">Procesadas reales (lb): </span>
-              <span className="font-medium">{procesadasReales.toFixed(2)}</span>
+            <div className={saleRequestDetail.summaryRow}>
+              <span className={saleRequestDetail.summaryLabel}>Procesadas reales (lb): </span>
+              <span className={saleRequestDetail.summaryValue}>{procesadasReales.toFixed(2)}</span>
             </div>
-            <div className="text-sm text-gray-900">
-              <span className="font-medium text-gray-700">Total valor: </span>
-              <span className="font-medium">$ {totalValor.toFixed(2)}</span>
+            <div className={saleRequestDetail.summaryRow}>
+              <span className={saleRequestDetail.summaryLabel}>Total valor: </span>
+              <span className={saleRequestDetail.summaryValue}>$ {totalValor.toFixed(2)}</span>
             </div>
-            <div className="text-sm text-gray-900">
-              <span className="font-medium text-gray-700">Rendimiento: </span>
-              <span className="font-medium">{rendimientoPct.toFixed(2)}%</span>
+            <div className={saleRequestDetail.summaryRow}>
+              <span className={saleRequestDetail.summaryLabel}>Rendimiento: </span>
+              <span className={saleRequestDetail.summaryValue}>{rendimientoPct.toFixed(2)}%</span>
             </div>
-            <div className="text-sm text-gray-900">
-              <span className="font-medium text-gray-700">Merma: </span>
-              <span className="font-medium">{mermaPct.toFixed(2)}%</span>
+            <div className={saleRequestDetail.summaryRow}>
+              <span className={saleRequestDetail.summaryLabel}>Merma: </span>
+              <span className={saleRequestDetail.summaryValue}>{mermaPct.toFixed(2)}%</span>
             </div>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { CollapsibleSection } from './CollapsibleSection';
-import { collapsible, form } from '../../../styles';
+import { collapsible, form, saleRequestDetail } from '../../../styles';
 import { REJECTION_REASONS } from './constants';
 
 interface RejectFormSectionProps {
@@ -34,7 +34,7 @@ export const RejectFormSection: React.FC<RejectFormSectionProps> = ({
         onToggle={onToggle}
         variant="default"
       >
-        <div className="px-6 pb-6 space-y-4">
+        <div className={collapsible.contentPadSpace}>
           <div>
             <label className={`block ${form.label} mb-2`}>
               Seleccione el motivo del rechazo
@@ -75,9 +75,9 @@ export const RejectFormSection: React.FC<RejectFormSectionProps> = ({
       onToggle={onToggle}
       variant="rejection"
     >
-      <div className="px-6 pb-6">
+      <div className={collapsible.contentPad}>
         <div className={collapsible.rejectReadonlyBox}>
-          <p className="text-gray-900">{rejectionReasonDisplay ?? ''}</p>
+          <p className={saleRequestDetail.rejectReadonlyText}>{rejectionReasonDisplay ?? ''}</p>
         </div>
       </div>
     </CollapsibleSection>

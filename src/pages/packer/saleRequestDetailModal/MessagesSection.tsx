@@ -26,21 +26,21 @@ export const MessagesSection: React.FC<MessagesSectionProps> = ({
   isMessagesActive,
   messagesEndRef,
 }) => (
-  <section className={messagesSection.container}>
+    <section className={messagesSection.container}>
     <button
       type="button"
       onClick={onToggle}
       className={messagesSection.headerButton}
     >
-      <div className="flex items-center gap-2">
+      <div className={messagesSection.headerTitleWrap}>
         <h3 className={messagesSection.title}>Mensajes sobre esta Solicitud</h3>
         {!isMessagesActive && (
           <span className={messagesSection.readOnlyBadge}>Solo lectura</span>
         )}
       </div>
-      <span className="text-gray-700">
+      <span className={messagesSection.chevronWrap}>
         <svg
-          className={`w-5 h-5 transition-transform ${expanded ? 'rotate-180' : ''}`}
+          className={`${messagesSection.chevron} ${expanded ? 'rotate-180' : ''}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -50,7 +50,7 @@ export const MessagesSection: React.FC<MessagesSectionProps> = ({
       </span>
     </button>
     {expanded && (
-      <div className="px-6 pb-6">
+      <div className={messagesSection.contentPad}>
         <div className={messagesSection.messagesBox}>
           <div
             className={`${messagesSection.messagesArea} ${isMessagesActive ? messagesSection.messagesAreaActive : messagesSection.messagesAreaReadOnly}`}
@@ -69,10 +69,10 @@ export const MessagesSection: React.FC<MessagesSectionProps> = ({
                 return (
                   <div
                     key={msg.id}
-                    className={`flex ${isPacker ? 'justify-end' : 'justify-start'}`}
+                    className={isPacker ? messagesSection.bubbleWrapEnd : messagesSection.bubbleWrapStart}
                   >
                     <div
-                      className={`max-w-[75%] rounded-lg p-3 ${
+                      className={
                         isMessagesActive
                           ? isPacker
                             ? messagesSection.bubblePacker
@@ -80,11 +80,11 @@ export const MessagesSection: React.FC<MessagesSectionProps> = ({
                           : isPacker
                             ? messagesSection.bubblePackerReadOnly
                             : messagesSection.bubbleProducerReadOnly
-                      }`}
+                      }
                     >
-                      <div className="text-xs font-semibold mb-1 opacity-80">{msg.senderName}</div>
-                      <div className="text-sm">{msg.text}</div>
-                      <div className="text-xs mt-1 opacity-70">
+                      <div className={messagesSection.messageSender}>{msg.senderName}</div>
+                      <div className={messagesSection.messageText}>{msg.text}</div>
+                      <div className={messagesSection.messageTime}>
                         {format(new Date(msg.createdAt), 'dd MMM yyyy, HH:mm', { locale: es })}
                       </div>
                     </div>
@@ -96,7 +96,7 @@ export const MessagesSection: React.FC<MessagesSectionProps> = ({
           </div>
           {isMessagesActive && (
             <div className={messagesSection.inputArea}>
-              <div className="flex gap-2">
+              <div className={messagesSection.inputRow}>
                 <textarea
                   value={messageText}
                   onChange={(e) => {

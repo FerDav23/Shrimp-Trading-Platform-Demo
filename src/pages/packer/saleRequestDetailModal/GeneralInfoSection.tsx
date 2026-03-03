@@ -1,7 +1,7 @@
 import React from 'react';
 import { FormRow } from '../../../components/FormRow';
 import { StatusBadge } from '../../../components/StatusBadge';
-import { collapsible } from '../../../styles';
+import { collapsible, saleRequestDetail } from '../../../styles';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import type { SaleRequest } from '../../../types';
@@ -25,39 +25,39 @@ export const GeneralInfoSection: React.FC<GeneralInfoSectionProps> = ({
   <CollapsibleSection title="Información General" expanded={expanded} onToggle={onToggle}>
     <div className={collapsible.content}>
       <div className={collapsible.innerBox}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormRow labelClassName="text-sm font-medium text-gray-700" label="ID Solicitud">
-            <p className="py-2 text-sm text-gray-900 font-medium">#{request.id.split('-')[1]}</p>
+        <div className={saleRequestDetail.gridForm}>
+          <FormRow labelClassName={saleRequestDetail.formRowLabel} label="ID Solicitud">
+            <p className={saleRequestDetail.formRowValueBold}>#{request.id.split('-')[1]}</p>
           </FormRow>
-          <FormRow labelClassName="text-sm font-medium text-gray-700" label="Estado">
-            <div className="py-2">
+          <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Estado">
+            <div className={saleRequestDetail.formRowValue}>
               <StatusBadge status={request.status} label={getStatusLabel(request.status)} />
             </div>
           </FormRow>
-          <FormRow labelClassName="text-sm font-medium text-gray-700" label="Productor">
-            <p className="py-2 text-sm text-gray-900">{request.producerName}</p>
+          <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Productor">
+            <p className={saleRequestDetail.formRowValue}>{request.producerName}</p>
           </FormRow>
-          <FormRow labelClassName="text-sm font-medium text-gray-700" label="Producto">
-            <p className="py-2 text-sm text-gray-900">{getProductFormLabel(request.productForm)}</p>
+          <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Producto">
+            <p className={saleRequestDetail.formRowValue}>{getProductFormLabel(request.productForm)}</p>
           </FormRow>
-          <FormRow labelClassName="text-sm font-medium text-gray-700" label="Fecha de Solicitud">
-            <p className="py-2 text-sm text-gray-900">
+          <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Fecha de Solicitud">
+            <p className={saleRequestDetail.formRowValue}>
               {format(new Date(request.createdAt), 'dd MMM yyyy, HH:mm', { locale: es })}
             </p>
           </FormRow>
           {request.respondedAt && (
-            <FormRow labelClassName="text-sm font-medium text-gray-700" label="Fecha de Respuesta">
-              <p className="py-2 text-sm text-gray-900">
+            <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Fecha de Respuesta">
+              <p className={saleRequestDetail.formRowValue}>
                 {format(new Date(request.respondedAt), 'dd MMM yyyy, HH:mm', { locale: es })}
               </p>
             </FormRow>
           )}
           <div className="md:col-span-2 mt-2">
-            <FormRow labelClassName="text-sm font-medium text-gray-700" label="Oferta vinculada">
-              <div className="flex items-center gap-2 py-2">
+            <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Oferta vinculada">
+              <div className={saleRequestDetail.formRowInline}>
                 {linkedOffer ? (
                   <>
-                    <span className="text-sm text-gray-900 font-medium">{linkedOffer.offerCode}</span>
+                    <span className={saleRequestDetail.formRowValueBold}>{linkedOffer.offerCode}</span>
                     <button
                       type="button"
                       onClick={onOpenOfferModal}
@@ -67,7 +67,7 @@ export const GeneralInfoSection: React.FC<GeneralInfoSectionProps> = ({
                     </button>
                   </>
                 ) : (
-                  <span className="text-sm text-gray-500">Oferta no encontrada</span>
+                  <span className={saleRequestDetail.mutedText}>Oferta no encontrada</span>
                 )}
               </div>
             </FormRow>
