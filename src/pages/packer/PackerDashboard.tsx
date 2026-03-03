@@ -6,7 +6,7 @@ import { dummyOffers } from '../../data/offers';
 import { dummySaleRequests } from '../../data/saleRequests';
 import { Card } from '../../components/Card';
 import { StatusBadge } from '../../components/StatusBadge';
-import { SALES_NAV_ITEMS, statusToPath } from './salesRoutes';
+import { SALES_STATUS_TABS, statusToPath } from './salesRoutes';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import type { SaleRequestStatus } from '../../types';
@@ -37,9 +37,9 @@ export const PackerDashboard: React.FC = () => {
   const offersCola = publishedOffers.filter((o) => o.productForm === 'COLA_DIRECTA').length;
 
   const mySaleRequests = dummySaleRequests.filter((r) => r.packingCompanyId === PACKER_ID);
-  const requestsByStatus = SALES_NAV_ITEMS.reduce<Record<SaleRequestStatus, number>>(
-    (acc, { status }) => {
-      acc[status] = mySaleRequests.filter((r) => r.status === status).length;
+  const requestsByStatus = SALES_STATUS_TABS.reduce<Record<SaleRequestStatus, number>>(
+    (acc, { tab }) => {
+      acc[tab] = mySaleRequests.filter((r) => r.status === tab).length;
       return acc;
     },
     {} as Record<SaleRequestStatus, number>
@@ -126,12 +126,12 @@ export const PackerDashboard: React.FC = () => {
           <div className="mb-6">
             <h3 className={page.sectionSubtitle}>Por estado</h3>
             <ul className="space-y-2">
-              {SALES_NAV_ITEMS.map(({ status, label }) => {
-                const count = requestsByStatus[status] ?? 0;
+              {SALES_STATUS_TABS.map(({ tab, label }) => {
+                const count = requestsByStatus[tab] ?? 0;
                 return (
-                  <li key={status}>
+                  <li key={tab}>
                     <Link
-                      to={statusToPath(status)}
+                      to={statusToPath(tab)}
                       className={page.listItem}
                     >
                       <span className={page.listItemLabel}>{label}</span>

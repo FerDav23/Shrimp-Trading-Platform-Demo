@@ -423,3 +423,42 @@ export const login = {
   subtitle: 'text-gray-600',
   cardHover: 'hover:shadow-lg transition-all cursor-pointer',
 } as const;
+
+/** Packer Sales – barra de pestañas y tabla de solicitudes */
+export const packerSales = {
+  tabsOuter: '-mx-6 mb-0',
+  tabsBar: 'bg-white flex items-center overflow-hidden px-0 border-b-2 border-gray-200 pr-1',
+  tabArrow:
+    'shrink-0 w-9 h-9 flex items-center justify-center bg-sky-100 text-sky-600 hover:bg-sky-200 hover:text-sky-700 transition-colors',
+  tabScroll:
+    'flex items-center overflow-x-auto scroll-smooth flex-1 min-w-0 [&::-webkit-scrollbar]:hidden',
+  tabButton:
+    'shrink-0 px-4 py-2 font-medium transition-colors whitespace-nowrap border-r border-gray-200 last:border-r-0',
+  tabButtonActive: 'bg-sky-600 text-white',
+  tabButtonInactive: 'bg-white text-slate-700 hover:bg-gray-50',
+  sectionWrap: 'pt-2',
+  section: 'p-6 pt-1 rounded-xl bg-transparent',
+  sectionTitle: 'text-lg font-semibold text-sky-900 mb-4 pb-3 border-b border-gray-400',
+  tableOuter: 'border border-gray-300 rounded-lg overflow-hidden',
+  tableEmpty: 'text-center py-12 text-slate-600 bg-gray-50',
+  tableEmptyText: 'text-sm',
+  tableScroll: 'overflow-x-auto',
+  table: 'min-w-full divide-y divide-sky-300',
+  thead: 'bg-sky-100',
+  th: 'px-6 py-3 text-left text-xs font-semibold text-slate-800 uppercase tracking-wide',
+  tbody: 'bg-white divide-y divide-sky-300',
+  trClickable: 'hover:bg-sky-50 cursor-pointer transition-colors',
+  trDisabled: 'bg-gray-100 text-gray-500 cursor-not-allowed',
+  td: 'px-6 py-4 whitespace-nowrap text-sm text-slate-800',
+  colRequestId: 'text-sky-700 font-semibold',
+  colProducerName: 'font-medium text-slate-800',
+  colProduct: 'text-sm text-slate-700 font-medium',
+  colCatchQty: 'text-slate-800 font-semibold',
+  colCatchSub: 'text-slate-600',
+  colCatchMeta: 'text-slate-500 text-xs mt-1',
+  colLocationMain: 'text-slate-800 font-medium',
+  colLocationSub: 'text-slate-600 text-xs',
+  colDate: 'text-slate-700',
+  colStatusAwaiting: 'text-amber-700 font-medium',
+  colStatus: 'text-slate-700',
+} as const;
