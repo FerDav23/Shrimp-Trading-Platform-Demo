@@ -6,7 +6,7 @@
 /** Layout principal */
 export const layout = {
   main: 'flex h-screen bg-gray-50',
-  mainContent: 'flex-1 overflow-y-auto px-6',
+  mainContent: 'flex-1 flex flex-col min-h-0 overflow-y-auto px-6',
   sidebar: 'w-64 bg-gray-900 text-white min-h-screen',
   topbar: 'bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center',
 } as const;
@@ -426,6 +426,10 @@ export const login = {
 
 /** Packer Sales – barra de pestañas y tabla de solicitudes */
 export const packerSales = {
+  /** Wrapper para que la tabla sea el único scroll */
+  pageLayout: 'flex flex-col flex-1 min-h-0',
+  /** Header fijo: tabs + título de sección (no se desplaza) */
+  stickyHeader: 'shrink-0 bg-transparent',
   tabsOuter: '-mx-6 mb-0',
   tabsBar: 'bg-white flex items-center overflow-hidden px-0 border-b-2 border-gray-200 pr-1',
   tabArrow:
@@ -438,8 +442,10 @@ export const packerSales = {
   tabButtonInactive: 'bg-white text-slate-700 hover:bg-gray-50',
   sectionWrap: 'pt-2',
   section: 'p-6 pt-1 rounded-xl bg-transparent',
-  sectionTitle: 'text-lg font-semibold text-sky-900 mb-4 pb-3 border-b border-gray-400',
-  tableOuter: 'border border-gray-300 rounded-lg overflow-hidden',
+  sectionTitle: 'text-lg font-semibold text-sky-900 mb-4 pb-3 border-b border-gray-400 px-6 mt-2',
+  /** Contenedor con scroll solo para la tabla */
+  tableScrollWrap: 'flex-1 min-h-0 overflow-auto px-6 pt-2',
+  tableOuter: 'border border-gray-300 rounded-lg overflow-hidden mb-6',
   tableEmpty: 'text-center py-12 text-slate-600 bg-gray-50',
   tableEmptyText: 'text-sm',
   tableScroll: 'overflow-x-auto',
@@ -459,6 +465,20 @@ export const packerSales = {
   colLocationMain: 'text-slate-800 font-medium',
   colLocationSub: 'text-slate-600 text-xs',
   colDate: 'text-slate-700',
-  colStatusAwaiting: 'text-amber-700 font-medium',
-  colStatus: 'text-slate-700',
+  /** Estado: en espera de confirmación (liquidación enviada) */
+  colStatusAwaiting: 'inline-block px-2.5 py-1 rounded-md bg-amber-100 text-amber-800 font-medium text-sm',
+  /** Estado: pendientes de aceptar */
+  colStatusPendingAcceptance: 'inline-block px-2.5 py-1 rounded-md bg-amber-100 text-amber-800 font-medium text-sm',
+  /** Estado: liquidación de pesca pendiente */
+  colStatusCatchSettlement: 'inline-block px-2.5 py-1 rounded-md bg-sky-100 text-sky-800 font-medium text-sm',
+  /** Estado: anticipo pendiente */
+  colStatusAdvancePending: 'inline-block px-2.5 py-1 rounded-md bg-amber-100 text-amber-800 font-medium text-sm',
+  /** Estado: saldo restante pendiente */
+  colStatusBalancePending: 'inline-block px-2.5 py-1 rounded-md bg-amber-100 text-amber-800 font-medium text-sm',
+  /** Estado: venta finalizada */
+  colStatusSaleCompleted: 'inline-block px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-800 font-medium text-sm',
+  /** Estado: rechazada */
+  colStatusRejected: 'inline-block px-2.5 py-1 rounded-md bg-red-100 text-red-800 font-medium text-sm',
+  /** Estado: genérico (fallback) */
+  colStatus: 'inline-block px-2.5 py-1 rounded-md bg-gray-100 text-gray-800 font-medium text-sm',
 } as const;

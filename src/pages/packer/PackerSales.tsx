@@ -43,6 +43,18 @@ function getSectionTitle(tab: SalesViewTab): string {
   return SECTION_TITLES[tab];
 }
 
+function getStatusClass(status: SalesViewFilter): string {
+  const statusClasses: Record<SalesViewFilter, string> = {
+    PENDING_ACCEPTANCE: packerSales.colStatusPendingAcceptance,
+    CATCH_SETTLEMENT_PENDING: packerSales.colStatusCatchSettlement,
+    ADVANCE_PENDING: packerSales.colStatusAdvancePending,
+    BALANCE_PENDING: packerSales.colStatusBalancePending,
+    SALE_COMPLETED: packerSales.colStatusSaleCompleted,
+    REJECTED: packerSales.colStatusRejected,
+  };
+  return statusClasses[status] ?? packerSales.colStatus;
+}
+
 export const PackerSales: React.FC = () => {
   useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -134,12 +146,6 @@ export const PackerSales: React.FC = () => {
 
   const columns = [
     {
-      header: 'ID Solicitud',
-      accessor: (request: SaleRequest) => (
-        <span className={packerSales.colRequestId}>#{request.id.split('-')[1]}</span>
-      ),
-    },
-    {
       header: 'Productor',
       accessor: (request: SaleRequest) => (
         <div>
@@ -195,8 +201,11 @@ export const PackerSales: React.FC = () => {
           : isAllView
             ? getStatusLabel(request.status)
             : getStatusLabel(activeTab);
+        const statusClass = awaiting
+          ? packerSales.colStatusAwaiting
+          : getStatusClass(isAllView ? request.status : activeTab);
         return (
-          <span className={awaiting ? packerSales.colStatusAwaiting : packerSales.colStatus}>
+          <span className={statusClass}>
             {statusLabel}
           </span>
         );
@@ -210,108 +219,108 @@ export const PackerSales: React.FC = () => {
       : `No hay solicitudes ${getStatusLabel(activeTab).toLowerCase()} disponibles.`;
 
   return (
-    <div>
+    <div className={packerSales.pageLayout}>
       <div className={page.headerWithSubtitle}>
         <h1 className={page.headerTitle}>Compras</h1>
         <p className={page.headerSubtitle}>{getSectionTitle(activeTab)}</p>
       </div>
 
-      {/* Tabs superiores: full-bleed sin cambiar padding del main */}
-      <div className={packerSales.tabsOuter}>
-        <div className={packerSales.tabsBar}>
-          {canScrollLeft && (
-            <button
-              type="button"
-              onClick={() => scrollTabs('left')}
-              className={packerSales.tabArrow}
-              aria-label="Ver opciones anteriores"
+      {/* Tabs + título de sección fijos; solo la tabla hace scroll */}
+      <div className={packerSales.stickyHeader}>
+        <div className={packerSales.tabsOuter}>
+          <div className={packerSales.tabsBar}>
+            {canScrollLeft && (
+              <button
+                type="button"
+                onClick={() => scrollTabs('left')}
+                className={packerSales.tabArrow}
+                aria-label="Ver opciones anteriores"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+            )}
+            <div
+              ref={tabsScrollRef}
+              className={packerSales.tabScroll}
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-          )}
-          <div
-            ref={tabsScrollRef}
-            className={packerSales.tabScroll}
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-          >
-            {SALES_VIEW_TABS.map(({ tab, label }) => {
-              const isActive = activeTab === tab;
-              return (
-                <button
-                  key={tab === VIEW_ALL ? 'ALL' : tab}
-                  type="button"
-                  onClick={() => setActiveTab(tab)}
-                  className={`${packerSales.tabButton} ${isActive ? packerSales.tabButtonActive : packerSales.tabButtonInactive}`}
-                >
-                  {label}
-                </button>
-              );
-            })}
-          </div>
-          {canScrollRight && (
-            <button
-              type="button"
-              onClick={() => scrollTabs('right')}
-              className={packerSales.tabArrow}
-              aria-label="Ver más opciones"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-          )}
-        </div>
-      </div>
-
-      <div className={packerSales.sectionWrap}>
-        <section className={packerSales.section}>
-          <h3 className={packerSales.sectionTitle}>
-            {getSectionTitle(activeTab)}
-          </h3>
-          <div className={packerSales.tableOuter}>
-            {filteredRequests.length === 0 ? (
-              <div className={packerSales.tableEmpty}>
-                <p className={packerSales.tableEmptyText}>{emptyMessage}</p>
-              </div>
-            ) : (
-              <div className={packerSales.tableScroll}>
-                <table className={packerSales.table}>
-                  <thead className={packerSales.thead}>
-                    <tr>
-                      {columns.map((column, idx) => (
-                        <th key={idx} className={packerSales.th}>
-                          {column.header}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className={packerSales.tbody}>
-                    {filteredRequests.map((request) => {
-                      const isAwaitingConfirmation = settlementSentIds.has(request.id);
-                      return (
-                        <tr
-                          key={request.id}
-                          onClick={() => !isAwaitingConfirmation && handleRowClick(request)}
-                          className={isAwaitingConfirmation ? packerSales.trDisabled : packerSales.trClickable}
-                        >
-                          {columns.map((column, colIdx) => (
-                            <td key={colIdx} className={packerSales.td}>
-                              {typeof column.accessor === 'function'
-                                ? column.accessor(request)
-                                : String(request[column.accessor as keyof SaleRequest])}
-                            </td>
-                          ))}
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+              {SALES_VIEW_TABS.map(({ tab, label }) => {
+                const isActive = activeTab === tab;
+                return (
+                  <button
+                    key={tab === VIEW_ALL ? 'ALL' : tab}
+                    type="button"
+                    onClick={() => setActiveTab(tab)}
+                    className={`${packerSales.tabButton} ${isActive ? packerSales.tabButtonActive : packerSales.tabButtonInactive}`}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+            {canScrollRight && (
+              <button
+                type="button"
+                onClick={() => scrollTabs('right')}
+                className={packerSales.tabArrow}
+                aria-label="Ver más opciones"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
             )}
           </div>
-        </section>
+        </div>
+        <h3 className={packerSales.sectionTitle}>
+          {getSectionTitle(activeTab)}
+        </h3>
+      </div>
+
+      <div className={packerSales.tableScrollWrap}>
+        <div className={packerSales.tableOuter}>
+          {filteredRequests.length === 0 ? (
+            <div className={packerSales.tableEmpty}>
+              <p className={packerSales.tableEmptyText}>{emptyMessage}</p>
+            </div>
+          ) : (
+            <div className={packerSales.tableScroll}>
+              <table className={packerSales.table}>
+                <thead className={packerSales.thead}>
+                  <tr>
+                    {columns.map((column, idx) => (
+                      <th key={idx} className={packerSales.th}>
+                        {column.header}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className={packerSales.tbody}>
+                  {filteredRequests.map((request) => {
+                    const isAwaitingConfirmation = settlementSentIds.has(request.id);
+                    return (
+                      <tr
+                        key={request.id}
+                        onClick={() => !isAwaitingConfirmation && handleRowClick(request)}
+                        className={isAwaitingConfirmation ? packerSales.trDisabled : packerSales.trClickable}
+                      >
+                        {columns.map((column, colIdx) => (
+                          <td key={colIdx} className={packerSales.td}>
+                            {typeof column.accessor === 'function'
+                              ? column.accessor(request)
+                              : String(request[column.accessor as keyof SaleRequest])}
+                          </td>
+                        ))}
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
       </div>
 
       <SaleRequestDetailModal
