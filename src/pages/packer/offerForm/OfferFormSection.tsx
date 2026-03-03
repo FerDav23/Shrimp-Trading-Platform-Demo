@@ -370,6 +370,10 @@ export const OfferFormSection: React.FC<OfferFormSectionProps> = ({
         addAdditionalCondition={addAdditionalCondition}
         updateAdditionalCondition={updateAdditionalCondition}
         removeAdditionalCondition={removeAdditionalCondition}
+        updateData={updateData}
+        numDisplay={numDisplay}
+        setNumInput={setNumInput}
+        setIncompleteNumBlur={setIncompleteNumBlur}
       />
 
       <div className={offerSection.footerPublish}>

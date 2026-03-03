@@ -37,6 +37,9 @@ export interface OfferFormData {
   colaDirectaTiers: PriceTier[];
   ventaLocalPrices: { quebrado: number; rojo: number; juvenil: number };
   additionalConditions: string[];
+  /** Rango opcional de cantidad de pesca a comprar (mínimo y/o máximo) */
+  quantityRangeMin?: number;
+  quantityRangeMax?: number;
 }
 
 export interface OfferFormSectionProps {

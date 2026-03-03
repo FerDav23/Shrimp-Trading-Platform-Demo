@@ -315,6 +315,33 @@ export const OfferPreviewContent: React.FC<OfferPreviewContentProps> = ({
         </div>
       </section>
 
+      {(offer.quantityRangeMin != null && offer.quantityRangeMin > 0) ||
+       (offer.quantityRangeMax != null && offer.quantityRangeMax > 0) ? (
+        <section className={offerPreview.section}>
+          <h3 className={offerPreview.title}>Cantidad de pesca a comprar</h3>
+          <div className={offerPreview.inner}>
+            <div className={offerPreview.conditionsList + ' space-y-1'}>
+              {offer.quantityRangeMin != null && offer.quantityRangeMin > 0 && (
+                <div>
+                  <span className={offerPreview.infoLabel}>Mínimo: </span>
+                  <span className={offerPreview.infoValue}>
+                    {offer.quantityRangeMin} {offer.priceUnit === 'PER_KG' ? 'kg' : 'lb'}
+                  </span>
+                </div>
+              )}
+              {offer.quantityRangeMax != null && offer.quantityRangeMax > 0 && (
+                <div>
+                  <span className={offerPreview.infoLabel}>Máximo: </span>
+                  <span className={offerPreview.infoValue}>
+                    {offer.quantityRangeMax} {offer.priceUnit === 'PER_KG' ? 'kg' : 'lb'}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      ) : null}
+
       {offer.additionalConditions && offer.additionalConditions.length > 0 && (
         <section className={offerPreview.section}>
           <h3 className={offerPreview.title}>Condiciones adicionales</h3>

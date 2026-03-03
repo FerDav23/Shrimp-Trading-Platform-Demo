@@ -95,6 +95,8 @@ export const createEmptyOfferForm = (productForm: ProductForm): OfferFormData =>
   colaDirectaTiers: buildPriceTiersFromTallas('COLA_DIRECTA'),
   ventaLocalPrices: { quebrado: 0, rojo: 0, juvenil: 0 },
   additionalConditions: [],
+  quantityRangeMin: undefined,
+  quantityRangeMax: undefined,
 });
 
 /** Input numérico con decimales: solo dígitos y un ".", sin "-". */
@@ -331,6 +333,8 @@ export const buildPreviewOffer = (
         ? data.ventaLocalPrices
         : undefined,
     additionalConditions: data.additionalConditions.filter((s) => s.trim() !== ''),
+    quantityRangeMin: data.quantityRangeMin,
+    quantityRangeMax: data.quantityRangeMax,
   };
 };
 
@@ -411,6 +415,8 @@ export const getInitialFormData = (
         juvenil: 0,
       },
       additionalConditions: existingOffer.additionalConditions ?? [],
+      quantityRangeMin: existingOffer.quantityRangeMin,
+      quantityRangeMax: existingOffer.quantityRangeMax,
     };
   }
   return createEmptyOfferForm(formType);

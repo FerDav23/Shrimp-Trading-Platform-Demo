@@ -98,6 +98,9 @@ export interface Offer {
   ventaLocalPrices?: { quebrado: number; rojo: number; juvenil: number };
   /** Condiciones adicionales (cada item máx. 100 caracteres) */
   additionalConditions?: string[];
+  /** Rango opcional de cantidad de pesca a comprar (mínimo y/o máximo, misma unidad que priceUnit) */
+  quantityRangeMin?: number;
+  quantityRangeMax?: number;
 }
 
 export interface Sale {
