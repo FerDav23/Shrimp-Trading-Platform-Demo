@@ -5,7 +5,7 @@ import { dummyOffers } from '../../../data/offers';
 import { useAuth } from '../../../contexts/AuthContext';
 import type { SaleRequestDetailModalProps } from './types';
 import type { SectionKey } from './types';
-import { defaultExpanded, REJECTION_REASONS, ADVANCE_DEADLINE_HOURS, BALANCE_DEADLINE_HOURS } from './constants';
+import { SECTION_LABELS, REJECTION_REASONS, ADVANCE_DEADLINE_HOURS, BALANCE_DEADLINE_HOURS } from './constants';
 import { createEmptySettlement, normalizeSettlement } from './utils';
 import { GeneralInfoSection } from './GeneralInfoSection';
 import { CatchInfoSection } from './CatchInfoSection';
@@ -41,7 +41,7 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
   const [showRejectForm, setShowRejectForm] = useState(false);
   const [messageText, setMessageText] = useState('');
   const [messages, setMessages] = useState<RequestMessage[]>([]);
-  const [expanded, setExpanded] = useState<Record<SectionKey, boolean>>(defaultExpanded);
+  const [activeTab, setActiveTab] = useState<SectionKey>('general');
   const [showOfferModal, setShowOfferModal] = useState(false);
   const [settlement, setSettlement] = useState<CatchSettlement>(() => createEmptySettlement());
   const [isSettlementLocked, setIsSettlementLocked] = useState(false);
@@ -57,12 +57,39 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const advanceProofInputRef = useRef<HTMLInputElement>(null);
   const balanceProofInputRef = useRef<HTMLInputElement>(null);
+  const tabsScrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
 
   const linkedOffer = request ? dummyOffers.find((o) => o.id === request.offerId) ?? null : null;
 
-  const toggleSection = (key: SectionKey) => {
-    setExpanded((prev) => ({ ...prev, [key]: !prev[key] }));
+  const updateTabsScrollArrows = () => {
+    const el = tabsScrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 0);
+    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 1);
   };
+
+  useEffect(() => {
+    const el = tabsScrollRef.current;
+    if (!el) return;
+    updateTabsScrollArrows();
+    const ro = new ResizeObserver(updateTabsScrollArrows);
+    ro.observe(el);
+    el.addEventListener('scroll', updateTabsScrollArrows);
+    return () => {
+      ro.disconnect();
+      el.removeEventListener('scroll', updateTabsScrollArrows);
+    };
+  }, [isOpen, activeTab]);
+
+  const scrollTabs = (direction: 'left' | 'right') => {
+    const el = tabsScrollRef.current;
+    if (!el) return;
+    const step = el.clientWidth * 0.8;
+    el.scrollBy({ left: direction === 'left' ? -step : step, behavior: 'smooth' });
+  };
+
 
   useEffect(() => {
     if (request) {
@@ -79,6 +106,10 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
 
   useEffect(() => {
     setSelectedBankIndex(0);
+  }, [request?.id]);
+
+  useEffect(() => {
+    if (request?.id) setActiveTab('general');
   }, [request?.id]);
 
   useEffect(() => {
@@ -161,7 +192,7 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
       setSelectedRejectionReason('');
       setShowRejectForm(false);
       setMessageText('');
-      setExpanded(defaultExpanded);
+      setActiveTab('general');
       setShowOfferModal(false);
       setIsSettlementLocked(false);
       setAdvanceProofFile(null);
@@ -269,48 +300,111 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
     ? (request.catchSettlement as Parameters<typeof normalizeSettlement>[0])
     : null;
 
+  const visibleTabs: SectionKey[] = [
+    'general',
+    'catch',
+    ...(request.packerNotes ? (['packerNotes'] as const) : []),
+    ...(request.status === 'CATCH_SETTLEMENT_PENDING' ? (['settlement'] as const) : []),
+    ...(request.status === 'ADVANCE_PENDING' ||
+    request.status === 'BALANCE_PENDING' ||
+    request.status === 'SALE_COMPLETED'
+      ? settlementReadOnlySettlement
+        ? (['settlementReadOnly'] as const)
+        : []
+      : []),
+    ...(request.status === 'ADVANCE_PENDING' ? (['advanceTransfer'] as const) : []),
+    ...(request.status === 'BALANCE_PENDING' || request.status === 'SALE_COMPLETED'
+      ? (['advanceReadOnly'] as const)
+      : []),
+    ...(request.status === 'BALANCE_PENDING' ? (['balanceTransfer'] as const) : []),
+    ...(request.status === 'SALE_COMPLETED' ? (['balanceReadOnly'] as const) : []),
+    'messages',
+    ...(showRejectForm || (request.status === 'REJECTED' && rejectionReasonDisplay)
+      ? (['rejectForm'] as const)
+      : []),
+  ];
+
+  const isTabVisible = (key: SectionKey) => visibleTabs.includes(key);
+  const effectiveActiveTab = isTabVisible(activeTab) ? activeTab : 'general';
+
   return (
     <>
       <Modal isOpen={isOpen} onClose={onClose} title="Detalles de Solicitud de Compra" size="xl">
         <div className={saleRequestDetail.modalBody}>
-          <GeneralInfoSection
-            request={request}
-            expanded={expanded.general}
-            onToggle={() => toggleSection('general')}
-            linkedOffer={linkedOffer}
-            onOpenOfferModal={() => setShowOfferModal(true)}
-          />
+          <div className={saleRequestDetail.tabsBar}>
+            {canScrollLeft && (
+              <button
+                type="button"
+                onClick={() => scrollTabs('left')}
+                className={saleRequestDetail.tabArrow}
+                aria-label="Ver secciones anteriores"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+            )}
+            <div
+              ref={tabsScrollRef}
+              className={saleRequestDetail.tabsScroll}
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
+              {visibleTabs.map((key) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setActiveTab(key)}
+                  className={`${saleRequestDetail.tabButton} ${
+                    effectiveActiveTab === key
+                      ? saleRequestDetail.tabButtonActive
+                      : saleRequestDetail.tabButtonInactive
+                  }`}
+                >
+                  {SECTION_LABELS[key]}
+                </button>
+              ))}
+            </div>
+            {canScrollRight && (
+              <button
+                type="button"
+                onClick={() => scrollTabs('right')}
+                className={saleRequestDetail.tabArrow}
+                aria-label="Ver más secciones"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            )}
+          </div>
 
-          <CatchInfoSection
-            request={request}
-            expanded={expanded.catch}
-            onToggle={() => toggleSection('catch')}
-          />
-
-          {request.packerNotes && (
-            <PackerNotesSection
-              packerNotes={request.packerNotes}
-              expanded={expanded.packerNotes}
-              onToggle={() => toggleSection('packerNotes')}
-            />
-          )}
-
-          {/* ADVANCE_PENDING: settlement read-only + advance transfer */}
-          {request.status === 'ADVANCE_PENDING' && (
-            <>
-              {settlementReadOnlySettlement && (
-                <SettlementReadOnlySection
-                  settlement={settlementReadOnlySettlement}
-                  remitidasLb={request.catchInfo.estimatedQuantityLb}
-                  expanded={expanded.settlementReadOnly}
-                  onToggle={() => toggleSection('settlementReadOnly')}
-                />
-              )}
+          <div className={saleRequestDetail.tabContent}>
+            {effectiveActiveTab === 'general' && (
+              <GeneralInfoSection
+                request={request}
+                contentOnly
+                linkedOffer={linkedOffer}
+                onOpenOfferModal={() => setShowOfferModal(true)}
+              />
+            )}
+            {effectiveActiveTab === 'catch' && (
+              <CatchInfoSection request={request} contentOnly />
+            )}
+            {effectiveActiveTab === 'packerNotes' && request.packerNotes && (
+              <PackerNotesSection packerNotes={request.packerNotes} contentOnly />
+            )}
+            {effectiveActiveTab === 'settlementReadOnly' && settlementReadOnlySettlement && (
+              <SettlementReadOnlySection
+                settlement={settlementReadOnlySettlement}
+                remitidasLb={request.catchInfo.estimatedQuantityLb}
+                contentOnly
+              />
+            )}
+            {effectiveActiveTab === 'advanceTransfer' && request.status === 'ADVANCE_PENDING' && (
               <AdvanceTransferSection
                 request={request}
                 linkedOffer={linkedOffer}
-                expanded={expanded.advanceTransfer}
-                onToggle={() => toggleSection('advanceTransfer')}
+                contentOnly
                 advancePaymentEndsAt={advancePaymentEndsAt}
                 advanceTimerTick={advanceTimerTick}
                 selectedBankIndex={selectedBankIndex}
@@ -320,29 +414,15 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
                 advanceProofPreviewUrl={advanceProofPreviewUrl}
                 advanceProofInputRef={advanceProofInputRef}
               />
-            </>
-          )}
-
-          {/* BALANCE_PENDING: settlement read-only + advance read-only + balance transfer */}
-          {request.status === 'BALANCE_PENDING' && (
-            <>
-              {settlementReadOnlySettlement && (
-                <SettlementReadOnlySection
-                  settlement={settlementReadOnlySettlement}
-                  remitidasLb={request.catchInfo.estimatedQuantityLb}
-                  expanded={expanded.settlementReadOnly}
-                  onToggle={() => toggleSection('settlementReadOnly')}
-                />
-              )}
-              <AdvanceReadOnlySection
-                expanded={expanded.advanceReadOnly}
-                onToggle={() => toggleSection('advanceReadOnly')}
-              />
+            )}
+            {effectiveActiveTab === 'advanceReadOnly' && (
+              <AdvanceReadOnlySection contentOnly />
+            )}
+            {effectiveActiveTab === 'balanceTransfer' && request.status === 'BALANCE_PENDING' && (
               <BalanceTransferSection
                 request={request}
                 linkedOffer={linkedOffer}
-                expanded={expanded.balanceTransfer}
-                onToggle={() => toggleSection('balanceTransfer')}
+                contentOnly
                 balancePaymentEndsAt={balancePaymentEndsAt}
                 balanceTimerTick={balanceTimerTick}
                 selectedBankIndex={selectedBankIndex}
@@ -352,83 +432,61 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
                 balanceProofPreviewUrl={balanceProofPreviewUrl}
                 balanceProofInputRef={balanceProofInputRef}
               />
-            </>
-          )}
-
-          {/* SALE_COMPLETED: settlement + advance + balance all read-only */}
-          {request.status === 'SALE_COMPLETED' && (
-            <>
-              {settlementReadOnlySettlement && (
-                <SettlementReadOnlySection
-                  settlement={settlementReadOnlySettlement}
-                  remitidasLb={request.catchInfo.estimatedQuantityLb}
-                  expanded={expanded.settlementReadOnly}
-                  onToggle={() => toggleSection('settlementReadOnly')}
-                />
-              )}
-              <AdvanceReadOnlySection
-                expanded={expanded.advanceReadOnly}
-                onToggle={() => toggleSection('advanceReadOnly')}
-              />
+            )}
+            {effectiveActiveTab === 'balanceReadOnly' && request.status === 'SALE_COMPLETED' && (
               <BalanceReadOnlySection
                 request={request}
                 linkedOffer={linkedOffer}
-                expanded={expanded.balanceReadOnly}
-                onToggle={() => toggleSection('balanceReadOnly')}
+                contentOnly
               />
-            </>
-          )}
+            )}
+            {effectiveActiveTab === 'settlement' && request.status === 'CATCH_SETTLEMENT_PENDING' && (
+              <SettlementFormSection
+                request={request}
+                settlement={settlement}
+                onSettlementChange={setSettlement}
+                isSettlementLocked={isSettlementLocked}
+                onSettlementLockedChange={setIsSettlementLocked}
+                contentOnly
+              />
+            )}
+            {effectiveActiveTab === 'messages' && (
+              <MessagesSection
+                messages={messages}
+                messageText={messageText}
+                onMessageTextChange={setMessageText}
+                onSendMessage={handleSendMessage}
+                contentOnly
+                isMessagesActive={isMessagesActive}
+                messagesEndRef={messagesEndRef}
+              />
+            )}
+            {effectiveActiveTab === 'rejectForm' && (
+              showRejectForm ? (
+                <RejectFormSection
+                  isForm
+                  contentOnly
+                  selectedRejectionReason={selectedRejectionReason}
+                  onSelectedRejectionReasonChange={setSelectedRejectionReason}
+                  rejectNotes={rejectNotes}
+                  onRejectNotesChange={setRejectNotes}
+                />
+              ) : request.status === 'REJECTED' && rejectionReasonDisplay ? (
+                <RejectFormSection
+                  isForm={false}
+                  contentOnly
+                  selectedRejectionReason=""
+                  onSelectedRejectionReasonChange={() => {}}
+                  rejectNotes=""
+                  onRejectNotesChange={() => {}}
+                  rejectionReasonDisplay={rejectionReasonDisplay}
+                />
+              ) : null
+            )}
+          </div>
 
-          {/* CATCH_SETTLEMENT_PENDING: editable settlement form */}
-          {request.status === 'CATCH_SETTLEMENT_PENDING' && (
-            <SettlementFormSection
-              request={request}
-              settlement={settlement}
-              onSettlementChange={setSettlement}
-              isSettlementLocked={isSettlementLocked}
-              onSettlementLockedChange={setIsSettlementLocked}
-              expanded={expanded.settlement}
-              onToggle={() => toggleSection('settlement')}
-            />
-          )}
-
-          <MessagesSection
-            messages={messages}
-            messageText={messageText}
-            onMessageTextChange={setMessageText}
-            onSendMessage={handleSendMessage}
-            expanded={expanded.messages}
-            onToggle={() => toggleSection('messages')}
-            isMessagesActive={isMessagesActive}
-            messagesEndRef={messagesEndRef}
-          />
-
-          {showRejectForm && (
-            <RejectFormSection
-              isForm
-              expanded={expanded.rejectForm}
-              onToggle={() => toggleSection('rejectForm')}
-              selectedRejectionReason={selectedRejectionReason}
-              onSelectedRejectionReasonChange={setSelectedRejectionReason}
-              rejectNotes={rejectNotes}
-              onRejectNotesChange={setRejectNotes}
-            />
-          )}
-
-          {request.status === 'REJECTED' && rejectionReasonDisplay && (
-            <RejectFormSection
-              isForm={false}
-              expanded={expanded.rejectForm}
-              onToggle={() => toggleSection('rejectForm')}
-              selectedRejectionReason=""
-              onSelectedRejectionReasonChange={() => {}}
-              rejectNotes=""
-              onRejectNotesChange={() => {}}
-              rejectionReasonDisplay={rejectionReasonDisplay}
-            />
-          )}
-
-          <DetailActions
+          <div className={saleRequestDetail.detailActionsWrap}>
+            <DetailActions
             status={request.status}
             showRejectForm={showRejectForm}
             canConfirmReject={canConfirmReject}
@@ -444,6 +502,7 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
             onSendAdvanceProof={onSendAdvanceProof ? handleSendAdvanceProof : undefined}
             onSendBalanceProof={onSendBalanceProof ? handleSendBalanceProof : undefined}
           />
+          </div>
         </div>
       </Modal>
       <LinkedOfferModal

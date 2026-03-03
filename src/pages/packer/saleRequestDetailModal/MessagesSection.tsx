@@ -10,8 +10,9 @@ interface MessagesSectionProps {
   messageText: string;
   onMessageTextChange: (value: string) => void;
   onSendMessage: () => void;
-  expanded: boolean;
-  onToggle: () => void;
+  expanded?: boolean;
+  onToggle?: () => void;
+  contentOnly?: boolean;
   isMessagesActive: boolean;
   messagesEndRef: RefObject<HTMLDivElement>;
 }
@@ -21,35 +22,13 @@ export const MessagesSection: React.FC<MessagesSectionProps> = ({
   messageText,
   onMessageTextChange,
   onSendMessage,
-  expanded,
-  onToggle,
+  expanded = false,
+  onToggle = () => {},
+  contentOnly = false,
   isMessagesActive,
   messagesEndRef,
-}) => (
-    <section className={messagesSection.container}>
-    <button
-      type="button"
-      onClick={onToggle}
-      className={messagesSection.headerButton}
-    >
-      <div className={messagesSection.headerTitleWrap}>
-        <h3 className={messagesSection.title}>Mensajes sobre esta Solicitud</h3>
-        {!isMessagesActive && (
-          <span className={messagesSection.readOnlyBadge}>Solo lectura</span>
-        )}
-      </div>
-      <span className={messagesSection.chevronWrap}>
-        <svg
-          className={`${messagesSection.chevron} ${expanded ? 'rotate-180' : ''}`}
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
-      </span>
-    </button>
-    {expanded && (
+}) => {
+  const contentArea = (
       <div className={messagesSection.contentPad}>
         <div className={messagesSection.messagesBox}>
           <div
@@ -122,6 +101,35 @@ export const MessagesSection: React.FC<MessagesSectionProps> = ({
           )}
         </div>
       </div>
-    )}
-  </section>
-);
+  );
+  if (contentOnly) {
+    return <section className={messagesSection.container}>{contentArea}</section>;
+  }
+  return (
+    <section className={messagesSection.container}>
+      <button
+        type="button"
+        onClick={onToggle}
+        className={messagesSection.headerButton}
+      >
+        <div className={messagesSection.headerTitleWrap}>
+          <h3 className={messagesSection.title}>Mensajes sobre esta Solicitud</h3>
+          {!isMessagesActive && (
+            <span className={messagesSection.readOnlyBadge}>Solo lectura</span>
+          )}
+        </div>
+        <span className={messagesSection.chevronWrap}>
+          <svg
+            className={`${messagesSection.chevron} ${expanded ? 'rotate-180' : ''}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </span>
+      </button>
+      {expanded && contentArea}
+    </section>
+  );
+};

@@ -8,44 +8,81 @@ import { CollapsibleSection } from './CollapsibleSection';
 
 interface CatchInfoSectionProps {
   request: SaleRequest;
-  expanded: boolean;
-  onToggle: () => void;
+  expanded?: boolean;
+  onToggle?: () => void;
+  contentOnly?: boolean;
 }
 
-export const CatchInfoSection: React.FC<CatchInfoSectionProps> = ({ request, expanded, onToggle }) => (
-  <CollapsibleSection title="Información de Pesca" expanded={expanded} onToggle={onToggle}>
-    <div className={collapsible.content}>
-      <div className={collapsible.innerBox}>
-        <div className={saleRequestDetail.gridForm}>
-          <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Cantidad Estimada">
-            <p className={saleRequestDetail.formRowValueBold}>{request.catchInfo.estimatedQuantityLb} lb</p>
-          </FormRow>
-          <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Rango de Tallas">
-            <p className={saleRequestDetail.formRowValue}>
-              {request.catchInfo.sizeRange.min}/{request.catchInfo.sizeRange.max}
+const CatchInfoContent: React.FC<{ request: SaleRequest }> = ({ request }) => (
+  <div className={collapsible.content}>
+    <div className={saleRequestDetail.sectionCard}>
+      <div className={saleRequestDetail.sectionGridTwoCols}>
+        <FormRow
+          labelClassName={saleRequestDetail.sectionLabelSm}
+          className={saleRequestDetail.sectionRowCompact}
+          label="Cantidad Estimada"
+        >
+          <p className={saleRequestDetail.sectionValueSm}>
+            {request.catchInfo.estimatedQuantityLb} lb
+          </p>
+        </FormRow>
+        <FormRow
+          labelClassName={saleRequestDetail.sectionLabelSm}
+          className={saleRequestDetail.sectionRowCompact}
+          label="Rango de Tallas"
+        >
+          <p className={saleRequestDetail.sectionValueSm}>
+            {request.catchInfo.sizeRange.min}/{request.catchInfo.sizeRange.max}
+          </p>
+        </FormRow>
+        <FormRow
+          labelClassName={saleRequestDetail.sectionLabelSm}
+          className={saleRequestDetail.sectionRowCompact}
+          label="Fecha Estimada de Cosecha"
+        >
+          <p className={saleRequestDetail.sectionValueSm}>
+            {format(new Date(request.catchInfo.estimatedHarvestDate), 'dd MMM yyyy', { locale: es })}
+          </p>
+        </FormRow>
+        <FormRow
+          labelClassName={saleRequestDetail.sectionLabelSm}
+          className={saleRequestDetail.sectionRowCompact}
+          label="Ciudad"
+        >
+          <p className={saleRequestDetail.sectionValueSm}>
+            {request.catchInfo.harvestLocation.city}
+          </p>
+        </FormRow>
+        <div className={`md:col-span-2 ${saleRequestDetail.sectionRowCompact}`}>
+          <FormRow
+            labelClassName={saleRequestDetail.sectionLabelSm}
+            className={saleRequestDetail.sectionRowCompact}
+            label="Dirección de Cosecha"
+          >
+            <p className={saleRequestDetail.sectionValueSm}>
+              {request.catchInfo.harvestLocation.address}
             </p>
           </FormRow>
-          <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Fecha Estimada de Cosecha">
-            <p className={saleRequestDetail.formRowValue}>
-              {format(new Date(request.catchInfo.estimatedHarvestDate), 'dd MMM yyyy', { locale: es })}
-            </p>
-          </FormRow>
-          <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Ciudad">
-            <p className={saleRequestDetail.formRowValue}>{request.catchInfo.harvestLocation.city}</p>
-          </FormRow>
-          <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Dirección de Cosecha" className="md:col-span-2">
-            <p className={saleRequestDetail.formRowValue}>{request.catchInfo.harvestLocation.address}</p>
-          </FormRow>
-          {request.catchInfo.notes && (
-            <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Notas del Productor" className="md:col-span-2">
-              <p className={collapsible.notesBox}>
-                {request.catchInfo.notes}
-              </p>
+        </div>
+        {request.catchInfo.notes && (
+          <div className={`md:col-span-2 ${saleRequestDetail.sectionRowCompact}`}>
+            <FormRow
+              labelClassName={saleRequestDetail.sectionLabelSm}
+              className={saleRequestDetail.sectionRowCompact}
+              label="Notas del Productor"
+            >
+              <p className={collapsible.notesBox}>{request.catchInfo.notes}</p>
             </FormRow>
-          )}
-          {request.catchInfo.attachments && request.catchInfo.attachments.length > 0 && (
-            <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Archivos Adjuntos" className="md:col-span-2">
-              <div className={`${saleRequestDetail.formRowValue} space-y-2`}>
+          </div>
+        )}
+        {request.catchInfo.attachments && request.catchInfo.attachments.length > 0 && (
+          <div className={`md:col-span-2 ${saleRequestDetail.sectionRowCompact}`}>
+            <FormRow
+              labelClassName={saleRequestDetail.sectionLabelSm}
+              className={saleRequestDetail.sectionRowCompact}
+              label="Archivos Adjuntos"
+            >
+              <div className="space-y-1.5">
                 {request.catchInfo.attachments.map((attachment, idx) => (
                   <a
                     key={idx}
@@ -69,9 +106,25 @@ export const CatchInfoSection: React.FC<CatchInfoSectionProps> = ({ request, exp
                 ))}
               </div>
             </FormRow>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
-  </CollapsibleSection>
+  </div>
 );
+
+export const CatchInfoSection: React.FC<CatchInfoSectionProps> = ({
+  request,
+  expanded = false,
+  onToggle = () => {},
+  contentOnly = false,
+}) => {
+  if (contentOnly) {
+    return <CatchInfoContent request={request} />;
+  }
+  return (
+    <CollapsibleSection title="Información de Pesca" expanded={expanded} onToggle={onToggle}>
+      <CatchInfoContent request={request} />
+    </CollapsibleSection>
+  );
+};

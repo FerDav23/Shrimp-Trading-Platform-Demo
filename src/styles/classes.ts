@@ -409,8 +409,21 @@ export const saleRequestDetail = {
   iconMd: 'w-5 h-5 shrink-0',
   /** Status success (green) */
   statusSuccess: 'text-green-700',
-  /** Modal body scroll container */
-  modalBody: 'space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto pr-2',
+  /** Modal body: tabs + content */
+  modalBody: 'flex flex-col max-h-[calc(100vh-200px)] min-h-0',
+  /** Barra de pestañas en la parte superior del modal */
+  tabsBar: 'flex h-10 items-stretch border-b-2 border-gray-200 bg-gray-50 shrink-0 gap-1 px-1',
+  /** Contenedor desplazable de las pestañas */
+  tabsScroll: 'flex items-center overflow-x-auto overflow-y-hidden scroll-smooth flex-1 min-w-0 [&::-webkit-scrollbar]:hidden',
+  /** Flechas para desplazar las pestañas cuando hay overflow */
+  tabArrow: 'shrink-0 w-9 h-full flex items-center justify-center rounded-md bg-sky-100 text-sky-600 hover:bg-sky-200 hover:text-sky-700 transition-colors',
+  tabButton: 'shrink-0 h-full px-4 flex items-center font-medium text-sm transition-colors whitespace-nowrap border-b-2 -mb-0.5',
+  tabButtonActive: 'text-sky-600 border-sky-600 border-b-2',
+  tabButtonInactive: 'text-gray-600 hover:text-gray-900 border-transparent hover:border-gray-300',
+  /** Área de contenido de la pestaña activa (scroll) */
+  tabContent: 'flex-1 min-h-0 overflow-y-auto pt-4 pr-2 space-y-6',
+  /** Wrapper de acciones del modal para fijarlas abajo */
+  detailActionsWrap: 'shrink-0 pt-4 border-t border-gray-200',
   /** Subsection title small (Datos del ingreso, etc.) */
   subsectionSmall: 'text-sm font-semibold text-gray-700 mb-3',
   subsectionSmallPlain: 'text-sm font-semibold text-gray-700',
@@ -430,6 +443,21 @@ export const saleRequestDetail = {
   mutedText: 'text-sm text-gray-500',
   /** Reject readonly text */
   rejectReadonlyText: 'text-gray-900',
+  /** Información general: card celeste compacta */
+  generalInfoCard: 'rounded-xl border border-sky-200 bg-sky-50/90 p-3 md:p-4 shadow-sm',
+  /** Card celeste reutilizable para secciones del modal */
+  sectionCard: 'rounded-xl border border-sky-200 bg-sky-50/90 p-3 md:p-4 shadow-sm',
+  /** Grid compacto de 2 columnas para secciones (pesca, pagos, etc.) */
+  sectionGridTwoCols: 'grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2',
+  sectionRowCompact: '!mb-0',
+  sectionLabelSm: 'text-xs font-medium text-sky-800/90',
+  sectionValueSm: 'text-sm text-gray-900 py-0.5',
+  generalInfoGrid: 'grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2',
+  generalInfoRow: '!mb-0',
+  generalInfoLabel: 'text-xs font-medium text-sky-800/90',
+  generalInfoValue: 'text-sm text-gray-900 py-0.5',
+  generalInfoValueBold: 'text-sm text-gray-900 font-semibold py-0.5',
+  generalInfoInline: 'flex items-center gap-2 py-0.5',
 } as const;
 
 /** Messages section (saleRequestDetailModal) */
@@ -466,15 +494,15 @@ export const messagesSection = {
 
 /** Settlement table (saleRequestDetailModal) */
 export const settlementTable = {
-  table: 'w-full text-sm border border-gray-200 rounded-lg',
-  tableOverflow: 'w-full text-sm border border-gray-200 rounded-lg overflow-hidden',
-  thead: 'bg-gray-100 text-left',
-  th: 'px-2 py-2 font-medium text-gray-700',
+  table: 'w-full text-xs md:text-sm border border-sky-200 rounded-lg bg-white shadow-sm',
+  tableOverflow: 'w-full text-xs md:text-sm border border-sky-200 rounded-lg overflow-hidden bg-white shadow-sm',
+  thead: 'bg-sky-100/80 text-left',
+  th: 'px-3 py-2 text-[11px] md:text-xs font-semibold text-slate-700 uppercase tracking-wide',
   thActions: 'w-10',
-  td: 'px-2 py-1.5 text-gray-900',
-  tdMedium: 'px-2 py-1.5 font-medium text-gray-800',
-  emptyCell: 'px-2 py-3 text-center text-gray-500',
-  row: 'border-t border-gray-100',
+  td: 'px-3 py-1.5 text-slate-900',
+  tdMedium: 'px-3 py-1.5 font-semibold text-slate-900',
+  emptyCell: 'px-3 py-3 text-center text-gray-500',
+  row: 'border-t border-sky-100 odd:bg-white even:bg-sky-50/40',
   removeBtn: 'p-1 text-red-600 hover:bg-red-50 rounded',
   addLineBtn: 'text-xs px-2 py-1 bg-sky-600 text-white rounded hover:bg-sky-700',
 } as const;

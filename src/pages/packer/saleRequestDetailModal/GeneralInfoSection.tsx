@@ -9,71 +9,114 @@ import { getProductFormLabel, getStatusLabel } from './utils';
 import { CollapsibleSection } from './CollapsibleSection';
 interface GeneralInfoSectionProps {
   request: SaleRequest;
-  expanded: boolean;
-  onToggle: () => void;
+  expanded?: boolean;
+  onToggle?: () => void;
+  contentOnly?: boolean;
   linkedOffer: { id: string; offerCode: string } | null;
   onOpenOfferModal: () => void;
 }
 
-export const GeneralInfoSection: React.FC<GeneralInfoSectionProps> = ({
-  request,
-  expanded,
-  onToggle,
-  linkedOffer,
-  onOpenOfferModal,
-}) => (
-  <CollapsibleSection title="Información General" expanded={expanded} onToggle={onToggle}>
-    <div className={collapsible.content}>
-      <div className={collapsible.innerBox}>
-        <div className={saleRequestDetail.gridForm}>
-          <FormRow labelClassName={saleRequestDetail.formRowLabel} label="ID Solicitud">
-            <p className={saleRequestDetail.formRowValueBold}>#{request.id.split('-')[1]}</p>
-          </FormRow>
-          <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Estado">
-            <div className={saleRequestDetail.formRowValue}>
-              <StatusBadge status={request.status} label={getStatusLabel(request.status)} />
-            </div>
-          </FormRow>
-          <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Productor">
-            <p className={saleRequestDetail.formRowValue}>{request.producerName}</p>
-          </FormRow>
-          <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Producto">
-            <p className={saleRequestDetail.formRowValue}>{getProductFormLabel(request.productForm)}</p>
-          </FormRow>
-          <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Fecha de Solicitud">
-            <p className={saleRequestDetail.formRowValue}>
-              {format(new Date(request.createdAt), 'dd MMM yyyy, HH:mm', { locale: es })}
+const GeneralInfoContent: React.FC<{
+  request: SaleRequest;
+  linkedOffer: { id: string; offerCode: string } | null;
+  onOpenOfferModal: () => void;
+}> = ({ request, linkedOffer, onOpenOfferModal }) => (
+  <div className={collapsible.content}>
+    <div className={saleRequestDetail.generalInfoCard}>
+      <div className={saleRequestDetail.generalInfoGrid}>
+        <FormRow
+          labelClassName={saleRequestDetail.generalInfoLabel}
+          className={saleRequestDetail.generalInfoRow}
+          label="ID Solicitud"
+        >
+          <p className={saleRequestDetail.generalInfoValueBold}>#{request.id.split('-')[1]}</p>
+        </FormRow>
+        <FormRow
+          labelClassName={saleRequestDetail.generalInfoLabel}
+          className={saleRequestDetail.generalInfoRow}
+          label="Estado"
+        >
+          <div className={saleRequestDetail.generalInfoValue}>
+            <StatusBadge status={request.status} label={getStatusLabel(request.status)} />
+          </div>
+        </FormRow>
+        <FormRow
+          labelClassName={saleRequestDetail.generalInfoLabel}
+          className={saleRequestDetail.generalInfoRow}
+          label="Productor"
+        >
+          <p className={saleRequestDetail.generalInfoValue}>{request.producerName}</p>
+        </FormRow>
+        <FormRow
+          labelClassName={saleRequestDetail.generalInfoLabel}
+          className={saleRequestDetail.generalInfoRow}
+          label="Producto"
+        >
+          <p className={saleRequestDetail.generalInfoValue}>{getProductFormLabel(request.productForm)}</p>
+        </FormRow>
+        <FormRow
+          labelClassName={saleRequestDetail.generalInfoLabel}
+          className={saleRequestDetail.generalInfoRow}
+          label="Fecha de Solicitud"
+        >
+          <p className={saleRequestDetail.generalInfoValue}>
+            {format(new Date(request.createdAt), 'dd MMM yyyy, HH:mm', { locale: es })}
+          </p>
+        </FormRow>
+        {request.respondedAt && (
+          <FormRow
+            labelClassName={saleRequestDetail.generalInfoLabel}
+            className={saleRequestDetail.generalInfoRow}
+            label="Fecha de Respuesta"
+          >
+            <p className={saleRequestDetail.generalInfoValue}>
+              {format(new Date(request.respondedAt), 'dd MMM yyyy, HH:mm', { locale: es })}
             </p>
           </FormRow>
-          {request.respondedAt && (
-            <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Fecha de Respuesta">
-              <p className={saleRequestDetail.formRowValue}>
-                {format(new Date(request.respondedAt), 'dd MMM yyyy, HH:mm', { locale: es })}
-              </p>
-            </FormRow>
-          )}
-          <div className="md:col-span-2 mt-2">
-            <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Oferta vinculada">
-              <div className={saleRequestDetail.formRowInline}>
-                {linkedOffer ? (
-                  <>
-                    <span className={saleRequestDetail.formRowValueBold}>{linkedOffer.offerCode}</span>
-                    <button
-                      type="button"
-                      onClick={onOpenOfferModal}
-                      className={collapsible.skyButton}
-                    >
-                      Ver oferta
-                    </button>
-                  </>
-                ) : (
-                  <span className={saleRequestDetail.mutedText}>Oferta no encontrada</span>
-                )}
-              </div>
-            </FormRow>
-          </div>
+        )}
+        <div className={`md:col-span-2 ${saleRequestDetail.generalInfoRow}`}>
+          <FormRow
+            labelClassName={saleRequestDetail.generalInfoLabel}
+            className={saleRequestDetail.generalInfoRow}
+            label="Oferta vinculada"
+          >
+            <div className={saleRequestDetail.generalInfoInline}>
+              {linkedOffer ? (
+                <>
+                  <span className={saleRequestDetail.generalInfoValueBold}>{linkedOffer.offerCode}</span>
+                  <button
+                    type="button"
+                    onClick={onOpenOfferModal}
+                    className={collapsible.skyButton}
+                  >
+                    Ver oferta
+                  </button>
+                </>
+              ) : (
+                <span className={saleRequestDetail.mutedText}>Oferta no encontrada</span>
+              )}
+            </div>
+          </FormRow>
         </div>
       </div>
     </div>
-  </CollapsibleSection>
+  </div>
 );
+
+export const GeneralInfoSection: React.FC<GeneralInfoSectionProps> = ({
+  request,
+  expanded = false,
+  onToggle = () => {},
+  contentOnly = false,
+  linkedOffer,
+  onOpenOfferModal,
+}) => {
+  if (contentOnly) {
+    return <GeneralInfoContent request={request} linkedOffer={linkedOffer} onOpenOfferModal={onOpenOfferModal} />;
+  }
+  return (
+    <CollapsibleSection title="Información General" expanded={expanded} onToggle={onToggle}>
+      <GeneralInfoContent request={request} linkedOffer={linkedOffer} onOpenOfferModal={onOpenOfferModal} />
+    </CollapsibleSection>
+  );
+};

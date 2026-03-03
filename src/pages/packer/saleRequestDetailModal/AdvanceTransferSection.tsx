@@ -11,8 +11,9 @@ type SettlementInput = Parameters<typeof normalizeSettlement>[0];
 interface AdvanceTransferSectionProps {
   request: SaleRequest;
   linkedOffer: Offer | null;
-  expanded: boolean;
-  onToggle: () => void;
+  expanded?: boolean;
+  onToggle?: () => void;
+  contentOnly?: boolean;
   advancePaymentEndsAt: number | null;
   advanceTimerTick: number;
   selectedBankIndex: number;
@@ -26,8 +27,9 @@ interface AdvanceTransferSectionProps {
 export const AdvanceTransferSection: React.FC<AdvanceTransferSectionProps> = ({
   request,
   linkedOffer,
-  expanded,
-  onToggle,
+  expanded = false,
+  onToggle = () => {},
+  contentOnly = false,
   advancePaymentEndsAt,
   advanceTimerTick,
   selectedBankIndex,
@@ -62,14 +64,9 @@ export const AdvanceTransferSection: React.FC<AdvanceTransferSectionProps> = ({
   const safeBankIndex = selectedBankIndex >= producerBankAccounts.length ? 0 : selectedBankIndex;
   const account = producerBankAccounts[safeBankIndex] as ProducerBankAccount | undefined;
 
-  return (
-    <CollapsibleSection
-      title="Transferencia de anticipo al productor"
-      expanded={expanded}
-      onToggle={onToggle}
-    >
+  const content = (
       <div className={collapsible.content}>
-        <div className={collapsible.innerBoxXl}>
+        <div className={saleRequestDetail.sectionCard}>
           <div
             className={isExpired ? collapsible.timerExpired : collapsible.timerActive}
           >
@@ -262,6 +259,15 @@ export const AdvanceTransferSection: React.FC<AdvanceTransferSectionProps> = ({
           </div>
         </div>
       </div>
+  );
+  if (contentOnly) return content;
+  return (
+    <CollapsibleSection
+      title="Transferencia de anticipo al productor"
+      expanded={expanded}
+      onToggle={onToggle}
+    >
+      {content}
     </CollapsibleSection>
   );
 };

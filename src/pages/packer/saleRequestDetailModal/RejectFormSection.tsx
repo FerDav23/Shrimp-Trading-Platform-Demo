@@ -6,8 +6,9 @@ import { REJECTION_REASONS } from './constants';
 interface RejectFormSectionProps {
   /** When true: show the form to select reason and submit. When false: show read-only rejection reason (for REJECTED status). */
   isForm: boolean;
-  expanded: boolean;
-  onToggle: () => void;
+  expanded?: boolean;
+  onToggle?: () => void;
+  contentOnly?: boolean;
   selectedRejectionReason: string;
   onSelectedRejectionReasonChange: (value: string) => void;
   rejectNotes: string;
@@ -18,8 +19,9 @@ interface RejectFormSectionProps {
 
 export const RejectFormSection: React.FC<RejectFormSectionProps> = ({
   isForm,
-  expanded,
-  onToggle,
+  expanded = false,
+  onToggle = () => {},
+  contentOnly = false,
   selectedRejectionReason,
   onSelectedRejectionReasonChange,
   rejectNotes,
@@ -27,13 +29,7 @@ export const RejectFormSection: React.FC<RejectFormSectionProps> = ({
   rejectionReasonDisplay,
 }) => {
   if (isForm) {
-    return (
-      <CollapsibleSection
-        title="Motivo del rechazo"
-        expanded={expanded}
-        onToggle={onToggle}
-        variant="default"
-      >
+    const formContent = (
         <div className={collapsible.contentPadSpace}>
           <div>
             <label className={`block ${form.label} mb-2`}>
@@ -64,10 +60,28 @@ export const RejectFormSection: React.FC<RejectFormSectionProps> = ({
             />
           </div>
         </div>
+    );
+    if (contentOnly) return formContent;
+    return (
+      <CollapsibleSection
+        title="Motivo del rechazo"
+        expanded={expanded}
+        onToggle={onToggle}
+        variant="default"
+      >
+        {formContent}
       </CollapsibleSection>
     );
   }
 
+  const readonlyContent = (
+    <div className={collapsible.contentPad}>
+      <div className={collapsible.rejectReadonlyBox}>
+        <p className={saleRequestDetail.rejectReadonlyText}>{rejectionReasonDisplay ?? ''}</p>
+      </div>
+    </div>
+  );
+  if (contentOnly) return readonlyContent;
   return (
     <CollapsibleSection
       title="Motivo del rechazo"
@@ -75,11 +89,7 @@ export const RejectFormSection: React.FC<RejectFormSectionProps> = ({
       onToggle={onToggle}
       variant="rejection"
     >
-      <div className={collapsible.contentPad}>
-        <div className={collapsible.rejectReadonlyBox}>
-          <p className={saleRequestDetail.rejectReadonlyText}>{rejectionReasonDisplay ?? ''}</p>
-        </div>
-      </div>
+      {readonlyContent}
     </CollapsibleSection>
   );
 };

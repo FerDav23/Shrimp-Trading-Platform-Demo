@@ -15,8 +15,9 @@ interface SettlementFormSectionProps {
   onSettlementChange: (s: CatchSettlement | ((prev: CatchSettlement) => CatchSettlement)) => void;
   isSettlementLocked: boolean;
   onSettlementLockedChange: (locked: boolean) => void;
-  expanded: boolean;
-  onToggle: () => void;
+  expanded?: boolean;
+  onToggle?: () => void;
+  contentOnly?: boolean;
 }
 
 export const SettlementFormSection: React.FC<SettlementFormSectionProps> = ({
@@ -25,8 +26,9 @@ export const SettlementFormSection: React.FC<SettlementFormSectionProps> = ({
   onSettlementChange,
   isSettlementLocked,
   onSettlementLockedChange,
-  expanded,
-  onToggle,
+  expanded = false,
+  onToggle = () => {},
+  contentOnly = false,
 }) => {
   const tableGroups: { key: SettlementKey; title: string }[] = [
     { key: 'colaDirectaALines', title: CATCH_SETTLEMENT_CLASSES.COLA_DIRECTA_A },
@@ -46,10 +48,9 @@ export const SettlementFormSection: React.FC<SettlementFormSectionProps> = ({
   const rendimientoPct = recibidasReferencial > 0 ? (procesadasReales / recibidasReferencial) * 100 : 0;
   const mermaPct = 100 - rendimientoPct;
 
-  return (
-    <CollapsibleSection title="Liquidación de pesca" expanded={expanded} onToggle={onToggle}>
+  const content = (
       <div className={collapsible.content}>
-        <div className={`${collapsible.innerBox} ${saleRequestDetail.innerBoxSpaceY}`}>
+        <div className={`${saleRequestDetail.sectionCard} ${saleRequestDetail.innerBoxSpaceY}`}>
           <div className={saleRequestDetail.flexEnd}>
             {isSettlementLocked ? (
               <button
@@ -303,6 +304,11 @@ export const SettlementFormSection: React.FC<SettlementFormSectionProps> = ({
           </div>
         </div>
       </div>
+  );
+  if (contentOnly) return content;
+  return (
+    <CollapsibleSection title="Liquidación de pesca" expanded={expanded} onToggle={onToggle}>
+      {content}
     </CollapsibleSection>
   );
 };

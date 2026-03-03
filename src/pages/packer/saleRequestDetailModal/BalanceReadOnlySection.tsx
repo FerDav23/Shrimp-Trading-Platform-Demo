@@ -11,15 +11,17 @@ type SettlementInput = Parameters<typeof normalizeSettlement>[0];
 interface BalanceReadOnlySectionProps {
   request: SaleRequest;
   linkedOffer: Offer | null;
-  expanded: boolean;
-  onToggle: () => void;
+  expanded?: boolean;
+  onToggle?: () => void;
+  contentOnly?: boolean;
 }
 
 export const BalanceReadOnlySection: React.FC<BalanceReadOnlySectionProps> = ({
   request,
   linkedOffer,
-  expanded,
-  onToggle,
+  expanded = false,
+  onToggle = () => {},
+  contentOnly = false,
 }) => {
   const settlementForReadOnly = request.catchSettlement
     ? normalizeSettlement(request.catchSettlement as SettlementInput)
@@ -35,10 +37,9 @@ export const BalanceReadOnlySection: React.FC<BalanceReadOnlySectionProps> = ({
   const balanceAmountRO = (balancePercentRO / 100) * totalValorRO;
   const firstAccount = request.producerBankAccounts?.[0];
 
-  return (
-    <CollapsibleSection title="Saldo restante pagado" expanded={expanded} onToggle={onToggle}>
+  const content = (
       <div className={collapsible.content}>
-        <div className={collapsible.innerBoxXl}>
+        <div className={saleRequestDetail.sectionCard}>
           <div className="space-y-4">
             <h4 className={collapsible.subsectionTitle}>
               Información del productor
@@ -106,6 +107,11 @@ export const BalanceReadOnlySection: React.FC<BalanceReadOnlySectionProps> = ({
           </div>
         </div>
       </div>
+  );
+  if (contentOnly) return content;
+  return (
+    <CollapsibleSection title="Saldo restante pagado" expanded={expanded} onToggle={onToggle}>
+      {content}
     </CollapsibleSection>
   );
 };

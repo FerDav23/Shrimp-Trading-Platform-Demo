@@ -13,15 +13,17 @@ type SettlementInput = CatchSettlement & {
 interface SettlementReadOnlySectionProps {
   settlement: SettlementInput;
   remitidasLb: number;
-  expanded: boolean;
-  onToggle: () => void;
+  expanded?: boolean;
+  onToggle?: () => void;
+  contentOnly?: boolean;
 }
 
 export const SettlementReadOnlySection: React.FC<SettlementReadOnlySectionProps> = ({
   settlement,
   remitidasLb,
-  expanded,
-  onToggle,
+  expanded = false,
+  onToggle = () => {},
+  contentOnly = false,
 }) => {
   const s = normalizeSettlement(settlement);
   const allLines = [...s.colaDirectaALines, ...s.colaDirectaBLines, ...s.ventaLocalLines];
@@ -31,10 +33,9 @@ export const SettlementReadOnlySection: React.FC<SettlementReadOnlySectionProps>
   const rendimientoPct = recibidasReferencial > 0 ? (procesadasReales / recibidasReferencial) * 100 : 0;
   const mermaPct = 100 - rendimientoPct;
 
-  return (
-    <CollapsibleSection title="Liquidación de pesca" expanded={expanded} onToggle={onToggle}>
-      <div className={collapsible.content}>
-        <div className={`${collapsible.innerBox} ${saleRequestDetail.innerBoxSpaceY}`}>
+  const content = (
+    <div className={collapsible.content}>
+        <div className={`${saleRequestDetail.sectionCard} ${saleRequestDetail.innerBoxSpaceY}`}>
           <div>
             <h4 className={saleRequestDetail.subsectionSmall}>Datos del ingreso</h4>
             <div className={saleRequestDetail.gridSettlementReadOnly}>
@@ -130,6 +131,11 @@ export const SettlementReadOnlySection: React.FC<SettlementReadOnlySectionProps>
           </div>
         </div>
       </div>
+  );
+  if (contentOnly) return content;
+  return (
+    <CollapsibleSection title="Liquidación de pesca" expanded={expanded} onToggle={onToggle}>
+      {content}
     </CollapsibleSection>
   );
 };

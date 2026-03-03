@@ -11,8 +11,9 @@ type SettlementInput = Parameters<typeof normalizeSettlement>[0];
 interface BalanceTransferSectionProps {
   request: SaleRequest;
   linkedOffer: Offer | null;
-  expanded: boolean;
-  onToggle: () => void;
+  expanded?: boolean;
+  onToggle?: () => void;
+  contentOnly?: boolean;
   balancePaymentEndsAt: number | null;
   balanceTimerTick: number;
   selectedBankIndex: number;
@@ -26,8 +27,9 @@ interface BalanceTransferSectionProps {
 export const BalanceTransferSection: React.FC<BalanceTransferSectionProps> = ({
   request,
   linkedOffer,
-  expanded,
-  onToggle,
+  expanded = false,
+  onToggle = () => {},
+  contentOnly = false,
   balancePaymentEndsAt,
   balanceTimerTick,
   selectedBankIndex,
@@ -61,14 +63,9 @@ export const BalanceTransferSection: React.FC<BalanceTransferSectionProps> = ({
   const safeBankIndex = selectedBankIndex >= producerBankAccounts.length ? 0 : selectedBankIndex;
   const account = producerBankAccounts[safeBankIndex] as ProducerBankAccount | undefined;
 
-  return (
-    <CollapsibleSection
-      title="Pago del saldo restante al productor"
-      expanded={expanded}
-      onToggle={onToggle}
-    >
+  const content = (
       <div className={collapsible.content}>
-        <div className={collapsible.innerBoxXl}>
+        <div className={saleRequestDetail.sectionCard}>
           <div
             className={isBalanceExpired ? collapsible.timerExpired : collapsible.timerActive}
           >
@@ -262,6 +259,15 @@ export const BalanceTransferSection: React.FC<BalanceTransferSectionProps> = ({
           </div>
         </div>
       </div>
+  );
+  if (contentOnly) return content;
+  return (
+    <CollapsibleSection
+      title="Pago del saldo restante al productor"
+      expanded={expanded}
+      onToggle={onToggle}
+    >
+      {content}
     </CollapsibleSection>
   );
 };

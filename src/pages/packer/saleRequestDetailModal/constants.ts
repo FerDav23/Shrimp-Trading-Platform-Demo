@@ -2,6 +2,21 @@ import type { SectionKey } from './types';
 
 export const MAX_MESSAGE_LENGTH = 500;
 
+/** Etiquetas de las pestañas del modal de detalle (por SectionKey) */
+export const SECTION_LABELS: Record<SectionKey, string> = {
+  general: 'Información General',
+  catch: 'Información de Pesca',
+  packerNotes: 'Notas del Packer',
+  settlement: 'Liquidación de pesca',
+  settlementReadOnly: 'Liquidación de pesca',
+  advanceTransfer: 'Transferencia de anticipo',
+  advanceReadOnly: 'Anticipo pagado',
+  balanceTransfer: 'Pago del saldo',
+  balanceReadOnly: 'Saldo restante pagado',
+  messages: 'Mensajes',
+  rejectForm: 'Motivo del rechazo',
+};
+
 /** Opciones del dropdown de motivo de rechazo (packer elige al rechazar) */
 export const REJECTION_REASONS = [
   { value: '', label: 'Seleccione un motivo...' },

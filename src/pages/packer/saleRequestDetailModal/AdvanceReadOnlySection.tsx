@@ -4,17 +4,14 @@ import { collapsible, saleRequestDetail } from '../../../styles';
 import { DUMMY_ADVANCE_PROOF_IMAGE } from './constants';
 
 interface AdvanceReadOnlySectionProps {
-  expanded: boolean;
-  onToggle: () => void;
+  expanded?: boolean;
+  onToggle?: () => void;
+  contentOnly?: boolean;
 }
 
-export const AdvanceReadOnlySection: React.FC<AdvanceReadOnlySectionProps> = ({
-  expanded,
-  onToggle,
-}) => (
-  <CollapsibleSection title="Anticipo pagado" expanded={expanded} onToggle={onToggle}>
-    <div className={collapsible.content}>
-      <div className={collapsible.innerBoxXl}>
+const AdvanceReadOnlyContent: React.FC = () => (
+  <div className={collapsible.content}>
+      <div className={saleRequestDetail.sectionCard}>
         <h4 className={collapsible.subsectionTitle}>
           Comprobante de anticipo
         </h4>
@@ -41,5 +38,17 @@ export const AdvanceReadOnlySection: React.FC<AdvanceReadOnlySectionProps> = ({
         </div>
       </div>
     </div>
-  </CollapsibleSection>
 );
+
+export const AdvanceReadOnlySection: React.FC<AdvanceReadOnlySectionProps> = ({
+  expanded = false,
+  onToggle = () => {},
+  contentOnly = false,
+}) => {
+  if (contentOnly) return <AdvanceReadOnlyContent />;
+  return (
+    <CollapsibleSection title="Anticipo pagado" expanded={expanded} onToggle={onToggle}>
+      <AdvanceReadOnlyContent />
+    </CollapsibleSection>
+  );
+};
