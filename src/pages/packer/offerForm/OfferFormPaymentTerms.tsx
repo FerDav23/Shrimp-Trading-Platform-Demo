@@ -2,7 +2,7 @@ import React from 'react';
 import { FormRow } from '../../../components/FormRow';
 import { InputWithInfo } from '../../../components/InputWithInfo';
 import type { OfferFormData, PaymentTerm } from './types';
-import { FORM_ROW_SUBTITLE_LABEL, STRING_INPUT_MAX_LENGTH, TRIGGER_MAX_LENGTH } from './constants';
+import { FORM_ROW_SUBTITLE_LABEL, STRING_INPUT_MAX_LENGTH, TRIGGER_CONDITIONS_BD } from './constants';
 import { blockNegativeAndExponentKeys } from './utils';
 import { offerSection, button } from '../../../styles';
 
@@ -91,17 +91,20 @@ export const OfferFormPaymentTerms: React.FC<OfferFormPaymentTermsProps> = ({
                     </InputWithInfo>
                   </FormRow>
                   <FormRow labelClassName={FORM_ROW_SUBTITLE_LABEL} label="Condición/Trigger">
-                    <InputWithInfo infoText="Ingrese la condición o trigger del anticipo." className="block w-full">
-                      <input
-                        type="text"
+                    <InputWithInfo infoText="Seleccione la condición o trigger del anticipo." className="block w-full">
+                      <select
                         value={term.trigger ?? ''}
-                        maxLength={TRIGGER_MAX_LENGTH}
-                        onChange={(e) =>
-                          updatePaymentTerm(idx, 'trigger', e.target.value.slice(0, TRIGGER_MAX_LENGTH))
-                        }
-                        placeholder="Ej: Confirmación de compra"
-                        {...inputProps}
-                      />
+                        onChange={(e) => updatePaymentTerm(idx, 'trigger', e.target.value || undefined)}
+                        disabled={inputProps.disabled}
+                        className="block w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-900 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 disabled:bg-slate-50 disabled:text-slate-500"
+                      >
+                        <option value="">Seleccione una condición</option>
+                        {TRIGGER_CONDITIONS_BD.map((opt) => (
+                          <option key={opt.id} value={opt.id}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </select>
                     </InputWithInfo>
                   </FormRow>
                 </div>
@@ -109,13 +112,11 @@ export const OfferFormPaymentTerms: React.FC<OfferFormPaymentTermsProps> = ({
             );
           }
           if (term.termType === 'BALANCE') {
-            const advancePercent = data.paymentTerms.find((p) => p.termType === 'ADVANCE')?.percent ?? 0;
-            const balancePercent = 100 - advancePercent;
             return (
               <div key="balance" className={offerSection.block}>
-                <h4 className={offerSection.textBold + ' mb-2'}>Saldo restante (requerido)</h4>
+                <h4 className={offerSection.textBold + ' mb-2'}>Liquidacion de la venta (requerido)</h4>
                 <p className={offerSection.textSm + ' mb-2'}>
-                  Porcentaje: {balancePercent}% (lo faltante después del anticipo)
+                  El valor a liquidar se definira despues de la liquidacion de la pesca
                 </p>
                 <div className="space-y-2">
                   <FormRow labelClassName={FORM_ROW_SUBTITLE_LABEL} label="Vence en (días)">
@@ -138,19 +139,10 @@ export const OfferFormPaymentTerms: React.FC<OfferFormPaymentTermsProps> = ({
                       />
                     </InputWithInfo>
                   </FormRow>
-                  <FormRow labelClassName={FORM_ROW_SUBTITLE_LABEL} label="Condición/Trigger">
-                    <InputWithInfo infoText="Ingrese la condición o trigger del saldo restante." className="block w-full">
-                      <input
-                        type="text"
-                        value={term.trigger ?? ''}
-                        maxLength={TRIGGER_MAX_LENGTH}
-                        onChange={(e) =>
-                          updatePaymentTerm(idx, 'trigger', e.target.value.slice(0, TRIGGER_MAX_LENGTH))
-                        }
-                        placeholder="Ej: Entrega en planta"
-                        {...inputProps}
-                      />
-                    </InputWithInfo>
+                  <FormRow labelClassName={FORM_ROW_SUBTITLE_LABEL} label="Condición">
+                    <p className={offerSection.textSm + ' text-slate-600'}>
+                      Al recibir la factura de acuerdo a la liquidacion de la pesca.
+                    </p>
                   </FormRow>
                 </div>
               </div>

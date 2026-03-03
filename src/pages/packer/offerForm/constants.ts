@@ -42,6 +42,19 @@ export const STRING_INPUT_MAX_LENGTH = 100;
 /** Límite para Condición/Trigger en términos de pago */
 export const TRIGGER_MAX_LENGTH = 50;
 
+/** Opciones de condición/trigger para términos de pago (temporal: se cargarán desde BD) */
+export interface TriggerConditionOption {
+  id: string;
+  label: string;
+}
+
+export const TRIGGER_CONDITIONS_BD: TriggerConditionOption[] = [
+  { id: 'recpcion_producto', label: 'A la recepcion del producto' },
+  { id: 'un_dia', label: 'A un dia de la recepcion del producto' },
+  { id: 'dos_dias', label: 'A dos dias de la recepcion del producto' },
+  { id: 'recibida_factura', label: 'Una ves recibida la factura' }
+];
+
 /** Límite por item en condiciones adicionales */
 export const ADDITIONAL_CONDITION_MAX_LENGTH = 100;
 
