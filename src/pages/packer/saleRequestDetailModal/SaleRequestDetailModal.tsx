@@ -385,7 +385,7 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
     ...(showPaymentTabs && request.status === 'ADVANCE_PENDING' ? (['advanceTransfer'] as const) : []),
     ...(showPaymentTabs && request.status === 'BALANCE_PENDING' ? (['balanceTransfer'] as const) : []),
     ...(showPaymentTabs && request.status === 'SALE_COMPLETED' ? (['balanceReadOnly'] as const) : []),
-    'messages',
+    ...(request.status !== 'SALE_COMPLETED' && request.status !== 'REJECTED' ? (['messages'] as const) : []),
     ...(showRejectForm || (request.status === 'REJECTED' && rejectionReasonDisplay)
       ? (['rejectForm'] as const)
       : []),
