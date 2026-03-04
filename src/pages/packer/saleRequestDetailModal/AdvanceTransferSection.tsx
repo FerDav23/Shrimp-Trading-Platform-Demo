@@ -5,6 +5,7 @@ import type { Offer } from '../../../types';
 import { normalizeSettlement } from './utils';
 import { CollapsibleSection } from './CollapsibleSection';
 import { ADVANCE_DEADLINE_HOURS } from './constants';
+import { PACKER_BANK_ACCOUNTS } from '../../../data/packerBankAccounts';
 
 type SettlementInput = Parameters<typeof normalizeSettlement>[0];
 
@@ -39,15 +40,13 @@ export const AdvanceTransferSection: React.FC<AdvanceTransferSectionProps> = ({
   advanceProofPreviewUrl,
   advanceProofInputRef,
 }) => {
-  const settlementForAdvance = request.catchSettlement
-    ? normalizeSettlement(request.catchSettlement as SettlementInput)
-    : null;
-  const totalValor = settlementForAdvance
-    ? [...settlementForAdvance.colaDirectaALines, ...settlementForAdvance.colaDirectaBLines, ...settlementForAdvance.ventaLocalLines].reduce(
-        (sum, l) => sum + l.pounds * l.unitPrice,
-        0
-      )
-    : 0;
+  const estimatedQuantityLb = request.catchInfo.estimatedQuantityLb;
+  const sizeRange = request.catchInfo.sizeRange;
+  const activeTiers = linkedOffer?.priceTiers.filter((t) => t.isActive && t.price > 0) ?? [];
+  const matchingTier = activeTiers.find(
+    (t) => t.sizeMin === sizeRange.min && t.sizeMax === sizeRange.max
+  );
+  const totalValor = matchingTier ? matchingTier.price * estimatedQuantityLb : 0;
   const advanceTerm = linkedOffer?.paymentTerms.find((p) => p.termType === 'ADVANCE');
   const advancePercent = advanceTerm?.percent ?? 0;
   const advanceAmount = (advancePercent / 100) * totalValor;
@@ -60,9 +59,9 @@ export const AdvanceTransferSection: React.FC<AdvanceTransferSectionProps> = ({
   const formatTwo = (n: number) => n.toString().padStart(2, '0');
   const isExpired = advancePaymentEndsAt != null && remainingMs === 0;
 
-  const producerBankAccounts = request.producerBankAccounts ?? [];
-  const safeBankIndex = selectedBankIndex >= producerBankAccounts.length ? 0 : selectedBankIndex;
-  const account = producerBankAccounts[safeBankIndex] as ProducerBankAccount | undefined;
+  const bankAccounts = PACKER_BANK_ACCOUNTS;
+  const safeBankIndex = selectedBankIndex >= bankAccounts.length ? 0 : selectedBankIndex;
+  const account = bankAccounts[safeBankIndex] as ProducerBankAccount | undefined;
 
   const content = (
       <div className={collapsible.content}>
@@ -92,13 +91,15 @@ export const AdvanceTransferSection: React.FC<AdvanceTransferSectionProps> = ({
 
           <div className="space-y-4">
             <h4 className={collapsible.subsectionTitle}>
-              Información del productor
+              Información bancaria de la empacadora
             </h4>
             <div>
-              <p className={collapsible.fieldLabelMb1}>Productor</p>
-              <p className="text-base text-gray-900 font-medium leading-snug">{request.producerName}</p>
+              <p className={collapsible.fieldLabelMb1}>Empacadora</p>
+              <p className="text-base text-gray-900 font-medium leading-snug">
+                {linkedOffer?.packingCompany.name ?? 'Empacadora'}
+              </p>
             </div>
-            {producerBankAccounts.length > 0 ? (
+            {bankAccounts.length > 0 ? (
               <>
                 <div>
                   <label className={`block ${collapsible.fieldLabel} mb-2`}>
@@ -109,7 +110,7 @@ export const AdvanceTransferSection: React.FC<AdvanceTransferSectionProps> = ({
                     onChange={(e) => onSelectedBankIndexChange(Number(e.target.value))}
                     className={collapsible.selectSky}
                   >
-                    {producerBankAccounts.map((acc, idx) => (
+                    {bankAccounts.map((acc, idx) => (
                       <option key={idx} value={idx}>
                         {acc.bankName}
                       </option>
@@ -154,7 +155,7 @@ export const AdvanceTransferSection: React.FC<AdvanceTransferSectionProps> = ({
               </>
             ) : (
               <p className={saleRequestDetail.noBankData}>
-                No hay datos bancarios registrados para este productor.
+                No hay datos bancarios registrados para la empacadora.
               </p>
             )}
           </div>

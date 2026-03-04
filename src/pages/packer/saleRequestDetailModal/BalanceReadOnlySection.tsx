@@ -5,6 +5,7 @@ import { normalizeSettlement } from './utils';
 import { CollapsibleSection } from './CollapsibleSection';
 import { DUMMY_BALANCE_PROOF_IMAGE } from './constants';
 import type { Offer } from '../../../types';
+import { PACKER_BANK_ACCOUNTS } from '../../../data/packerBankAccounts';
 
 type SettlementInput = Parameters<typeof normalizeSettlement>[0];
 
@@ -35,18 +36,20 @@ export const BalanceReadOnlySection: React.FC<BalanceReadOnlySectionProps> = ({
   const balanceTermRO = linkedOffer?.paymentTerms.find((p) => p.termType === 'BALANCE');
   const balancePercentRO = balanceTermRO?.percent ?? 70;
   const balanceAmountRO = (balancePercentRO / 100) * totalValorRO;
-  const firstAccount = request.producerBankAccounts?.[0];
+  const firstAccount = PACKER_BANK_ACCOUNTS[0];
 
   const content = (
       <div className={collapsible.content}>
         <div className={saleRequestDetail.sectionCard}>
           <div className="space-y-4">
             <h4 className={collapsible.subsectionTitle}>
-              Información del productor
+              Información bancaria de la empacadora
             </h4>
             <div>
-              <p className={collapsible.fieldLabelMb1}>Productor</p>
-              <p className="text-base text-gray-900 font-medium leading-snug">{request.producerName}</p>
+              <p className={collapsible.fieldLabelMb1}>Empacadora</p>
+              <p className="text-base text-gray-900 font-medium leading-snug">
+                {linkedOffer?.packingCompany.name ?? 'Empacadora'}
+              </p>
             </div>
             {firstAccount && (
               <div className={collapsible.bankCard}>

@@ -111,11 +111,6 @@ export const dummySaleRequests: SaleRequest[] = [
     respondedAt: '2024-02-14T16:00:00Z',
     packerNotes: 'Aceptada. Confirmar fecha exacta de cosecha.',
     saleId: 'sale-5',
-    producerBankAccounts: [
-      { bankName: 'Banco Bolivariano', accountType: 'Cta. Ahorros', accountNumber: '0841427955', accountHolderName: 'Luis Andres Asanza Castro', identification: '0926219924' },
-      { bankName: 'Banco Guayaquil', accountType: 'Ahorro', accountNumber: '0015076369', accountHolderName: 'Asanza Castro Luis Andres', identification: '0926219924', email: 'luisao232@gmail.com' },
-      { bankName: 'Banco del Pacífico', accountType: 'Cuenta de Ahorros', accountNumber: '1058247939', accountHolderName: 'Luis Andrés Asanza Castro', identification: '0926219924', email: 'luisao232@gmail.com' },
-    ],
     catchSettlement: {
       entryDate: '2024-02-22',
       lotNumber: 'L-2024-022',
@@ -175,9 +170,6 @@ export const dummySaleRequests: SaleRequest[] = [
     respondedAt: '2024-02-08T12:00:00Z',
     packerNotes: 'Aceptada y convertida a venta.',
     saleId: 'sale-7',
-    producerBankAccounts: [
-      { bankName: 'Banco Pichincha', accountType: 'Cta. Ahorros', accountNumber: '2100123456', accountHolderName: 'Acuícola del Pacífico S.A.', identification: '0190123456001' },
-    ],
     catchSettlement: {
       entryDate: '2024-02-24',
       lotNumber: 'L-2024-018',
@@ -222,11 +214,6 @@ export const dummySaleRequests: SaleRequest[] = [
     respondedAt: '2024-02-15T09:00:00Z',
     packerNotes: 'Aceptada. Anticipo enviado, pendiente saldo.',
     saleId: 'sale-8',
-    producerBankAccounts: [
-      { bankName: 'Banco Bolivariano', accountType: 'Cta. Ahorros', accountNumber: '0841427955', accountHolderName: 'Luis Andres Asanza Castro', identification: '0926219924' },
-      { bankName: 'Banco Guayaquil', accountType: 'Ahorro', accountNumber: '0015076369', accountHolderName: 'Asanza Castro Luis Andres', identification: '0926219924', email: 'luisao232@gmail.com' },
-      { bankName: 'Banco del Pacífico', accountType: 'Cuenta de Ahorros', accountNumber: '1058247939', accountHolderName: 'Luis Andrés Asanza Castro', identification: '0926219924', email: 'luisao232@gmail.com' },
-    ],
     catchSettlement: {
       entryDate: '2024-03-05',
       lotNumber: 'L-2024-031',
@@ -329,9 +316,6 @@ export const dummySaleRequests: SaleRequest[] = [
     respondedAt: '2024-02-28T14:00:00Z',
     packerNotes: 'Aceptada. Demo tracking.',
     saleId: 'sale-log-2',
-    producerBankAccounts: [
-      { bankName: 'Banco Guayaquil', accountType: 'Ahorro', accountNumber: '0015076369', accountHolderName: 'Demo', identification: '1234567890' },
-    ],
     catchSettlement: {
       entryDate: '2024-03-12',
       lotNumber: 'L-DEMO-2',
@@ -356,8 +340,8 @@ export const dummySaleRequests: SaleRequest[] = [
       estimatedHarvestDate: '2024-03-18',
       harvestLocation: { city: 'Guayaquil', address: 'Km 18 Vía a Daule' },
       estimatedQuantityLb: 420,
-      sizeRange: { min: 21, max: 25 },
-      notes: 'Solicitud demo con liquidación de pesca pendiente.',
+      sizeRange: { min: 20, max: 30 },
+      notes: 'Solicitud demo con liquidación de pesca pendiente (talla 20/30 según oferta vinculada).',
     },
     status: 'CATCH_SETTLEMENT_PENDING',
     createdAt: '2024-03-10T09:00:00Z',

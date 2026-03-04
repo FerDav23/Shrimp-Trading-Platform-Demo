@@ -361,7 +361,11 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
     'catch',
     ...(request.packerNotes ? (['packerNotes'] as const) : []),
     ...(isRequestAccepted ? (['logisticsTracking'] as const) : []),
-    ...(!isLogisticsActive && request.status === 'CATCH_SETTLEMENT_PENDING' ? (['settlement'] as const) : []),
+    // Para estado "Liquidación de pesca pendiente", mostrar primero "Anticipo pagado"
+    // y luego "Liquidación de pesca" en el orden de pestañas.
+    ...(!isLogisticsActive && request.status === 'CATCH_SETTLEMENT_PENDING'
+      ? (['advanceReadOnly', 'settlement'] as const)
+      : []),
     ...(!isLogisticsActive &&
     (request.status === 'ADVANCE_PENDING' ||
       request.status === 'BALANCE_PENDING' ||
@@ -370,7 +374,9 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
       ? (['settlementReadOnly'] as const)
       : []),
     ...(showPaymentTabs && request.status === 'ADVANCE_PENDING' ? (['advanceTransfer'] as const) : []),
-    ...(showPaymentTabs && (request.status === 'BALANCE_PENDING' || request.status === 'SALE_COMPLETED')
+    ...(showPaymentTabs &&
+    (request.status === 'BALANCE_PENDING' ||
+      request.status === 'SALE_COMPLETED')
       ? (['advanceReadOnly'] as const)
       : []),
     ...(showPaymentTabs && request.status === 'BALANCE_PENDING' ? (['balanceTransfer'] as const) : []),
@@ -489,7 +495,11 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
               />
             )}
             {effectiveActiveTab === 'advanceReadOnly' && (
-              <AdvanceReadOnlySection contentOnly />
+              <AdvanceReadOnlySection
+                request={request}
+                linkedOffer={linkedOffer}
+                contentOnly
+              />
             )}
             {effectiveActiveTab === 'balanceTransfer' && request.status === 'BALANCE_PENDING' && (
               <BalanceTransferSection

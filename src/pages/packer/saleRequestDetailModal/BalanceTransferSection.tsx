@@ -5,6 +5,7 @@ import type { Offer } from '../../../types';
 import { normalizeSettlement } from './utils';
 import { CollapsibleSection } from './CollapsibleSection';
 import { BALANCE_DEADLINE_HOURS } from './constants';
+import { PACKER_BANK_ACCOUNTS } from '../../../data/packerBankAccounts';
 
 type SettlementInput = Parameters<typeof normalizeSettlement>[0];
 
@@ -59,9 +60,9 @@ export const BalanceTransferSection: React.FC<BalanceTransferSectionProps> = ({
   const formatTwoBalance = (n: number) => n.toString().padStart(2, '0');
   const isBalanceExpired = balancePaymentEndsAt != null && remainingBalanceMs === 0;
 
-  const producerBankAccounts = request.producerBankAccounts ?? [];
-  const safeBankIndex = selectedBankIndex >= producerBankAccounts.length ? 0 : selectedBankIndex;
-  const account = producerBankAccounts[safeBankIndex] as ProducerBankAccount | undefined;
+  const bankAccounts = PACKER_BANK_ACCOUNTS;
+  const safeBankIndex = selectedBankIndex >= bankAccounts.length ? 0 : selectedBankIndex;
+  const account = bankAccounts[safeBankIndex] as ProducerBankAccount | undefined;
 
   const content = (
       <div className={collapsible.content}>
@@ -92,13 +93,15 @@ export const BalanceTransferSection: React.FC<BalanceTransferSectionProps> = ({
 
           <div className="space-y-4">
             <h4 className={collapsible.subsectionTitle}>
-              Información del productor
+              Información bancaria de la empacadora
             </h4>
             <div>
-              <p className={collapsible.fieldLabelMb1}>Productor</p>
-              <p className="text-base text-gray-900 font-medium leading-snug">{request.producerName}</p>
+              <p className={collapsible.fieldLabelMb1}>Empacadora</p>
+              <p className="text-base text-gray-900 font-medium leading-snug">
+                {linkedOffer?.packingCompany.name ?? 'Empacadora'}
+              </p>
             </div>
-            {producerBankAccounts.length > 0 ? (
+            {bankAccounts.length > 0 ? (
               <>
                 <div>
                   <label className={`block ${collapsible.fieldLabel} mb-2`}>
@@ -109,7 +112,7 @@ export const BalanceTransferSection: React.FC<BalanceTransferSectionProps> = ({
                     onChange={(e) => onSelectedBankIndexChange(Number(e.target.value))}
                     className={collapsible.selectSky}
                   >
-                    {producerBankAccounts.map((acc, idx) => (
+                    {bankAccounts.map((acc, idx) => (
                       <option key={idx} value={idx}>
                         {acc.bankName}
                       </option>
@@ -154,7 +157,7 @@ export const BalanceTransferSection: React.FC<BalanceTransferSectionProps> = ({
               </>
             ) : (
               <p className={saleRequestDetail.noBankData}>
-                No hay datos bancarios registrados para este productor.
+                No hay datos bancarios registrados para la empacadora.
               </p>
             )}
           </div>
