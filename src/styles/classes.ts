@@ -343,7 +343,7 @@ export const collapsible = {
   content: 'px-6 pb-6',
   innerBox: 'bg-white border border-sky-200 rounded-lg p-4',
   innerBoxXl: 'bg-white border border-sky-200 rounded-xl p-6 space-y-8 shadow-sm',
-  subsectionTitle: 'text-base font-semibold text-sky-800 tracking-tight border-b border-sky-200 pb-2',
+  subsectionTitle: 'text-base font-semibold text-sky-800 tracking-tight border-b border-sky-200 pb-2 mt-4',
   subsectionTitleMb: 'text-base font-semibold text-sky-800 tracking-tight border-b border-sky-200 pb-2 mb-4',
   fieldLabel: 'text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5',
   fieldLabelMb1: 'text-xs font-medium text-gray-500 uppercase tracking-wider mb-1',

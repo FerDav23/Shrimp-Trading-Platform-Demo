@@ -48,6 +48,13 @@ export const defaultExpanded: Record<SectionKey, boolean> = {
 export const ADVANCE_DEADLINE_HOURS = 24;
 export const BALANCE_DEADLINE_HOURS = 24;
 
+/** Comisión por libra (oferta en lb) */
+export const COMMISSION_PER_LB = 0.01;
+/** Comisión por kg en USD (oferta en kg) */
+export const COMMISSION_PER_KG = 0.02;
+/** 1 lb en kg */
+export const LB_TO_KG = 0.453592;
+
 export const DUMMY_ADVANCE_PROOF_IMAGE =
   'data:image/svg+xml,' +
   encodeURIComponent(

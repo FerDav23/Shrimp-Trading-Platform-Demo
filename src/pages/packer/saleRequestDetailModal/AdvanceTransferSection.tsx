@@ -2,12 +2,10 @@ import React, { RefObject } from 'react';
 import type { SaleRequest, ProducerBankAccount } from '../../../types';
 import { collapsible, button, saleRequestDetail } from '../../../styles';
 import type { Offer } from '../../../types';
-import { normalizeSettlement } from './utils';
 import { CollapsibleSection } from './CollapsibleSection';
-import { ADVANCE_DEADLINE_HOURS } from './constants';
+import { ADVANCE_DEADLINE_HOURS, COMMISSION_PER_LB, COMMISSION_PER_KG, LB_TO_KG } from './constants';
 import { PACKER_BANK_ACCOUNTS } from '../../../data/packerBankAccounts';
 
-type SettlementInput = Parameters<typeof normalizeSettlement>[0];
 
 interface AdvanceTransferSectionProps {
   request: SaleRequest;
@@ -50,6 +48,19 @@ export const AdvanceTransferSection: React.FC<AdvanceTransferSectionProps> = ({
   const advanceTerm = linkedOffer?.paymentTerms.find((p) => p.termType === 'ADVANCE');
   const advancePercent = advanceTerm?.percent ?? 0;
   const advanceAmount = (advancePercent / 100) * totalValor;
+  const priceUnit = linkedOffer?.priceUnit ?? 'PER_LB';
+  const quantityForAdvance =
+    priceUnit === 'PER_KG'
+      ? estimatedQuantityLb * LB_TO_KG * (advancePercent / 100)
+      : estimatedQuantityLb * (advancePercent / 100);
+  const commissionAmount =
+    priceUnit === 'PER_KG' ? quantityForAdvance * COMMISSION_PER_KG : quantityForAdvance * COMMISSION_PER_LB;
+  const totalToPay = advanceAmount + commissionAmount;
+  const unitLabel = priceUnit === 'PER_KG' ? 'kg' : 'lb';
+  const lotWeight =
+    priceUnit === 'PER_KG' ? estimatedQuantityLb * LB_TO_KG : estimatedQuantityLb;
+  const unitPriceTalla = matchingTier ? matchingTier.price : 0;
+  const commissionUnitRate = priceUnit === 'PER_KG' ? COMMISSION_PER_KG : COMMISSION_PER_LB;
   const now = Date.now();
   const remainingMs = advancePaymentEndsAt ? Math.max(0, advancePaymentEndsAt - now) : 0;
   const totalSeconds = Math.floor(remainingMs / 1000);
@@ -93,12 +104,6 @@ export const AdvanceTransferSection: React.FC<AdvanceTransferSectionProps> = ({
             <h4 className={collapsible.subsectionTitle}>
               Información bancaria de la empacadora
             </h4>
-            <div>
-              <p className={collapsible.fieldLabelMb1}>Empacadora</p>
-              <p className="text-base text-gray-900 font-medium leading-snug">
-                {linkedOffer?.packingCompany.name ?? 'Empacadora'}
-              </p>
-            </div>
             {bankAccounts.length > 0 ? (
               <>
                 <div>
@@ -170,12 +175,26 @@ export const AdvanceTransferSection: React.FC<AdvanceTransferSectionProps> = ({
                 <p className={saleRequestDetail.fieldValue}>{request.producerName}</p>
               </div>
               <div>
-                <p className={collapsible.fieldLabel}>ID Solicitud</p>
-                <p className={saleRequestDetail.fieldValueSemibold}>#{request.id.split('-')[1]}</p>
-              </div>
-              <div>
                 <p className={collapsible.fieldLabel}>Concepto</p>
                 <p className={saleRequestDetail.fieldValueText}>Anticipo por compra de pesca</p>
+              </div>
+              <div>
+                <p className={collapsible.fieldLabel}>Peso de la pesca</p>
+                <p className={saleRequestDetail.fieldValueSemibold}>
+                  {lotWeight.toFixed(2)} {unitLabel}
+                </p>
+              </div>
+              <div>
+                <p className={collapsible.fieldLabel}>Valor unitario de la talla</p>
+                <p className={saleRequestDetail.fieldValueText}>
+                  $ {unitPriceTalla.toFixed(2)} / {unitLabel}
+                </p>
+              </div>
+              <div>
+                <p className={collapsible.fieldLabel}>Valor unitario de comisión</p>
+                <p className={saleRequestDetail.fieldValueText}>
+                  $ {commissionUnitRate.toFixed(3)} / {unitLabel}
+                </p>
               </div>
               <div>
                 <p className={collapsible.fieldLabel}>Valor total (liquidación)</p>
@@ -187,7 +206,15 @@ export const AdvanceTransferSection: React.FC<AdvanceTransferSectionProps> = ({
               </div>
               <div>
                 <p className={collapsible.fieldLabel}>Monto del anticipo</p>
-                <p className={saleRequestDetail.amountHighlight}>$ {advanceAmount.toFixed(2)}</p>
+                <p className={saleRequestDetail.fieldValueSemibold}>$ {advanceAmount.toFixed(2)}</p>
+              </div>
+              <div>
+                <p className={collapsible.fieldLabel}>Pago de comisión</p>
+                <p className={saleRequestDetail.fieldValueSemibold}>$ {commissionAmount.toFixed(2)}</p>
+              </div>
+              <div>
+                <p className={collapsible.fieldLabel}>Valor final a pagar</p>
+                <p className={saleRequestDetail.amountHighlight}>$ {totalToPay.toFixed(2)}</p>
               </div>
             </div>
             <p className={saleRequestDetail.transferHelp}>

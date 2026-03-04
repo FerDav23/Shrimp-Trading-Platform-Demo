@@ -2,7 +2,7 @@ import React from 'react';
 import type { SaleRequest, Offer } from '../../../types';
 import { CollapsibleSection } from './CollapsibleSection';
 import { collapsible, saleRequestDetail } from '../../../styles';
-import { DUMMY_ADVANCE_PROOF_IMAGE } from './constants';
+import { DUMMY_ADVANCE_PROOF_IMAGE, COMMISSION_PER_LB, COMMISSION_PER_KG, LB_TO_KG } from './constants';
 
 interface AdvanceReadOnlySectionProps {
   request: SaleRequest;
@@ -29,6 +29,19 @@ export const AdvanceReadOnlySection: React.FC<AdvanceReadOnlySectionProps> = ({
   const advanceTerm = linkedOffer?.paymentTerms.find((p) => p.termType === 'ADVANCE');
   const advancePercent = advanceTerm?.percent ?? 0;
   const advanceAmount = (advancePercent / 100) * totalValor;
+  const priceUnit = linkedOffer?.priceUnit ?? 'PER_LB';
+  const quantityForAdvance =
+    priceUnit === 'PER_KG'
+      ? estimatedQuantityLb * LB_TO_KG * (advancePercent / 100)
+      : estimatedQuantityLb * (advancePercent / 100);
+  const commissionAmount =
+    priceUnit === 'PER_KG' ? quantityForAdvance * COMMISSION_PER_KG : quantityForAdvance * COMMISSION_PER_LB;
+  const totalToPay = advanceAmount + commissionAmount;
+  const unitLabel = priceUnit === 'PER_KG' ? 'kg' : 'lb';
+  const lotWeight =
+    priceUnit === 'PER_KG' ? estimatedQuantityLb * LB_TO_KG : estimatedQuantityLb;
+  const unitPriceTalla = matchingTier ? matchingTier.price : 0;
+  const commissionUnitRate = priceUnit === 'PER_KG' ? COMMISSION_PER_KG : COMMISSION_PER_LB;
 
   const content = (
       <div className={collapsible.content}>
@@ -43,24 +56,32 @@ export const AdvanceReadOnlySection: React.FC<AdvanceReadOnlySectionProps> = ({
                 <p className={saleRequestDetail.fieldValue}>{request.producerName}</p>
               </div>
               <div>
-                <p className={collapsible.fieldLabel}>ID Solicitud</p>
-                <p className={saleRequestDetail.fieldValueSemibold}>#{request.id.split('-')[1]}</p>
-              </div>
-              <div>
                 <p className={collapsible.fieldLabel}>Talla seleccionada</p>
                 <p className={saleRequestDetail.fieldValueText}>
                   {sizeRange.min}/{sizeRange.max}
                 </p>
               </div>
               <div>
-                <p className={collapsible.fieldLabel}>Cantidad estimada (lb)</p>
-                <p className={saleRequestDetail.fieldValueSemibold}>{estimatedQuantityLb}</p>
+                <p className={collapsible.fieldLabel}>Peso de la pesca</p>
+                <p className={saleRequestDetail.fieldValueSemibold}>
+                  {lotWeight.toFixed(2)} {unitLabel}
+                </p>
               </div>
               <div>
-                <p className={collapsible.fieldLabel}>Precio por talla (oferta)</p>
+                <p className={collapsible.fieldLabel}>Valor unitario de la talla</p>
                 <p className={saleRequestDetail.fieldValueSemibold}>
-                  $ {matchingTier ? matchingTier.price.toFixed(2) : '0.00'}
+                  $ {unitPriceTalla.toFixed(2)} / {unitLabel}
                 </p>
+              </div>
+              <div>
+                <p className={collapsible.fieldLabel}>Valor unitario de comisión</p>
+                <p className={saleRequestDetail.fieldValueText}>
+                  $ {commissionUnitRate.toFixed(3)} / {unitLabel}
+                </p>
+              </div>
+              <div>
+                <p className={collapsible.fieldLabel}>Cantidad estimada (lb)</p>
+                <p className={saleRequestDetail.fieldValueSemibold}>{estimatedQuantityLb}</p>
               </div>
               <div>
                 <p className={collapsible.fieldLabel}>Valor total estimado</p>
@@ -72,7 +93,15 @@ export const AdvanceReadOnlySection: React.FC<AdvanceReadOnlySectionProps> = ({
               </div>
               <div>
                 <p className={collapsible.fieldLabel}>Monto del anticipo estimado</p>
-                <p className={saleRequestDetail.amountHighlight}>$ {advanceAmount.toFixed(2)}</p>
+                <p className={saleRequestDetail.fieldValueSemibold}>$ {advanceAmount.toFixed(2)}</p>
+              </div>
+              <div>
+                <p className={collapsible.fieldLabel}>Pago de comisión</p>
+                <p className={saleRequestDetail.fieldValueSemibold}>$ {commissionAmount.toFixed(2)}</p>
+              </div>
+              <div>
+                <p className={collapsible.fieldLabel}>Valor final cancelado</p>
+                <p className={saleRequestDetail.amountHighlight}>$ {totalToPay.toFixed(2)}</p>
               </div>
             </div>
           </div>
