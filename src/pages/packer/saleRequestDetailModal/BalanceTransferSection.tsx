@@ -4,7 +4,7 @@ import { collapsible, button, saleRequestDetail } from '../../../styles';
 import type { Offer } from '../../../types';
 import { normalizeSettlement } from './utils';
 import { CollapsibleSection } from './CollapsibleSection';
-import { BALANCE_DEADLINE_HOURS } from './constants';
+import { BALANCE_DEADLINE_HOURS, COMMISSION_PER_LB, COMMISSION_PER_KG, LB_TO_KG } from './constants';
 import { PACKER_BANK_ACCOUNTS } from '../../../data/packerBankAccounts';
 
 type SettlementInput = Parameters<typeof normalizeSettlement>[0];
@@ -43,15 +43,35 @@ export const BalanceTransferSection: React.FC<BalanceTransferSectionProps> = ({
   const settlementForBalance = request.catchSettlement
     ? normalizeSettlement(request.catchSettlement as SettlementInput)
     : null;
-  const totalValor = settlementForBalance
-    ? [...settlementForBalance.colaDirectaALines, ...settlementForBalance.colaDirectaBLines, ...settlementForBalance.ventaLocalLines].reduce(
-        (sum, l) => sum + l.pounds * l.unitPrice,
-        0
-      )
-    : 0;
-  const balanceTerm = linkedOffer?.paymentTerms.find((p) => p.termType === 'BALANCE');
-  const balancePercent = balanceTerm?.percent ?? 70;
-  const balanceAmount = (balancePercent / 100) * totalValor;
+  const allLines = settlementForBalance
+    ? [...settlementForBalance.colaDirectaALines, ...settlementForBalance.colaDirectaBLines, ...settlementForBalance.ventaLocalLines]
+    : [];
+  const totalValor = allLines.reduce((sum, l) => sum + l.pounds * l.unitPrice, 0);
+  const procesadasRealesLb = allLines.reduce((sum, l) => sum + l.pounds, 0);
+  const priceUnit = linkedOffer?.priceUnit ?? 'PER_LB';
+  const unitLabel = priceUnit === 'PER_KG' ? 'kg' : 'lb';
+  const commissionUnitRate = priceUnit === 'PER_KG' ? COMMISSION_PER_KG : COMMISSION_PER_LB;
+  const totalCommission =
+    priceUnit === 'PER_KG'
+      ? procesadasRealesLb * LB_TO_KG * COMMISSION_PER_KG
+      : procesadasRealesLb * COMMISSION_PER_LB;
+  const activeTiers = linkedOffer?.priceTiers.filter((t) => t.isActive && t.price > 0) ?? [];
+  const sizeRange = request.catchInfo?.sizeRange ?? { min: 0, max: 0 };
+  const matchingTier = activeTiers.find((t) => t.sizeMin === sizeRange.min && t.sizeMax === sizeRange.max);
+  const estimatedQuantityLb = request.catchInfo?.estimatedQuantityLb ?? 0;
+  const totalValorAdvance = matchingTier ? matchingTier.price * estimatedQuantityLb : 0;
+  const advanceTerm = linkedOffer?.paymentTerms.find((p) => p.termType === 'ADVANCE');
+  const advancePercent = advanceTerm?.percent ?? 0;
+  const advanceAmount = (advancePercent / 100) * totalValorAdvance;
+  const quantityForAdvance =
+    priceUnit === 'PER_KG'
+      ? estimatedQuantityLb * LB_TO_KG * (advancePercent / 100)
+      : estimatedQuantityLb * (advancePercent / 100);
+  const commissionAmountAdvance =
+    priceUnit === 'PER_KG' ? quantityForAdvance * COMMISSION_PER_KG : quantityForAdvance * COMMISSION_PER_LB;
+  const valorPagadoAnticipo = advanceAmount + commissionAmountAdvance;
+  const subtotalConComision = totalValor + totalCommission;
+  const balanceAmount = Math.max(0, subtotalConComision - valorPagadoAnticipo);
   const remainingBalanceMs = balancePaymentEndsAt ? Math.max(0, balancePaymentEndsAt - Date.now()) : 0;
   const totalBalanceSeconds = Math.floor(remainingBalanceMs / 1000);
   const balanceHours = Math.floor(totalBalanceSeconds / 3600);
@@ -95,12 +115,6 @@ export const BalanceTransferSection: React.FC<BalanceTransferSectionProps> = ({
             <h4 className={collapsible.subsectionTitle}>
               Información bancaria de la empacadora
             </h4>
-            <div>
-              <p className={collapsible.fieldLabelMb1}>Empacadora</p>
-              <p className="text-base text-gray-900 font-medium leading-snug">
-                {linkedOffer?.packingCompany.name ?? 'Empacadora'}
-              </p>
-            </div>
             {bankAccounts.length > 0 ? (
               <>
                 <div>
@@ -172,23 +186,39 @@ export const BalanceTransferSection: React.FC<BalanceTransferSectionProps> = ({
                 <p className={saleRequestDetail.fieldValue}>{request.producerName}</p>
               </div>
               <div>
-                <p className={collapsible.fieldLabel}>ID Solicitud</p>
-                <p className={saleRequestDetail.fieldValueSemibold}>#{request.id.split('-')[1]}</p>
-              </div>
-              <div>
                 <p className={collapsible.fieldLabel}>Concepto</p>
                 <p className={saleRequestDetail.fieldValueText}>Saldo restante por compra de pesca</p>
+              </div>
+              <div>
+                <p className={collapsible.fieldLabel}>Procesadas reales de liquidación de pesca</p>
+                <p className={saleRequestDetail.fieldValueSemibold}>
+                  {priceUnit === 'PER_KG' ? (procesadasRealesLb * LB_TO_KG).toFixed(2) : procesadasRealesLb.toFixed(2)} {unitLabel}
+                </p>
+              </div>
+              <div>
+                <p className={collapsible.fieldLabel}>Precio de comisión unitario</p>
+                <p className={saleRequestDetail.fieldValueText}>
+                  $ {commissionUnitRate.toFixed(3)} / {unitLabel}
+                </p>
+              </div>
+              <div>
+                <p className={collapsible.fieldLabel}>Total comisión (procesadas × comisión)</p>
+                <p className={saleRequestDetail.fieldValueSemibold}>$ {totalCommission.toFixed(2)}</p>
               </div>
               <div>
                 <p className={collapsible.fieldLabel}>Valor total (liquidación)</p>
                 <p className={saleRequestDetail.fieldValueSemibold}>$ {totalValor.toFixed(2)}</p>
               </div>
               <div>
-                <p className={collapsible.fieldLabel}>Porcentaje de saldo (oferta)</p>
-                <p className="text-gray-900 tabular-nums">{balancePercent}%</p>
+                <p className={collapsible.fieldLabel}>Valor final cancelado del anticipo</p>
+                <p className={saleRequestDetail.fieldValueSemibold}>$ {valorPagadoAnticipo.toFixed(2)}</p>
               </div>
               <div>
-                <p className={collapsible.fieldLabel}>Monto del saldo restante</p>
+                <p className={collapsible.fieldLabel}>Subtotal (liquidación + comisión)</p>
+                <p className={saleRequestDetail.fieldValueSemibold}>$ {subtotalConComision.toFixed(2)}</p>
+              </div>
+              <div>
+                <p className={collapsible.fieldLabel}>Valor a pagar (subtotal − anticipo cancelado)</p>
                 <p className={saleRequestDetail.amountHighlight}>$ {balanceAmount.toFixed(2)}</p>
               </div>
             </div>
