@@ -65,7 +65,7 @@ export function statusToPath(status: WorkflowStatus): string {
 export const SALES_VIEW_TABS: { tab: SalesViewTab; label: string }[] = [
   { tab: VIEW_ALL, label: 'Todas las solicitudes' },
   { tab: 'PENDING_ACCEPTANCE', label: 'Pendientes de Aceptar' }, 
-  { tab: TAB_LOGISTICS_TRACKING, label: 'Tracking logístico' },
+  { tab: TAB_LOGISTICS_TRACKING, label: 'Logistica' },
   { tab: 'CATCH_SETTLEMENT_PENDING', label: 'Liquidación de Pesca pendiente' },
   { tab: 'ADVANCE_PENDING', label: 'Anticipo Pendiente' },
   { tab: 'BALANCE_PENDING', label: 'Saldo Restante Pendiente' },

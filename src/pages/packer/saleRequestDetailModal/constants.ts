@@ -7,7 +7,7 @@ export const SECTION_LABELS: Record<SectionKey, string> = {
   general: 'Información General',
   catch: 'Información de Pesca',
   packerNotes: 'Notas del Packer',
-  logisticsTracking: 'Tracking logístico',
+  logisticsTracking: 'Logistica',
   settlement: 'Liquidación de pesca',
   settlementReadOnly: 'Liquidación de pesca',
   advanceTransfer: 'Transferencia de anticipo',

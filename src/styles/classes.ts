@@ -448,7 +448,7 @@ export const saleRequestDetail = {
   /** Card celeste reutilizable para secciones del modal */
   sectionCard: 'rounded-xl border border-sky-200 bg-sky-50/90 p-3 md:p-4 shadow-sm',
   /** Grid compacto de 2 columnas para secciones (pesca, pagos, etc.) */
-  sectionGridTwoCols: 'grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2',
+  sectionGridTwoCols: 'grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2 mt-2',
   sectionRowCompact: '!mb-0',
   sectionLabelSm: 'text-xs font-medium text-sky-800/90',
   sectionValueSm: 'text-sm text-gray-900 py-0.5',

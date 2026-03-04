@@ -74,7 +74,133 @@ export const LogisticsTrackingSection: React.FC<LogisticsTrackingSectionProps> =
   onTermsAcceptedChange,
   onConfirmDelivery,
 }) => {
-  const status = (isLogisticsTrackingStatus(request.status) ? request.status : 'PENDING_PICKUP') as LogisticsTrackingStatus;
+  const isLogisticsStatus = isLogisticsTrackingStatus(request.status);
+
+  // Cuando ya estamos en estados posteriores (liquidación, anticipo, saldo, venta finalizada),
+  // solo se debe mostrar la pesca aceptada como registro (peso, documento, términos).
+  if (!isLogisticsStatus) {
+    const delivery = request.logisticsDelivery;
+
+    const readOnlyContent = (
+      <div className={collapsible.content}>
+        {/* Stepper con los 3 pasos completados */}
+        <div className={logisticsTracking.stepper}>
+          {(['PENDING_PICKUP', 'PENDING_DELIVERY', 'PICKED_UP'] as LogisticsDisplayStatus[]).map((key, idx) => {
+            const label =
+              key === 'PENDING_PICKUP'
+                ? 'Pendiente de recoger'
+                : key === 'PENDING_DELIVERY'
+                  ? 'Pesca pendiente de entregar'
+                  : 'Pesca pendiente de aceptar';
+            return (
+              <React.Fragment key={key}>
+                <div className={logisticsTracking.stepWrapper}>
+                  <div
+                    className={`${logisticsTracking.stepCircle} ${logisticsTracking.stepCirclePast}`}
+                  >
+                    <svg className={logisticsTracking.stepCheckIcon} fill="currentColor" viewBox="0 0 20 20">
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <span
+                    className={`${logisticsTracking.stepLabel} ${logisticsTracking.stepLabelPast}`}
+                  >
+                    {label}
+                  </span>
+                </div>
+                {idx < 2 && (
+                  <div
+                    className={`${logisticsTracking.stepConnector} ${logisticsTracking.stepConnectorPast}`}
+                  />
+                )}
+              </React.Fragment>
+            );
+          })}
+        </div>
+
+        <div className={saleRequestDetail.sectionCard}>
+          <h4 className={collapsible.subsectionTitle}>Registro de recepción de carga</h4>
+          {delivery ? (
+            <>
+              <div className={saleRequestDetail.sectionGridTwoCols}>
+                <div>
+                  <p className={saleRequestDetail.sectionLabelSm}>Peso del camión (lb)</p>
+                  <p className={saleRequestDetail.sectionValueSm}>
+                    {delivery.truckWeightLb.toLocaleString('es-EC')}
+                  </p>
+                </div>
+                <div>
+                  <p className={saleRequestDetail.sectionLabelSm}>Fecha de aceptación</p>
+                  <p className={saleRequestDetail.sectionValueSm}>
+                    {delivery.termsAcceptedAt
+                      ? new Date(delivery.termsAcceptedAt).toLocaleString('es-EC')
+                      : 'Aceptados'}
+                  </p>
+                </div>
+              </div>
+
+              {delivery.documentPhotoUrl && (
+                <div className="mt-3">
+                  <p className={saleRequestDetail.sectionLabelSm}>Documento de entrega</p>
+                  <div className={collapsible.proofImageLg}>
+                    <img
+                      src={delivery.documentPhotoUrl}
+                      alt="Documento de entrega"
+                      className={collapsible.proofImg}
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div className="mt-4">
+                <p className={saleRequestDetail.sectionLabelSm}>
+                  Términos y condiciones aceptados
+                  <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-xs font-semibold">
+                    <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    Aceptados
+                  </span>
+                </p>
+                <div className={logisticsTracking.termsBox}>
+                  <div className={logisticsTracking.termsText}>{TERMS_TEXT}</div>
+                </div>
+              </div>
+
+              <p className={`${saleRequestDetail.sectionValueSm} mt-3`}>
+                La recepción de carga se registró al aceptar la pesca. Esta información es solo de referencia.
+              </p>
+            </>
+          ) : (
+            <p className={saleRequestDetail.sectionValueSm}>
+              Aún no se ha registrado la recepción de carga. No se puede avanzar en el flujo sin aceptar la pesca.
+            </p>
+          )}
+        </div>
+      </div>
+    );
+
+    if (contentOnly) return readOnlyContent;
+
+    return (
+      <section className={collapsible.sectionDefault}>
+        <div className={collapsible.buttonDefault}>
+          <h3 className={collapsible.title}>Tracking logístico</h3>
+        </div>
+        {readOnlyContent}
+      </section>
+    );
+  }
+
+  const status = request.status as LogisticsTrackingStatus;
   const displayStatus: LogisticsDisplayStatus = status === 'DELIVERED' ? 'PICKED_UP' : status;
   const config = LOGISTICS_STATUS_CONFIG[displayStatus];
   const isPickedUp = status === 'PICKED_UP';
@@ -98,7 +224,7 @@ export const LogisticsTrackingSection: React.FC<LogisticsTrackingSectionProps> =
 
   const content = (
     <div className={collapsible.content}>
-      {/* Stepper: tres estados en la misma vista */}
+      {/* Stepper: tres estados en la misma vista (solo mientras la logística está en curso) */}
       <div className={logisticsTracking.stepper}>
         {statusSteps.map((step, idx) => {
           const isActive = idx === currentStepIndex;
