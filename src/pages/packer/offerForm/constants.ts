@@ -51,8 +51,7 @@ export interface TriggerConditionOption {
 export const TRIGGER_CONDITIONS_BD: TriggerConditionOption[] = [
   { id: 'recpcion_producto', label: 'A la recepcion del producto' },
   { id: 'un_dia', label: 'A un dia de la recepcion del producto' },
-  { id: 'dos_dias', label: 'A dos dias de la recepcion del producto' },
-  { id: 'recibida_factura', label: 'Una ves recibida la factura' }
+  { id: 'dos_dias', label: 'A dos dias de la recepcion del producto' }
 ];
 
 /** Límite por item en condiciones adicionales */

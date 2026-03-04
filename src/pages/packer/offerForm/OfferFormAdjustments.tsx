@@ -71,20 +71,23 @@ export const OfferFormAdjustments: React.FC<OfferFormAdjustmentsProps> = ({
                 disabled={isLocked}
                 className={offerSection.radio}
               />
-              <span className={offerSection.textBold}>Tablas de Cola Directa y Venta Local</span>
+              <span className={offerSection.textBold}>Tablas de clase B y Venta Local</span>
             </label>
           </div>
           {data.enteroAdjustmentsMode === 'CLASS' ? (
             <div className="space-y-2">
               <p className={offerSection.textMuted}>
-                Moneda fija: USD. Defina el descuento por clase. Opcional.
+                Moneda fija: USD. Defina el descuento por clase. Clase B es obligatoria.
               </p>
               {data.adjustments.map((adj, idx) => (
                 <div
                   key={adj.appliesToClass}
                   className={offerSection.row}
                 >
-                  <div className={`${offerSection.textBold} w-20`}>Clase {adj.appliesToClass}</div>
+                  <div className={`${offerSection.textBold} w-20`}>
+                    Clase {adj.appliesToClass}
+                    {adj.appliesToClass === 'B' ? ' (obligatorio)' : ''}
+                  </div>
                   <div className="flex items-center gap-2">
                     <span className={offerSection.textLabel}>Tipo de descuento:</span>
                     <InputWithInfo infoText="Por favor, seleccione el tipo de descuento que desea aplicar." className="inline-block">
@@ -144,7 +147,7 @@ export const OfferFormAdjustments: React.FC<OfferFormAdjustmentsProps> = ({
               <h4 className={`${offerSection.textBold} text-base`}>Venta Local</h4>
               <p className={`${offerSection.textMuted} min-w-0`}>
                 Lo que no califique como entero se pagará como cola directa según los precios por
-                talla (USD/lb). Indique el precio para cada talla que aplique.
+                talla (USD/lb). Al menos una talla con precio es obligatoria.
               </p>
               <p className={`${offerSection.textMuted} min-w-0`}>
                 Indique el precio (USD) para cada categoría.
@@ -241,8 +244,7 @@ export const OfferFormAdjustments: React.FC<OfferFormAdjustmentsProps> = ({
       ) : (
         <>
           <p className={`${offerSection.textSm} mb-2`}>
-            Moneda fija: USD. Defina el descuento por clase (B, C). Los campos de esta sección no son
-            obligatorios.
+            Moneda fija: USD. Defina el descuento por clase (B, C). Clase B es obligatoria.
           </p>
           <div className="space-y-2">
             {data.adjustments.map((adj, idx) => (
@@ -250,7 +252,10 @@ export const OfferFormAdjustments: React.FC<OfferFormAdjustmentsProps> = ({
                 key={adj.appliesToClass}
                 className={offerSection.row}
               >
-                <div className={`${offerSection.textBold} w-20`}>Clase {adj.appliesToClass}</div>
+                <div className={`${offerSection.textBold} w-20`}>
+                  Clase {adj.appliesToClass}
+                  {adj.appliesToClass === 'B' ? ' (obligatorio)' : ''}
+                </div>
                 <div className="flex items-center gap-2">
                   <span className={offerSection.textLabel}>Tipo de descuento:</span>
                   <InputWithInfo infoText="Por favor, seleccione el tipo de descuento que desea aplicar." className="inline-block">

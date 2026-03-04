@@ -1,6 +1,6 @@
 import React from 'react';
 import { Money } from './Money';
-import { Offer, PriceTier, Adjustment } from '../types';
+import { Offer } from '../types';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { offerPreview, offerSection } from '../styles';
@@ -14,12 +14,6 @@ const VENTA_LOCAL_ROWS: { key: 'quebrado' | 'rojo' | 'juvenil'; label: string }[
   { key: 'rojo', label: 'Rojo' },
   { key: 'juvenil', label: 'Juvenil' },
 ];
-
-/** Precio por talla tras aplicar el ajuste (USD o %) por clase */
-function adjustedPriceForTier(basePrice: number, adj: Adjustment): number {
-  if (adj.unit === 'USD') return Math.max(0, basePrice - adj.amount);
-  return Math.max(0, basePrice * (1 - adj.amount / 100));
-}
 
 function hasVentaLocalPrices(vl?: { quebrado: number; rojo: number; juvenil: number }): boolean {
   if (!vl) return false;
@@ -220,51 +214,21 @@ export const OfferPreviewContent: React.FC<OfferPreviewContentProps> = ({
                 </span>
               </div>
             )}
-            {offer.adjustments
-              .filter((a) => a.amount !== 0)
-              .map((adj, idx) => {
-                const activeTiers: PriceTier[] = (offer.priceTiers || []).filter(
-                  (tier) => tier.isActive && tier.price > 0
-                );
-                if (activeTiers.length === 0) return null;
-                return (
-                  <div key={idx} className="mb-6 last:mb-0">
-                    <h4 className={offerPreview.adjustmentTitle}>
-                      Clase {adj.appliesToClass} – Precio por talla
-                      <span className={offerPreview.adjustmentNote}>
-                        (descuento: {adj.unit === 'USD' ? <Money amount={adj.amount} /> : `${adj.amount}%`}
-                        {adj.unit === 'USD' && ` por ${offer.priceUnit === 'PER_KG' ? 'kg' : 'libra'}`} aplicado)
-                      </span>
-                    </h4>
-                    <div className={offerSection.tableWrapperFull + ' max-w-xs'}>
-                      <table className={offerSection.table + ' min-w-0 w-full'}>
-                        <thead className={offerSection.tableHead}>
-                          <tr>
-                            <th className={offerSection.tableTh + ' w-1/2'}>
-                              Talla
-                            </th>
-                            <th className={offerSection.tableTh + ' w-1/2'}>
-                              Precio ({offer.priceUnit.replace('PER_', '/')})
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody className={offerSection.tableBody}>
-                          {activeTiers.map((tier, tierIdx) => (
-                            <tr key={tierIdx} className={offerSection.tableRow}>
-                              <td className={offerSection.tableCell + ' text-slate-800 font-medium'}>
-                                {tier.sizeMin}/{tier.sizeMax}
-                              </td>
-                              <td className={offerSection.tableCell + ' text-slate-800'}>
-                                <Money amount={adjustedPriceForTier(tier.price, adj)} />
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
+            <div className="space-y-2">
+              {offer.adjustments
+                .filter((a) => a.amount !== 0)
+                .map((adj, idx) => (
+                  <div key={idx} className={offerSection.textMedium}>
+                    <span className="font-medium">Clase {adj.appliesToClass}:</span>{' '}
+                    descuento de{' '}
+                    {adj.unit === 'USD' ? (
+                      <><Money amount={adj.amount} /> por {offer.priceUnit === 'PER_KG' ? 'kg' : 'libra'}</>
+                    ) : (
+                      <>{adj.amount}% por {offer.priceUnit === 'PER_KG' ? 'kg' : 'libra'}</>
+                    )}
                   </div>
-                );
-              })}
+                ))}
+            </div>
           </div>
         </section>
       )}

@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { dummyOffers } from '../../data/offers';
-import { page } from '../../styles';
+import { page, button } from '../../styles';
 import { OfferFormSection, getInitialFormData, getOfferLabel } from './offerForm';
 import type { OfferFormType, OfferFormData } from './offerForm';
 
@@ -61,6 +61,13 @@ export const PackerOffers: React.FC = () => {
     setUploadedFiles((prev) => prev.filter((e) => e.id !== id));
   };
 
+  const handleSubmitDocuments = () => {
+    if (uploadedFiles.length === 0) return;
+    // TODO: integrar con API para enviar los documentos
+    console.log('Enviar documentos:', uploadedFiles.map((e) => ({ name: e.name, size: e.size })));
+    alert(`Se enviarán ${uploadedFiles.length} documento(s). (Integración con backend pendiente)`);
+  };
+
   return (
     <div>
       <div className={page.header}>
@@ -79,7 +86,7 @@ export const PackerOffers: React.FC = () => {
             onClick={() => setActiveTab('SUBIR_OFERTA')}
             className={`${page.tab} ${activeTab === 'SUBIR_OFERTA' ? page.tabActive : page.tabInactive}`}
           >
-            Subir Oferta
+            Oferta en pdf/docx/excel
           </button>
         </div>
       </div>
@@ -163,6 +170,16 @@ export const PackerOffers: React.FC = () => {
                       </li>
                     ))}
                   </ul>
+                  <button
+                    type="button"
+                    onClick={handleSubmitDocuments}
+                    className={`${button.primarySky} w-full mt-4 flex items-center justify-center gap-2`}
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    </svg>
+                    Enviar documentos
+                  </button>
                 </div>
               )}
             </div>

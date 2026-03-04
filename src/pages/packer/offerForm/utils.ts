@@ -199,6 +199,17 @@ export const isFormComplete = (data: OfferFormData): boolean => {
     data.productForm !== 'ENTERO' ||
     data.enteroAdjustmentsMode !== 'COLA_DIRECTA_TABLE' ||
     data.colaDirectaTiers.some((t) => t.price > 0);
+  /** Descuentos por clase: obligatorio. Si Ajuste por clase está activado (ENTERO) o form COLA_DIRECTA, Clase B es obligatoria. */
+  const adjustmentB = data.adjustments.find((a) => a.appliesToClass === 'B');
+  const hasValidAdjustments =
+    data.productForm !== 'ENTERO' &&
+    data.productForm !== 'COLA_DIRECTA'
+      ? true
+      : data.productForm === 'COLA_DIRECTA'
+        ? (adjustmentB?.amount ?? 0) > 0
+        : data.enteroAdjustmentsMode === 'CLASS'
+          ? (adjustmentB?.amount ?? 0) > 0
+          : true;
   const hasValidAdditionalConditions =
     data.additionalConditions.length === 0 ||
     data.additionalConditions.every((s) => s.trim() !== '');
@@ -209,6 +220,7 @@ export const isFormComplete = (data: OfferFormData): boolean => {
     hasValidCustomTerms &&
     hasValidGuarantee &&
     hasValidColaDirecta &&
+    hasValidAdjustments &&
     hasValidAdditionalConditions
   );
 };
@@ -273,7 +285,18 @@ export const getIncompleteSections = (data: OfferFormData): string[] => {
     !data.colaDirectaTiers.some((t) => t.price > 0)
   ) {
     sections.push(
-      'Ajustes por clase (tabla Cola Directa: debe haber al menos un precio)'
+      'Descuentos por clase (Tablas de Cola Directa: al menos una talla con precio obligatoria)'
+    );
+  }
+  const adjustmentB = data.adjustments.find((a) => a.appliesToClass === 'B');
+  const needsClassB =
+    (data.productForm === 'COLA_DIRECTA' && ((adjustmentB?.amount ?? 0) <= 0)) ||
+    (data.productForm === 'ENTERO' &&
+      data.enteroAdjustmentsMode === 'CLASS' &&
+      (adjustmentB?.amount ?? 0) <= 0);
+  if (needsClassB) {
+    sections.push(
+      'Descuentos por clase (Clase B es obligatoria cuando Ajuste por clase está activado)'
     );
   }
   if (
