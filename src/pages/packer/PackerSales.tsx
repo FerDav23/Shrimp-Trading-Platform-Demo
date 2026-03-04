@@ -3,20 +3,22 @@ import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { page, packerSales } from '../../styles';
 import { dummySaleRequests } from '../../data/saleRequests';
-import { SaleRequest } from '../../types';
+import { SaleRequest, LogisticsDeliveryConfirm, SaleRequestStatus, isLogisticsTrackingStatus } from '../../types';
 import { SaleRequestDetailModal } from './saleRequestDetailModal';
+import { getStatusLabel as getRequestStatusLabel } from './saleRequestDetailModal/utils';
 import {
   SALES_VIEW_TABS,
   slugToViewTab,
   viewTabToSlug,
+  TAB_LOGISTICS_TRACKING,
   VIEW_ALL,
-  type SalesViewFilter,
   type SalesViewTab,
+  type WorkflowStatus,
 } from './salesRoutes';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
-const STATUS_LABELS: Record<SalesViewFilter, string> = {
+const TAB_LABELS: Record<WorkflowStatus, string> = {
   PENDING_ACCEPTANCE: 'Pendientes de Aceptar',
   CATCH_SETTLEMENT_PENDING: 'Liquidación de Pesca pendiente',
   ADVANCE_PENDING: 'Anticipo Pendiente',
@@ -25,7 +27,7 @@ const STATUS_LABELS: Record<SalesViewFilter, string> = {
   REJECTED: 'Rechazada',
 };
 
-const SECTION_TITLES: Record<SalesViewFilter, string> = {
+const SECTION_TITLES: Record<WorkflowStatus, string> = {
   PENDING_ACCEPTANCE: 'Solicitudes Pendientes de Aceptar',
   CATCH_SETTLEMENT_PENDING: 'Solicitudes con Liquidación de Pesca pendiente',
   ADVANCE_PENDING: 'Solicitudes con Anticipo Pendiente',
@@ -34,25 +36,36 @@ const SECTION_TITLES: Record<SalesViewFilter, string> = {
   REJECTED: 'Solicitudes Rechazadas',
 };
 
-function getStatusLabel(status: SalesViewFilter): string {
-  return STATUS_LABELS[status];
+function getTabLabel(status: SalesViewTab): string {
+  if (status === VIEW_ALL) return 'Todas las solicitudes';
+  if (status === TAB_LOGISTICS_TRACKING) return 'Tracking logístico';
+  return TAB_LABELS[status as WorkflowStatus];
 }
 
 function getSectionTitle(tab: SalesViewTab): string {
   if (tab === VIEW_ALL) return 'Todas las solicitudes de compra';
-  return SECTION_TITLES[tab];
+  if (tab === TAB_LOGISTICS_TRACKING) return 'Solicitudes con Logistica Pendiente';
+  return SECTION_TITLES[tab as WorkflowStatus];
 }
 
-function getStatusClass(status: SalesViewFilter): string {
-  const statusClasses: Record<SalesViewFilter, string> = {
-    PENDING_ACCEPTANCE: packerSales.colStatusPendingAcceptance,
-    CATCH_SETTLEMENT_PENDING: packerSales.colStatusCatchSettlement,
-    ADVANCE_PENDING: packerSales.colStatusAdvancePending,
-    BALANCE_PENDING: packerSales.colStatusBalancePending,
-    SALE_COMPLETED: packerSales.colStatusSaleCompleted,
-    REJECTED: packerSales.colStatusRejected,
-  };
-  return statusClasses[status] ?? packerSales.colStatus;
+/** Clase de badge para cualquier estado (flujo + logística) */
+const STATUS_CLASSES: Record<SaleRequestStatus, string> = {
+  PENDING_ACCEPTANCE: packerSales.colStatusPendingAcceptance,
+  CATCH_SETTLEMENT_PENDING: packerSales.colStatusCatchSettlement,
+  ADVANCE_PENDING: packerSales.colStatusAdvancePending,
+  BALANCE_PENDING: packerSales.colStatusBalancePending,
+  SALE_COMPLETED: packerSales.colStatusSaleCompleted,
+  REJECTED: packerSales.colStatusRejected,
+  PENDING_PICKUP: packerSales.colStatusLogisticsPendingPickup,
+  PENDING_DELIVERY: packerSales.colStatusLogisticsPendingDelivery,
+  PICKED_UP: packerSales.colStatusLogisticsPickedUp,
+  DELIVERED: packerSales.colStatusLogisticsDelivered,
+};
+
+function getStatusClass(status: SalesViewTab): string {
+  if (status === VIEW_ALL) return packerSales.colStatus;
+  if (status === TAB_LOGISTICS_TRACKING) return packerSales.colStatusLogisticsTracking;
+  return STATUS_CLASSES[status] ?? packerSales.colStatus;
 }
 
 export const PackerSales: React.FC = () => {
@@ -70,12 +83,15 @@ export const PackerSales: React.FC = () => {
   const filteredRequests =
     activeTab === VIEW_ALL
       ? allRequests
-      : allRequests.filter((r) => r.status === activeTab);
+      : activeTab === TAB_LOGISTICS_TRACKING
+        ? allRequests.filter((r) => isLogisticsTrackingStatus(r.status))
+        : allRequests.filter((r) => r.status === activeTab);
 
   const [selectedRequest, setSelectedRequest] = useState<SaleRequest | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [settlementSentIds, setSettlementSentIds] = useState<Set<string>>(new Set());
   const [rejectionReasons, setRejectionReasons] = useState<Record<string, string>>({});
+  const [deliveryConfirmed, setDeliveryConfirmed] = useState<Record<string, LogisticsDeliveryConfirm>>({});
 
   const tabsScrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -113,7 +129,12 @@ export const PackerSales: React.FC = () => {
   };
 
   const handleRowClick = (request: SaleRequest) => {
-    setSelectedRequest(request);
+    const confirmed = deliveryConfirmed[request.id];
+    setSelectedRequest(
+      confirmed
+        ? { ...request, status: 'DELIVERED', logisticsDelivery: confirmed }
+        : request
+    );
     setIsModalOpen(true);
   };
 
@@ -140,6 +161,11 @@ export const PackerSales: React.FC = () => {
 
   const handleSendBalanceProof = (requestId: string) => {
     alert(`Prueba de saldo enviada para solicitud ${requestId} (simulado)`);
+  };
+
+  const handleConfirmDelivery = (requestId: string, data: LogisticsDeliveryConfirm) => {
+    setDeliveryConfirmed((prev) => ({ ...prev, [requestId]: data }));
+    alert(`Recepción de carga registrada para solicitud ${requestId} (simulado)`);
   };
 
   const isAllView = activeTab === VIEW_ALL;
@@ -196,14 +222,17 @@ export const PackerSales: React.FC = () => {
       header: 'Estado',
       accessor: (request: SaleRequest) => {
         const awaiting = settlementSentIds.has(request.id);
+        const showRequestStatus = isAllView || activeTab === TAB_LOGISTICS_TRACKING;
         const statusLabel = awaiting
           ? 'En espera de confirmación'
-          : isAllView
-            ? getStatusLabel(request.status)
-            : getStatusLabel(activeTab);
+          : showRequestStatus
+            ? getRequestStatusLabel(request.status)
+            : getTabLabel(activeTab);
         const statusClass = awaiting
           ? packerSales.colStatusAwaiting
-          : getStatusClass(isAllView ? request.status : activeTab);
+          : showRequestStatus
+            ? STATUS_CLASSES[request.status]
+            : getStatusClass(activeTab);
         return (
           <span className={statusClass}>
             {statusLabel}
@@ -216,7 +245,9 @@ export const PackerSales: React.FC = () => {
   const emptyMessage =
     activeTab === VIEW_ALL
       ? 'No hay solicitudes de compra.'
-      : `No hay solicitudes ${getStatusLabel(activeTab).toLowerCase()} disponibles.`;
+      : activeTab === TAB_LOGISTICS_TRACKING
+        ? 'No hay solicitudes con tracking logístico. Acepte una solicitud para ver el tab Compras.'
+        : `No hay solicitudes ${getTabLabel(activeTab).toLowerCase()} disponibles.`;
 
   return (
     <div className={packerSales.pageLayout}>
@@ -337,6 +368,7 @@ export const PackerSales: React.FC = () => {
         onCancelPurchase={handleCancelPurchase}
         onSendAdvanceProof={handleSendAdvanceProof}
         onSendBalanceProof={handleSendBalanceProof}
+        onConfirmDelivery={handleConfirmDelivery}
       />
     </div>
   );

@@ -1,23 +1,30 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { page } from '../../styles';
+import { page, packerSales } from '../../styles';
 import { dummyOffers } from '../../data/offers';
 import { dummySaleRequests } from '../../data/saleRequests';
 import { Card } from '../../components/Card';
 import { StatusBadge } from '../../components/StatusBadge';
-import { SALES_STATUS_TABS, statusToPath } from './salesRoutes';
+import { SALES_STATUS_TABS, statusToPath, SLUG_LOGISTICS_TRACKING } from './salesRoutes';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import type { SaleRequestStatus } from '../../types';
+import { isLogisticsTrackingStatus } from '../../types';
+import type { WorkflowStatus } from './salesRoutes';
+import { getStatusLabel } from './saleRequestDetailModal/utils';
 
-const SALE_REQUEST_STATUS_LABELS: Record<SaleRequestStatus, string> = {
-  PENDING_ACCEPTANCE: 'Pendientes de Aceptar',
-  CATCH_SETTLEMENT_PENDING: 'Liquidación de Pesca pendiente',
-  ADVANCE_PENDING: 'Anticipo Pendiente',
-  BALANCE_PENDING: 'Saldo Restante Pendiente',
-  SALE_COMPLETED: 'Venta Finalizada',
-  REJECTED: 'Rechazada',
+const STATUS_CLASS: Record<SaleRequestStatus, string> = {
+  PENDING_ACCEPTANCE: packerSales.colStatusPendingAcceptance,
+  CATCH_SETTLEMENT_PENDING: packerSales.colStatusCatchSettlement,
+  ADVANCE_PENDING: packerSales.colStatusAdvancePending,
+  BALANCE_PENDING: packerSales.colStatusBalancePending,
+  SALE_COMPLETED: packerSales.colStatusSaleCompleted,
+  REJECTED: packerSales.colStatusRejected,
+  PENDING_PICKUP: packerSales.colStatusLogisticsPendingPickup,
+  PENDING_DELIVERY: packerSales.colStatusLogisticsPendingDelivery,
+  PICKED_UP: packerSales.colStatusLogisticsPickedUp,
+  DELIVERED: packerSales.colStatusLogisticsDelivered,
 };
 
 const PRODUCT_FORM_LABELS: Record<string, string> = {
@@ -37,12 +44,12 @@ export const PackerDashboard: React.FC = () => {
   const offersCola = publishedOffers.filter((o) => o.productForm === 'COLA_DIRECTA').length;
 
   const mySaleRequests = dummySaleRequests.filter((r) => r.packingCompanyId === PACKER_ID);
-  const requestsByStatus = SALES_STATUS_TABS.reduce<Record<SaleRequestStatus, number>>(
+  const requestsByStatus = SALES_STATUS_TABS.reduce<Record<WorkflowStatus, number>>(
     (acc, { tab }) => {
       acc[tab] = mySaleRequests.filter((r) => r.status === tab).length;
       return acc;
     },
-    {} as Record<SaleRequestStatus, number>
+    {} as Record<WorkflowStatus, number>
   );
   const pendingAcceptance = requestsByStatus.PENDING_ACCEPTANCE ?? 0;
   const recentRequests = [...mySaleRequests]
@@ -152,7 +159,7 @@ export const PackerDashboard: React.FC = () => {
                 {recentRequests.map((request) => (
                   <li key={request.id}>
                     <Link
-                      to={statusToPath(request.status)}
+                      to={`/packer/sales?view=${isLogisticsTrackingStatus(request.status) ? SLUG_LOGISTICS_TRACKING : statusToPath(request.status as WorkflowStatus)}`}
                       className="flex justify-between items-start gap-3 py-3 px-2 -mx-2 rounded-lg hover:bg-gray-50"
                     >
                       <div className="min-w-0">
@@ -168,7 +175,8 @@ export const PackerDashboard: React.FC = () => {
                       </div>
                       <StatusBadge
                         status={request.status}
-                        label={SALE_REQUEST_STATUS_LABELS[request.status]}
+                        label={getStatusLabel(request.status)}
+                        fullClassName={STATUS_CLASS[request.status]}
                         className="shrink-0"
                       />
                     </Link>

@@ -577,19 +577,71 @@ export const packerSales = {
   colLocationSub: 'text-slate-600 text-xs',
   colDate: 'text-slate-700',
   /** Estado: en espera de confirmación (liquidación enviada) */
-  colStatusAwaiting: 'inline-block px-2.5 py-1 rounded-md bg-amber-100 text-amber-800 font-medium text-sm',
+  colStatusAwaiting: 'inline-block px-2.5 py-1 rounded-md bg-orange-100 text-orange-800 font-medium text-sm',
   /** Estado: pendientes de aceptar */
   colStatusPendingAcceptance: 'inline-block px-2.5 py-1 rounded-md bg-amber-100 text-amber-800 font-medium text-sm',
   /** Estado: liquidación de pesca pendiente */
   colStatusCatchSettlement: 'inline-block px-2.5 py-1 rounded-md bg-sky-100 text-sky-800 font-medium text-sm',
   /** Estado: anticipo pendiente */
-  colStatusAdvancePending: 'inline-block px-2.5 py-1 rounded-md bg-amber-100 text-amber-800 font-medium text-sm',
+  colStatusAdvancePending: 'inline-block px-2.5 py-1 rounded-md bg-violet-100 text-violet-800 font-medium text-sm',
   /** Estado: saldo restante pendiente */
-  colStatusBalancePending: 'inline-block px-2.5 py-1 rounded-md bg-amber-100 text-amber-800 font-medium text-sm',
+  colStatusBalancePending: 'inline-block px-2.5 py-1 rounded-md bg-indigo-100 text-indigo-800 font-medium text-sm',
   /** Estado: venta finalizada */
   colStatusSaleCompleted: 'inline-block px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-800 font-medium text-sm',
   /** Estado: rechazada */
   colStatusRejected: 'inline-block px-2.5 py-1 rounded-md bg-red-100 text-red-800 font-medium text-sm',
+  /** Vista: tracking logístico */
+  colStatusLogisticsTracking: 'inline-block px-2.5 py-1 rounded-md bg-teal-100 text-teal-800 font-medium text-sm',
+  /** Estados de logística en tabla (tab "Todas"): pendiente recoger / entregar / aceptar / entregada */
+  colStatusLogisticsPendingPickup: 'inline-block px-2.5 py-1 rounded-md bg-orange-100 text-orange-800 font-medium text-sm',
+  colStatusLogisticsPendingDelivery: 'inline-block px-2.5 py-1 rounded-md bg-violet-100 text-violet-800 font-medium text-sm',
+  colStatusLogisticsPickedUp: 'inline-block px-2.5 py-1 rounded-md bg-teal-100 text-teal-800 font-medium text-sm',
+  colStatusLogisticsDelivered: 'inline-block px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-800 font-medium text-sm',
   /** Estado: genérico (fallback) */
   colStatus: 'inline-block px-2.5 py-1 rounded-md bg-gray-100 text-gray-800 font-medium text-sm',
+} as const;
+
+/** Logistics tracking section (saleRequestDetailModal – LogisticsTrackingSection) */
+export const logisticsTracking = {
+  /** Stepper: contenedor de los 3 pasos */
+  stepper: 'flex items-center justify-between mb-6',
+  stepWrapper: 'flex flex-col items-center flex-1',
+  stepCircle: 'w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-colors',
+  stepCircleActive: 'bg-sky-600 text-white ring-4 ring-sky-200',
+  stepCirclePast: 'bg-green-500 text-white',
+  stepCirclePending: 'bg-gray-200 text-gray-500',
+  stepCheckIcon: 'w-5 h-5',
+  stepLabel: 'mt-2 text-xs font-medium text-center max-w-[80px]',
+  stepLabelActive: 'text-sky-700',
+  stepLabelPast: 'text-green-700',
+  stepLabelPending: 'text-gray-500',
+  stepConnector: 'flex-1 h-1 mx-1 rounded',
+  stepConnectorPast: 'bg-green-400',
+  stepConnectorPending: 'bg-gray-200',
+  /** Card del estado actual (PENDING_PICKUP, PENDING_DELIVERY, PICKED_UP) – colores distintos por estado */
+  statusCard: 'rounded-xl border-2 p-6 shadow-sm',
+  statusCardPendingPickup: 'border-orange-300 bg-orange-50/80',
+  statusCardPendingDelivery: 'border-violet-300 bg-violet-50/80',
+  statusCardPickedUp: 'border-teal-300 bg-teal-50/80',
+  statusCardInner: 'flex items-start gap-4',
+  statusCardIconWrap: 'shrink-0',
+  statusCardBody: 'flex-1 min-w-0',
+  statusCardTitle: 'text-lg font-semibold text-gray-900',
+  statusCardSubtitle: 'text-sm text-gray-600 mt-1',
+  /** Iconos por estado (SVG) – colores distintos */
+  iconPendingPickup: 'w-12 h-12 text-orange-600',
+  iconPendingDelivery: 'w-12 h-12 text-violet-600',
+  iconPickedUp: 'w-12 h-12 text-teal-600',
+  /** Formulario de recepción de carga */
+  receptionForm: 'mt-6 space-y-6',
+  inputTruckWeight: 'w-32 ml-3',
+  documentSection: 'space-y-3',
+  documentUploadRow: 'flex flex-col gap-4',
+  documentButtonsRow: 'flex flex-wrap items-center gap-3',
+  fileInputHidden: 'hidden',
+  termsBox: 'mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200',
+  termsLabel: 'flex items-start gap-3 cursor-pointer',
+  termsCheckbox: 'mt-1 rounded border-sky-300 text-sky-600 focus:ring-sky-500',
+  termsText: 'text-sm text-gray-700 whitespace-pre-line',
+  confirmButtonWrap: 'mt-6',
 } as const;

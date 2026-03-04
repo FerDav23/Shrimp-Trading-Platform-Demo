@@ -8,13 +8,36 @@ export type LogisticsStatus = 'PENDING_PICKUP' | 'IN_TRANSIT' | 'DELIVERED';
 export type PaymentStatus = 'PENDING' | 'PARTIAL' | 'PAID' | 'OVERDUE';
 export type PaymentTermType = 'ADVANCE' | 'BALANCE' | 'CUSTOM';
 export type AdjustmentType = 'CLASS_DISCOUNT';
+/** Todos los estados de la solicitud (flujo de aceptación/pagos + tracking logístico) */
 export type SaleRequestStatus =
   | 'PENDING_ACCEPTANCE'       // Pendientes de Aceptar
   | 'CATCH_SETTLEMENT_PENDING' // Liquidación de Pesca pendiente
   | 'ADVANCE_PENDING'          // Anticipo Pendiente
   | 'BALANCE_PENDING'          // Saldo Restante Pendiente
   | 'SALE_COMPLETED'           // Venta Finalizada
-  | 'REJECTED';                // Rechazada
+  | 'REJECTED'                 // Rechazada
+  | 'PENDING_PICKUP'           // Pendiente de recoger (logística)
+  | 'PENDING_DELIVERY'         // Pesca pendiente de entregar (logística en camino)
+  | 'PICKED_UP'                // Pesca pendiente de aceptar (camión en planta)
+  | 'DELIVERED';               // Pesca entregada (recepción registrada)
+
+/** Estados que corresponden al tracking logístico (subconjunto de SaleRequestStatus) */
+export type LogisticsTrackingStatus =
+  | 'PENDING_PICKUP'
+  | 'PENDING_DELIVERY'
+  | 'PICKED_UP'
+  | 'DELIVERED';
+
+const LOGISTICS_TRACKING_STATUSES: LogisticsTrackingStatus[] = [
+  'PENDING_PICKUP',
+  'PENDING_DELIVERY',
+  'PICKED_UP',
+  'DELIVERED',
+];
+
+export function isLogisticsTrackingStatus(s: SaleRequestStatus): s is LogisticsTrackingStatus {
+  return LOGISTICS_TRACKING_STATUSES.includes(s as LogisticsTrackingStatus);
+}
 
 export interface User {
   id: string;
@@ -206,6 +229,13 @@ export interface ProducerBankAccount {
   email?: string;
 }
 
+/** Confirmación de recepción de carga por el empacador */
+export interface LogisticsDeliveryConfirm {
+  truckWeightLb: number;
+  documentPhotoUrl?: string;
+  termsAcceptedAt?: string;
+}
+
 /** Solicitud de venta que un productor envía a un packer basada en una oferta */
 export interface SaleRequest {
   id: string;
@@ -237,4 +267,6 @@ export interface SaleRequest {
   saleId?: string;
   /** Liquidación de pesca registrada (cuando estado es CATCH_SETTLEMENT_PENDING) */
   catchSettlement?: CatchSettlement;
+  /** Confirmación de recepción de carga (cuando status es DELIVERED) */
+  logisticsDelivery?: LogisticsDeliveryConfirm;
 }

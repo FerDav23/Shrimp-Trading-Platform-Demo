@@ -7,9 +7,11 @@ interface StatusBadgeProps {
   /** Etiqueta opcional para mostrar en lugar de formatear status (ej. textos en español) */
   label?: string;
   className?: string;
+  /** Si se indica, se usa esta clase completa para el badge (en lugar de base + color por status) */
+  fullClassName?: string;
 }
 
-export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, label, className }) => {
+export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, label, className, fullClassName }) => {
   const getStatusColor = (status: string) => {
     const statusLower = status.toLowerCase();
     if (statusLower.includes('published') || statusLower.includes('paid') || statusLower.includes('delivered')) {
@@ -32,7 +34,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, label, classNa
 
   return (
     <span
-      className={clsx(badge.base, getStatusColor(status), className)}
+      className={clsx(fullClassName ?? [badge.base, getStatusColor(status)], className)}
     >
       {label ?? status.replace(/_/g, ' ')}
     </span>

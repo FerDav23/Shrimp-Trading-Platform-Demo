@@ -18,9 +18,11 @@ import { BalanceReadOnlySection } from './BalanceReadOnlySection';
 import { SettlementFormSection } from './SettlementFormSection';
 import { MessagesSection } from './MessagesSection';
 import { RejectFormSection } from './RejectFormSection';
+import { LogisticsTrackingSection } from './LogisticsTrackingSection';
 import { DetailActions } from './DetailActions';
 import { LinkedOfferModal } from './LinkedOfferModal';
 import type { CatchSettlement } from '../../../types';
+import { isLogisticsTrackingStatus } from '../../../types';
 import { saleRequestDetail } from '../../../styles';
 
 export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
@@ -34,6 +36,7 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
   onCancelPurchase,
   onSendAdvanceProof,
   onSendBalanceProof,
+  onConfirmDelivery,
 }) => {
   const { user } = useAuth();
   const [rejectNotes, setRejectNotes] = useState('');
@@ -57,7 +60,12 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const advanceProofInputRef = useRef<HTMLInputElement>(null);
   const balanceProofInputRef = useRef<HTMLInputElement>(null);
+  const documentInputRef = useRef<HTMLInputElement>(null);
   const tabsScrollRef = useRef<HTMLDivElement>(null);
+  const [truckWeightLb, setTruckWeightLb] = useState('');
+  const [documentFile, setDocumentFile] = useState<File | null>(null);
+  const [documentPreviewUrl, setDocumentPreviewUrl] = useState<string | null>(null);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
 
@@ -187,6 +195,23 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
   }, [balanceProofFile]);
 
   useEffect(() => {
+    if (!documentFile) {
+      setDocumentPreviewUrl((prev) => {
+        if (prev) URL.revokeObjectURL(prev);
+        return null;
+      });
+      return;
+    }
+    if (!documentFile.type.startsWith('image/')) {
+      setDocumentPreviewUrl(null);
+      return;
+    }
+    const url = URL.createObjectURL(documentFile);
+    setDocumentPreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [documentFile]);
+
+  useEffect(() => {
     if (!isOpen) {
       setRejectNotes('');
       setSelectedRejectionReason('');
@@ -208,6 +233,13 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
         if (prev) URL.revokeObjectURL(prev);
         return null;
       });
+      setTruckWeightLb('');
+      setDocumentFile(null);
+      setDocumentPreviewUrl((prev) => {
+        if (prev) URL.revokeObjectURL(prev);
+        return null;
+      });
+      setTermsAccepted(false);
     }
   }, [isOpen]);
 
@@ -274,6 +306,21 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
     onClose();
   };
 
+  const handleConfirmDelivery = () => {
+    if (!request || !onConfirmDelivery || !truckWeightLb || !documentFile || !termsAccepted) return;
+    const weight = Number(truckWeightLb);
+    if (weight <= 0) return;
+    onConfirmDelivery(request.id, {
+      truckWeightLb: weight,
+      documentPhotoUrl: URL.createObjectURL(documentFile),
+      termsAcceptedAt: new Date().toISOString(),
+    });
+    setTruckWeightLb('');
+    setDocumentFile(null);
+    setTermsAccepted(false);
+    onClose();
+  };
+
   const handleSendMessage = () => {
     if (!request || !messageText.trim() || messageText.length > 500) return;
     const newMessage: RequestMessage = {
@@ -300,24 +347,34 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
     ? (request.catchSettlement as Parameters<typeof normalizeSettlement>[0])
     : null;
 
+  const isRequestAccepted =
+    request.status !== 'PENDING_ACCEPTANCE' && request.status !== 'REJECTED';
+
+  const isLogisticsActive =
+    isLogisticsTrackingStatus(request.status) &&
+    !(request.status === 'DELIVERED' && request.logisticsDelivery);
+
+  const showPaymentTabs = !isLogisticsActive;
+
   const visibleTabs: SectionKey[] = [
     'general',
     'catch',
     ...(request.packerNotes ? (['packerNotes'] as const) : []),
-    ...(request.status === 'CATCH_SETTLEMENT_PENDING' ? (['settlement'] as const) : []),
-    ...(request.status === 'ADVANCE_PENDING' ||
-    request.status === 'BALANCE_PENDING' ||
-    request.status === 'SALE_COMPLETED'
-      ? settlementReadOnlySettlement
-        ? (['settlementReadOnly'] as const)
-        : []
+    ...(isRequestAccepted ? (['logisticsTracking'] as const) : []),
+    ...(!isLogisticsActive && request.status === 'CATCH_SETTLEMENT_PENDING' ? (['settlement'] as const) : []),
+    ...(!isLogisticsActive &&
+    (request.status === 'ADVANCE_PENDING' ||
+      request.status === 'BALANCE_PENDING' ||
+      request.status === 'SALE_COMPLETED') &&
+    settlementReadOnlySettlement
+      ? (['settlementReadOnly'] as const)
       : []),
-    ...(request.status === 'ADVANCE_PENDING' ? (['advanceTransfer'] as const) : []),
-    ...(request.status === 'BALANCE_PENDING' || request.status === 'SALE_COMPLETED'
+    ...(showPaymentTabs && request.status === 'ADVANCE_PENDING' ? (['advanceTransfer'] as const) : []),
+    ...(showPaymentTabs && (request.status === 'BALANCE_PENDING' || request.status === 'SALE_COMPLETED')
       ? (['advanceReadOnly'] as const)
       : []),
-    ...(request.status === 'BALANCE_PENDING' ? (['balanceTransfer'] as const) : []),
-    ...(request.status === 'SALE_COMPLETED' ? (['balanceReadOnly'] as const) : []),
+    ...(showPaymentTabs && request.status === 'BALANCE_PENDING' ? (['balanceTransfer'] as const) : []),
+    ...(showPaymentTabs && request.status === 'SALE_COMPLETED' ? (['balanceReadOnly'] as const) : []),
     'messages',
     ...(showRejectForm || (request.status === 'REJECTED' && rejectionReasonDisplay)
       ? (['rejectForm'] as const)
@@ -389,6 +446,21 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
             )}
             {effectiveActiveTab === 'catch' && (
               <CatchInfoSection request={request} contentOnly />
+            )}
+            {effectiveActiveTab === 'logisticsTracking' && isRequestAccepted && (
+              <LogisticsTrackingSection
+                request={request}
+                contentOnly
+                truckWeightLb={truckWeightLb}
+                onTruckWeightLbChange={setTruckWeightLb}
+                documentFile={documentFile}
+                onDocumentFileChange={setDocumentFile}
+                documentPreviewUrl={documentPreviewUrl}
+                documentInputRef={documentInputRef}
+                termsAccepted={termsAccepted}
+                onTermsAcceptedChange={setTermsAccepted}
+                onConfirmDelivery={onConfirmDelivery ? handleConfirmDelivery : undefined}
+              />
             )}
             {effectiveActiveTab === 'packerNotes' && request.packerNotes && (
               <PackerNotesSection packerNotes={request.packerNotes} contentOnly />

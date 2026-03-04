@@ -1,12 +1,25 @@
 import React from 'react';
 import { FormRow } from '../../../components/FormRow';
 import { StatusBadge } from '../../../components/StatusBadge';
-import { collapsible, saleRequestDetail } from '../../../styles';
+import { collapsible, saleRequestDetail, packerSales } from '../../../styles';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import type { SaleRequest } from '../../../types';
+import type { SaleRequest, SaleRequestStatus } from '../../../types';
 import { getProductFormLabel, getStatusLabel } from './utils';
 import { CollapsibleSection } from './CollapsibleSection';
+
+const STATUS_CLASS: Record<SaleRequestStatus, string> = {
+  PENDING_ACCEPTANCE: packerSales.colStatusPendingAcceptance,
+  CATCH_SETTLEMENT_PENDING: packerSales.colStatusCatchSettlement,
+  ADVANCE_PENDING: packerSales.colStatusAdvancePending,
+  BALANCE_PENDING: packerSales.colStatusBalancePending,
+  SALE_COMPLETED: packerSales.colStatusSaleCompleted,
+  REJECTED: packerSales.colStatusRejected,
+  PENDING_PICKUP: packerSales.colStatusLogisticsPendingPickup,
+  PENDING_DELIVERY: packerSales.colStatusLogisticsPendingDelivery,
+  PICKED_UP: packerSales.colStatusLogisticsPickedUp,
+  DELIVERED: packerSales.colStatusLogisticsDelivered,
+};
 interface GeneralInfoSectionProps {
   request: SaleRequest;
   expanded?: boolean;
@@ -37,7 +50,7 @@ const GeneralInfoContent: React.FC<{
           label="Estado"
         >
           <div className={saleRequestDetail.generalInfoValue}>
-            <StatusBadge status={request.status} label={getStatusLabel(request.status)} />
+            <StatusBadge status={request.status} label={getStatusLabel(request.status)} fullClassName={STATUS_CLASS[request.status]} />
           </div>
         </FormRow>
         <FormRow

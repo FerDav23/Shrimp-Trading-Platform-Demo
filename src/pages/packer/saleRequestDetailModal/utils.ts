@@ -80,6 +80,10 @@ export function getStatusLabel(status: SaleRequestStatus): string {
     BALANCE_PENDING: 'Saldo Restante Pendiente',
     SALE_COMPLETED: 'Venta Finalizada',
     REJECTED: 'Rechazada',
+    PENDING_PICKUP: 'Pesca pendiente de recoger',
+    PENDING_DELIVERY: 'Pesca pendiente de entregar',
+    PICKED_UP: 'Pesca pendiente de aceptar',
+    DELIVERED: 'Pesca entregada',
   };
   return labels[status];
 }

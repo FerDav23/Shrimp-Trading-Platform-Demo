@@ -12,12 +12,14 @@ export interface SaleRequestDetailModalProps {
   onCancelPurchase?: (requestId: string) => void;
   onSendAdvanceProof?: (requestId: string) => void;
   onSendBalanceProof?: (requestId: string) => void;
+  onConfirmDelivery?: (requestId: string, data: import('../../../types').LogisticsDeliveryConfirm) => void;
 }
 
 export type SectionKey =
   | 'general'
   | 'catch'
   | 'packerNotes'
+  | 'logisticsTracking'
   | 'settlement'
   | 'settlementReadOnly'
   | 'advanceTransfer'
