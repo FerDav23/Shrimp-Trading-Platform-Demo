@@ -453,6 +453,7 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
                 contentOnly
                 truckWeightLb={truckWeightLb}
                 onTruckWeightLbChange={setTruckWeightLb}
+                linkedOfferPriceUnit={linkedOffer?.priceUnit}
                 documentFile={documentFile}
                 onDocumentFileChange={setDocumentFile}
                 documentPreviewUrl={documentPreviewUrl}

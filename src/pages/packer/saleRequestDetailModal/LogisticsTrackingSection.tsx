@@ -1,5 +1,5 @@
 import React, { RefObject } from 'react';
-import type { SaleRequest, LogisticsTrackingStatus } from '../../../types';
+import type { SaleRequest, LogisticsTrackingStatus, PriceUnit } from '../../../types';
 import { isLogisticsTrackingStatus } from '../../../types';
 import { collapsible, button, form, saleRequestDetail, logisticsTracking } from '../../../styles';
 import { FormRow } from '../../../components/FormRow';
@@ -47,6 +47,8 @@ interface LogisticsTrackingSectionProps {
   contentOnly?: boolean;
   truckWeightLb: string;
   onTruckWeightLbChange: (value: string) => void;
+  /** Unidad de precio de la oferta vinculada (PER_LB o PER_KG) para alinear la unidad del peso del camión */
+  linkedOfferPriceUnit?: PriceUnit;
   documentFile: File | null;
   onDocumentFileChange: (file: File | null) => void;
   documentPreviewUrl: string | null;
@@ -66,6 +68,7 @@ export const LogisticsTrackingSection: React.FC<LogisticsTrackingSectionProps> =
   contentOnly = false,
   truckWeightLb,
   onTruckWeightLbChange,
+  linkedOfferPriceUnit,
   documentFile,
   onDocumentFileChange,
   documentPreviewUrl,
@@ -75,6 +78,7 @@ export const LogisticsTrackingSection: React.FC<LogisticsTrackingSectionProps> =
   onConfirmDelivery,
 }) => {
   const isLogisticsStatus = isLogisticsTrackingStatus(request.status);
+  const weightUnitLabel = linkedOfferPriceUnit === 'PER_KG' ? 'kg' : 'lb';
 
   // Cuando ya estamos en estados posteriores (liquidación, anticipo, saldo, venta finalizada),
   // solo se debe mostrar la pesca aceptada como registro (peso, documento, términos).
@@ -128,7 +132,9 @@ export const LogisticsTrackingSection: React.FC<LogisticsTrackingSectionProps> =
             <>
               <div className={saleRequestDetail.sectionGridTwoCols}>
                 <div>
-                  <p className={saleRequestDetail.sectionLabelSm}>Peso del camión (lb)</p>
+                  <p className={saleRequestDetail.sectionLabelSm}>
+                    Peso del camión ({weightUnitLabel})
+                  </p>
                   <p className={saleRequestDetail.sectionValueSm}>
                     {delivery.truckWeightLb.toLocaleString('es-EC')}
                   </p>
@@ -291,7 +297,7 @@ export const LogisticsTrackingSection: React.FC<LogisticsTrackingSectionProps> =
             <FormRow
               labelClassName={collapsible.fieldLabel}
               className="mb-4 mt-3"
-              label="Peso del camión (lb)"
+              label={`Peso del camión (${weightUnitLabel})`}
             >
               <input
                 type="number"
