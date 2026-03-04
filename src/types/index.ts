@@ -231,7 +231,7 @@ export interface ProducerBankAccount {
 
 /** Confirmación de recepción de carga por el empacador */
 export interface LogisticsDeliveryConfirm {
-  truckWeightLb: number;
+  catchWeight: number;
   documentPhotoUrl?: string;
   termsAcceptedAt?: string;
 }

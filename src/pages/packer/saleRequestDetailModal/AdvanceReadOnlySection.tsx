@@ -25,23 +25,24 @@ export const AdvanceReadOnlySection: React.FC<AdvanceReadOnlySectionProps> = ({
   const matchingTier = activeTiers.find(
     (t) => t.sizeMin === sizeRange.min && t.sizeMax === sizeRange.max
   );
-  const totalValor = matchingTier ? matchingTier.price * estimatedQuantityLb : 0;
+  
   const advanceTerm = linkedOffer?.paymentTerms.find((p) => p.termType === 'ADVANCE');
   const advancePercent = advanceTerm?.percent ?? 0;
-  const advanceAmount = (advancePercent / 100) * totalValor;
   const priceUnit = linkedOffer?.priceUnit ?? 'PER_LB';
-  const quantityForAdvance =
-    priceUnit === 'PER_KG'
-      ? estimatedQuantityLb * LB_TO_KG * (advancePercent / 100)
-      : estimatedQuantityLb * (advancePercent / 100);
-  const commissionAmount =
-    priceUnit === 'PER_KG' ? quantityForAdvance * COMMISSION_PER_KG : quantityForAdvance * COMMISSION_PER_LB;
-  const totalToPay = advanceAmount + commissionAmount;
-  const unitLabel = priceUnit === 'PER_KG' ? 'kg' : 'lb';
-  const lotWeight =
+  const estimatedLotWeight =
     priceUnit === 'PER_KG' ? estimatedQuantityLb * LB_TO_KG : estimatedQuantityLb;
+  const lotWeight = request.logisticsDelivery?.catchWeight ?? estimatedLotWeight;
+  const commissionAmount =
+    priceUnit === 'PER_KG' ? lotWeight * COMMISSION_PER_KG * (advancePercent / 100) : lotWeight * COMMISSION_PER_LB * (advancePercent / 100);
+  const unitLabel = priceUnit === 'PER_KG' ? 'kg' : 'lb';
+  
+  /** Peso de la pesca: igual al peso de la pesca recibida (LogisticsTrackingSection) cuando existe */
+  
   const unitPriceTalla = matchingTier ? matchingTier.price : 0;
   const commissionUnitRate = priceUnit === 'PER_KG' ? COMMISSION_PER_KG : COMMISSION_PER_LB;
+  const totalValor = matchingTier ? matchingTier.price * lotWeight : 0;
+  const advanceAmount = (advancePercent / 100) * totalValor;
+  const totalToPay = advanceAmount + commissionAmount;
 
   const content = (
       <div className={collapsible.content}>
@@ -78,10 +79,6 @@ export const AdvanceReadOnlySection: React.FC<AdvanceReadOnlySectionProps> = ({
                 <p className={saleRequestDetail.fieldValueText}>
                   $ {commissionUnitRate.toFixed(3)} / {unitLabel}
                 </p>
-              </div>
-              <div>
-                <p className={collapsible.fieldLabel}>Cantidad estimada (lb)</p>
-                <p className={saleRequestDetail.fieldValueSemibold}>{estimatedQuantityLb}</p>
               </div>
               <div>
                 <p className={collapsible.fieldLabel}>Valor total estimado</p>

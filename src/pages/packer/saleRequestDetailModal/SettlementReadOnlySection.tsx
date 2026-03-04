@@ -2,9 +2,10 @@ import React from 'react';
 import { FormRow } from '../../../components/FormRow';
 import { collapsible, settlementTable, saleRequestDetail } from '../../../styles';
 import { CATCH_SETTLEMENT_CLASSES } from '../../../types';
-import type { CatchSettlement } from '../../../types';
+import type { CatchSettlement, Offer } from '../../../types';
 import { normalizeSettlement } from './utils';
 import { CollapsibleSection } from './CollapsibleSection';
+import { LB_TO_KG } from './constants';
 
 type SettlementInput = CatchSettlement & {
   lineItems?: Array<{ id: string; class: string; sizeOrDesc: string; pounds: number; unitPrice: number }>;
@@ -13,6 +14,10 @@ type SettlementInput = CatchSettlement & {
 interface SettlementReadOnlySectionProps {
   settlement: SettlementInput;
   remitidasLb: number;
+  /** Peso de la pesca recibida en lb (LogisticsTrackingSection); usado como Recibidas referencial cuando existe */
+  receivedCatchWeightLb?: number | null;
+  /** Oferta vinculada: define la unidad (kg/lb) usada en la liquidación */
+  linkedOffer?: Offer | null;
   expanded?: boolean;
   onToggle?: () => void;
   contentOnly?: boolean;
@@ -21,16 +26,27 @@ interface SettlementReadOnlySectionProps {
 export const SettlementReadOnlySection: React.FC<SettlementReadOnlySectionProps> = ({
   settlement,
   remitidasLb,
+  receivedCatchWeightLb = null,
+  linkedOffer = null,
   expanded = false,
   onToggle = () => {},
   contentOnly = false,
 }) => {
+  const priceUnit = linkedOffer?.priceUnit ?? 'PER_LB';
+  const isKg = priceUnit === 'PER_KG';
+  const unitLabel = isKg ? 'kg' : 'lb';
+  const toDisplay = (lb: number) => (isKg ? lb * LB_TO_KG : lb);
+
   const s = normalizeSettlement(settlement);
   const allLines = [...s.colaDirectaALines, ...s.colaDirectaBLines, ...s.ventaLocalLines];
   const totalValor = allLines.reduce((sum, l) => sum + l.pounds * l.unitPrice, 0);
-  const recibidasReferencial = Math.max(0, remitidasLb - s.basuraColaDirectaLb);
-  const procesadasReales = allLines.reduce((sum, l) => sum + l.pounds, 0);
-  const rendimientoPct = recibidasReferencial > 0 ? (procesadasReales / recibidasReferencial) * 100 : 0;
+  /** Igual al peso de la pesca recibida (LogisticsTrackingSection) cuando existe; si no, remitidas - basura */
+  const recibidasReferencialLb =
+    receivedCatchWeightLb != null
+      ? receivedCatchWeightLb
+      : Math.max(0, remitidasLb - s.basuraColaDirectaLb);
+  const procesadasRealesLb = allLines.reduce((sum, l) => sum + l.pounds, 0);
+  const rendimientoPct = recibidasReferencialLb > 0 ? (procesadasRealesLb / recibidasReferencialLb) * 100 : 0;
   const mermaPct = 100 - rendimientoPct;
 
   const content = (
@@ -70,7 +86,7 @@ export const SettlementReadOnlySection: React.FC<SettlementReadOnlySectionProps>
                     <thead>
                       <tr className={settlementTable.thead}>
                         <th className={settlementTable.th}>Talla / Descripción</th>
-                        <th className={settlementTable.th}>Libras</th>
+                        <th className={settlementTable.th}>Peso ({unitLabel})</th>
                         <th className={settlementTable.th}>P. unit.</th>
                         <th className={settlementTable.th}>Valor total</th>
                       </tr>
@@ -86,7 +102,7 @@ export const SettlementReadOnlySection: React.FC<SettlementReadOnlySectionProps>
                         s[key].map((line) => (
                           <tr key={line.id} className={settlementTable.row}>
                             <td className={settlementTable.td}>{line.sizeOrDesc || '—'}</td>
-                            <td className={settlementTable.td}>{line.pounds}</td>
+                            <td className={settlementTable.td}>{toDisplay(line.pounds).toFixed(2)}</td>
                             <td className={settlementTable.td}>{line.unitPrice}</td>
                             <td className={settlementTable.tdMedium}>
                               {(line.pounds * line.unitPrice).toFixed(2)}
@@ -102,20 +118,20 @@ export const SettlementReadOnlySection: React.FC<SettlementReadOnlySectionProps>
           </div>
           <div className={`${saleRequestDetail.gridSettlementFooter} ${saleRequestDetail.summaryRow}`}>
             <div>
-              <span className={saleRequestDetail.summaryLabel}>Remitidas referencial (lb): </span>
-              {remitidasLb}
+              <span className={saleRequestDetail.summaryLabel}>Remitidas referencial ({unitLabel}): </span>
+              {toDisplay(remitidasLb).toFixed(2)}
             </div>
             <div>
-              <span className={saleRequestDetail.summaryLabel}>Basura cola directa (lb): </span>
-              {s.basuraColaDirectaLb}
+              <span className={saleRequestDetail.summaryLabel}>Basura cola directa ({unitLabel}): </span>
+              {toDisplay(s.basuraColaDirectaLb).toFixed(2)}
             </div>
             <div>
-              <span className={saleRequestDetail.summaryLabel}>Recibidas referencial (lb): </span>
-              {recibidasReferencial.toFixed(2)}
+              <span className={saleRequestDetail.summaryLabel}>Recibidas referencial ({unitLabel}): </span>
+              {toDisplay(recibidasReferencialLb).toFixed(2)}
             </div>
             <div>
-              <span className={saleRequestDetail.summaryLabel}>Procesadas reales (lb): </span>
-              {procesadasReales.toFixed(2)}
+              <span className={saleRequestDetail.summaryLabel}>Procesadas reales ({unitLabel}): </span>
+              {toDisplay(procesadasRealesLb).toFixed(2)}
             </div>
             <div>
               <span className={saleRequestDetail.summaryLabel}>Total valor: </span>$ {totalValor.toFixed(2)}

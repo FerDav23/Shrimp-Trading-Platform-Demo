@@ -45,8 +45,8 @@ const LOGISTICS_STATUS_CONFIG: Record<
 interface LogisticsTrackingSectionProps {
   request: SaleRequest;
   contentOnly?: boolean;
-  truckWeightLb: string;
-  onTruckWeightLbChange: (value: string) => void;
+  catchWeight: string;
+  onCatchWeightChange: (value: string) => void;
   /** Unidad de precio de la oferta vinculada (PER_LB o PER_KG) para alinear la unidad del peso del camión */
   linkedOfferPriceUnit?: PriceUnit;
   documentFile: File | null;
@@ -66,8 +66,8 @@ const TERMS_TEXT = `Al confirmar la recepción de la carga, declaro que:
 export const LogisticsTrackingSection: React.FC<LogisticsTrackingSectionProps> = ({
   request,
   contentOnly = false,
-  truckWeightLb,
-  onTruckWeightLbChange,
+  catchWeight,
+  onCatchWeightChange,
   linkedOfferPriceUnit,
   documentFile,
   onDocumentFileChange,
@@ -133,10 +133,10 @@ export const LogisticsTrackingSection: React.FC<LogisticsTrackingSectionProps> =
               <div className={saleRequestDetail.sectionGridTwoCols}>
                 <div>
                   <p className={saleRequestDetail.sectionLabelSm}>
-                    Peso del camión ({weightUnitLabel})
+                    Peso de la pesca recibida ({weightUnitLabel})
                   </p>
                   <p className={saleRequestDetail.sectionValueSm}>
-                    {delivery.truckWeightLb.toLocaleString('es-EC')}
+                    {delivery.catchWeight.toLocaleString('es-EC')}
                   </p>
                 </div>
                 <div>
@@ -215,8 +215,8 @@ export const LogisticsTrackingSection: React.FC<LogisticsTrackingSectionProps> =
 
   const canConfirm =
     showReceptionForm &&
-    truckWeightLb &&
-    Number(truckWeightLb) > 0 &&
+    catchWeight &&
+    Number(catchWeight) > 0 &&
     documentFile &&
     termsAccepted;
 
@@ -297,13 +297,13 @@ export const LogisticsTrackingSection: React.FC<LogisticsTrackingSectionProps> =
             <FormRow
               labelClassName={collapsible.fieldLabel}
               className="mb-4 mt-3"
-              label={`Peso del camión (${weightUnitLabel})`}
+              label={`Peso de la pesca recibida (${weightUnitLabel})`}
             >
               <input
                 type="number"
                 min={1}
-                value={truckWeightLb}
-                onChange={(e) => onTruckWeightLbChange(e.target.value)}
+                value={catchWeight}
+                onChange={(e) => onCatchWeightChange(e.target.value)}
                 className={`${form.input} ${logisticsTracking.inputTruckWeight}`}
                 placeholder="Ej: 8500"
               />

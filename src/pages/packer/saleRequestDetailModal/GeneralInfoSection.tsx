@@ -131,9 +131,9 @@ const GeneralInfoContent: React.FC<{
             <p className={saleRequestDetail.sectionLabelSm}>Registro de logística (recepción en planta)</p>
             <div className={saleRequestDetail.sectionGridTwoCols}>
               <div>
-                <p className={saleRequestDetail.sectionLabelSm}>Peso del camión (lb)</p>
+                <p className={saleRequestDetail.sectionLabelSm}>Peso de la pesca recibida (lb)</p>
                 <p className={saleRequestDetail.sectionValueSm}>
-                  {request.logisticsDelivery?.truckWeightLb.toLocaleString('es-EC')}
+                  {request.logisticsDelivery?.catchWeight.toLocaleString('es-EC')}
                 </p>
               </div>
               <div>

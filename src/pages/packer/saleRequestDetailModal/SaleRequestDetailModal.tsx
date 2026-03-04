@@ -5,7 +5,7 @@ import { dummyOffers } from '../../../data/offers';
 import { useAuth } from '../../../contexts/AuthContext';
 import type { SaleRequestDetailModalProps } from './types';
 import type { SectionKey } from './types';
-import { SECTION_LABELS, REJECTION_REASONS, ADVANCE_DEADLINE_HOURS, BALANCE_DEADLINE_HOURS } from './constants';
+import { SECTION_LABELS, REJECTION_REASONS, ADVANCE_DEADLINE_HOURS, BALANCE_DEADLINE_HOURS, LB_TO_KG } from './constants';
 import { createEmptySettlement, normalizeSettlement } from './utils';
 import { GeneralInfoSection } from './GeneralInfoSection';
 import { CatchInfoSection } from './CatchInfoSection';
@@ -62,7 +62,7 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
   const balanceProofInputRef = useRef<HTMLInputElement>(null);
   const documentInputRef = useRef<HTMLInputElement>(null);
   const tabsScrollRef = useRef<HTMLDivElement>(null);
-  const [truckWeightLb, setTruckWeightLb] = useState('');
+  const [catchWeight, setCatchWeight] = useState('');
   const [documentFile, setDocumentFile] = useState<File | null>(null);
   const [documentPreviewUrl, setDocumentPreviewUrl] = useState<string | null>(null);
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -70,6 +70,13 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
   const [canScrollRight, setCanScrollRight] = useState(false);
 
   const linkedOffer = request ? dummyOffers.find((o) => o.id === request.offerId) ?? null : null;
+  /** Peso de la pesca recibida en lb (igual al de LogisticsTrackingSection), para Recibidas referencial en liquidación */
+  const receivedCatchWeightLb =
+    request?.logisticsDelivery != null
+      ? linkedOffer?.priceUnit === 'PER_KG'
+        ? request.logisticsDelivery.catchWeight / LB_TO_KG
+        : request.logisticsDelivery.catchWeight
+      : null;
 
   const updateTabsScrollArrows = () => {
     const el = tabsScrollRef.current;
@@ -233,7 +240,7 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
         if (prev) URL.revokeObjectURL(prev);
         return null;
       });
-      setTruckWeightLb('');
+      setCatchWeight('');
       setDocumentFile(null);
       setDocumentPreviewUrl((prev) => {
         if (prev) URL.revokeObjectURL(prev);
@@ -307,15 +314,15 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
   };
 
   const handleConfirmDelivery = () => {
-    if (!request || !onConfirmDelivery || !truckWeightLb || !documentFile || !termsAccepted) return;
-    const weight = Number(truckWeightLb);
+    if (!request || !onConfirmDelivery || !catchWeight || !documentFile || !termsAccepted) return;
+    const weight = Number(catchWeight);
     if (weight <= 0) return;
     onConfirmDelivery(request.id, {
-      truckWeightLb: weight,
+      catchWeight: weight,
       documentPhotoUrl: URL.createObjectURL(documentFile),
       termsAcceptedAt: new Date().toISOString(),
     });
-    setTruckWeightLb('');
+    setCatchWeight('');
     setDocumentFile(null);
     setTermsAccepted(false);
     onClose();
@@ -366,19 +373,16 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
     ...(!isLogisticsActive && request.status === 'CATCH_SETTLEMENT_PENDING'
       ? (['advanceReadOnly', 'settlement'] as const)
       : []),
-    ...(!isLogisticsActive &&
-    (request.status === 'ADVANCE_PENDING' ||
-      request.status === 'BALANCE_PENDING' ||
-      request.status === 'SALE_COMPLETED') &&
-    settlementReadOnlySettlement
+    // Para saldo restante pendiente y venta finalizada: Anticipo pagado a la izquierda de Liquidación de pesca
+    ...(!isLogisticsActive && request.status === 'ADVANCE_PENDING' && settlementReadOnlySettlement
       ? (['settlementReadOnly'] as const)
       : []),
-    ...(showPaymentTabs && request.status === 'ADVANCE_PENDING' ? (['advanceTransfer'] as const) : []),
-    ...(showPaymentTabs &&
-    (request.status === 'BALANCE_PENDING' ||
-      request.status === 'SALE_COMPLETED')
-      ? (['advanceReadOnly'] as const)
+    ...(!isLogisticsActive &&
+    (request.status === 'BALANCE_PENDING' || request.status === 'SALE_COMPLETED') &&
+    settlementReadOnlySettlement
+      ? (['advanceReadOnly', 'settlementReadOnly'] as const)
       : []),
+    ...(showPaymentTabs && request.status === 'ADVANCE_PENDING' ? (['advanceTransfer'] as const) : []),
     ...(showPaymentTabs && request.status === 'BALANCE_PENDING' ? (['balanceTransfer'] as const) : []),
     ...(showPaymentTabs && request.status === 'SALE_COMPLETED' ? (['balanceReadOnly'] as const) : []),
     'messages',
@@ -457,8 +461,8 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
               <LogisticsTrackingSection
                 request={request}
                 contentOnly
-                truckWeightLb={truckWeightLb}
-                onTruckWeightLbChange={setTruckWeightLb}
+                catchWeight={catchWeight}
+                onCatchWeightChange={setCatchWeight}
                 linkedOfferPriceUnit={linkedOffer?.priceUnit}
                 documentFile={documentFile}
                 onDocumentFileChange={setDocumentFile}
@@ -476,6 +480,8 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
               <SettlementReadOnlySection
                 settlement={settlementReadOnlySettlement}
                 remitidasLb={request.catchInfo.estimatedQuantityLb}
+                receivedCatchWeightLb={receivedCatchWeightLb}
+                linkedOffer={linkedOffer}
                 contentOnly
               />
             )}
@@ -530,6 +536,8 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
                 onSettlementChange={setSettlement}
                 isSettlementLocked={isSettlementLocked}
                 onSettlementLockedChange={setIsSettlementLocked}
+                receivedCatchWeightLb={receivedCatchWeightLb}
+                linkedOffer={linkedOffer}
                 contentOnly
               />
             )}

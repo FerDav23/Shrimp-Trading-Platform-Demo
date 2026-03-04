@@ -187,7 +187,7 @@ export const dummySaleRequests: SaleRequest[] = [
       basuraColaDirectaLb: 22,
     },
     logisticsDelivery: {
-      truckWeightLb: 8200,
+      catchWeight: 720,
       termsAcceptedAt: '2024-02-24T10:30:00Z',
       documentPhotoUrl: 'https://via.placeholder.com/320x180?text=Documento+logistico',
     },
@@ -231,7 +231,7 @@ export const dummySaleRequests: SaleRequest[] = [
       basuraColaDirectaLb: 18,
     },
     logisticsDelivery: {
-      truckWeightLb: 7900,
+      catchWeight: 420,
       termsAcceptedAt: '2024-03-05T09:30:00Z',
       documentPhotoUrl: 'https://via.placeholder.com/320x180?text=Documento+logistico',
     },
@@ -348,7 +348,7 @@ export const dummySaleRequests: SaleRequest[] = [
     respondedAt: '2024-03-10T11:00:00Z',
     packerNotes: 'Aceptada. Falta registrar la liquidación de pesca.',
     logisticsDelivery: {
-      truckWeightLb: 7600,
+      catchWeight: 400,
       termsAcceptedAt: '2024-03-15T09:45:00Z',
       documentPhotoUrl: 'https://via.placeholder.com/320x180?text=Documento+logistico',
     },
@@ -372,7 +372,7 @@ export const dummySaleRequests: SaleRequest[] = [
     respondedAt: '2024-03-11T12:15:00Z',
     packerNotes: 'Aceptada. Pendiente enviar anticipo al productor.',
     logisticsDelivery: {
-      truckWeightLb: 7800,
+      catchWeight: 320,
       termsAcceptedAt: '2024-03-20T11:10:00Z',
       documentPhotoUrl: 'https://via.placeholder.com/320x180?text=Documento+logistico',
     },

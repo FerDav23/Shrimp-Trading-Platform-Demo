@@ -5,7 +5,8 @@ import { CATCH_SETTLEMENT_CLASSES } from '../../../types';
 import type { CatchSettlement, CatchSettlementLine } from '../../../types';
 import { createEmptyLine } from './utils';
 import { CollapsibleSection } from './CollapsibleSection';
-import type { SaleRequest } from '../../../types';
+import type { SaleRequest, Offer } from '../../../types';
+import { LB_TO_KG } from './constants';
 
 type SettlementKey = 'colaDirectaALines' | 'colaDirectaBLines' | 'ventaLocalLines';
 
@@ -15,6 +16,10 @@ interface SettlementFormSectionProps {
   onSettlementChange: (s: CatchSettlement | ((prev: CatchSettlement) => CatchSettlement)) => void;
   isSettlementLocked: boolean;
   onSettlementLockedChange: (locked: boolean) => void;
+  /** Peso de la pesca recibida en lb (LogisticsTrackingSection); usado como Recibidas referencial cuando existe */
+  receivedCatchWeightLb?: number | null;
+  /** Oferta vinculada: define la unidad (kg/lb) usada en la liquidación */
+  linkedOffer?: Offer | null;
   expanded?: boolean;
   onToggle?: () => void;
   contentOnly?: boolean;
@@ -26,10 +31,20 @@ export const SettlementFormSection: React.FC<SettlementFormSectionProps> = ({
   onSettlementChange,
   isSettlementLocked,
   onSettlementLockedChange,
+  receivedCatchWeightLb = null,
+  linkedOffer = null,
   expanded = false,
   onToggle = () => {},
   contentOnly = false,
 }) => {
+  const priceUnit = linkedOffer?.priceUnit ?? 'PER_LB';
+  const isKg = priceUnit === 'PER_KG';
+  const unitLabel = isKg ? 'kg' : 'lb';
+  /** Convierte valor en lb a unidad de la oferta para mostrar */
+  const toDisplay = (lb: number) => (isKg ? lb * LB_TO_KG : lb);
+  /** Convierte valor en unidad de la oferta (input) a lb para guardar */
+  const fromDisplay = (val: number) => (isKg ? val / LB_TO_KG : val);
+
   const tableGroups: { key: SettlementKey; title: string }[] = [
     { key: 'colaDirectaALines', title: CATCH_SETTLEMENT_CLASSES.COLA_DIRECTA_A },
     { key: 'colaDirectaBLines', title: CATCH_SETTLEMENT_CLASSES.COLA_DIRECTA_B },
@@ -37,15 +52,19 @@ export const SettlementFormSection: React.FC<SettlementFormSectionProps> = ({
   ];
 
   const remitidasLb = request.catchInfo.estimatedQuantityLb;
-  const recibidasReferencial = Math.max(0, remitidasLb - settlement.basuraColaDirectaLb);
+  /** Igual al peso de la pesca recibida (LogisticsTrackingSection) cuando existe; si no, remitidas - basura */
+  const recibidasReferencialLb =
+    receivedCatchWeightLb != null
+      ? receivedCatchWeightLb
+      : Math.max(0, remitidasLb - settlement.basuraColaDirectaLb);
   const allLines = [
     ...settlement.colaDirectaALines,
     ...settlement.colaDirectaBLines,
     ...settlement.ventaLocalLines,
   ];
-  const procesadasReales = allLines.reduce((sum, l) => sum + l.pounds, 0);
+  const procesadasRealesLb = allLines.reduce((sum, l) => sum + l.pounds, 0);
   const totalValor = allLines.reduce((sum, l) => sum + l.pounds * l.unitPrice, 0);
-  const rendimientoPct = recibidasReferencial > 0 ? (procesadasReales / recibidasReferencial) * 100 : 0;
+  const rendimientoPct = recibidasReferencialLb > 0 ? (procesadasRealesLb / recibidasReferencialLb) * 100 : 0;
   const mermaPct = 100 - rendimientoPct;
 
   const content = (
@@ -166,7 +185,7 @@ export const SettlementFormSection: React.FC<SettlementFormSectionProps> = ({
                       <thead>
                         <tr className={settlementTable.thead}>
                           <th className={settlementTable.th}>Talla / Descripción</th>
-                          <th className={settlementTable.th}>Libras</th>
+                          <th className={settlementTable.th}>Peso ({unitLabel})</th>
                           <th className={settlementTable.th}>P. unit.</th>
                           <th className={settlementTable.th}>Valor total</th>
                             {!isSettlementLocked && <th className={settlementTable.thActions} />}
@@ -200,16 +219,18 @@ export const SettlementFormSection: React.FC<SettlementFormSectionProps> = ({
                               </td>
                               <td className={settlementTable.td}>
                                 {isSettlementLocked ? (
-                                  <span className={saleRequestDetail.fieldValueText}>{line.pounds}</span>
+                                  <span className={saleRequestDetail.fieldValueText}>
+                                    {toDisplay(line.pounds).toFixed(2)}
+                                  </span>
                                 ) : (
                                   <input
                                     type="number"
                                     min={0}
                                     step={0.01}
-                                    value={line.pounds || ''}
+                                    value={line.pounds ? toDisplay(line.pounds) : ''}
                                     onChange={(e) => {
                                       const v = parseFloat(e.target.value);
-                                      updateLine(line.id, 'pounds', Number.isNaN(v) ? 0 : v);
+                                      updateLine(line.id, 'pounds', Number.isNaN(v) ? 0 : fromDisplay(v));
                                     }}
                                     className={form.inputSmallGray}
                                   />
@@ -259,35 +280,35 @@ export const SettlementFormSection: React.FC<SettlementFormSectionProps> = ({
           </div>
 
           <div className={saleRequestDetail.gridSettlementFooter}>
-            <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Remitidas referencial (lb)">
+            <FormRow labelClassName={saleRequestDetail.formRowLabel} label={`Remitidas referencial (${unitLabel})`}>
               <input
                 type="text"
                 readOnly
-                value={remitidasLb}
+                value={toDisplay(remitidasLb).toFixed(2)}
                 className={form.inputReadonlyGray}
               />
             </FormRow>
-            <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Basura cola directa (lb)">
+            <FormRow labelClassName={saleRequestDetail.formRowLabel} label={`Basura cola directa (${unitLabel})`}>
               <input
                 type="number"
                 min={0}
                 step={0.01}
-                value={settlement.basuraColaDirectaLb || ''}
+                value={settlement.basuraColaDirectaLb != null ? toDisplay(settlement.basuraColaDirectaLb) : ''}
                 onChange={(e) => {
                   const v = parseFloat(e.target.value);
-                  onSettlementChange((s) => ({ ...s, basuraColaDirectaLb: Number.isNaN(v) ? 0 : v }));
+                  onSettlementChange((s) => ({ ...s, basuraColaDirectaLb: Number.isNaN(v) ? 0 : fromDisplay(v) }));
                 }}
                 readOnly={isSettlementLocked}
                 className={`${form.inputEditable} ${isSettlementLocked ? saleRequestDetail.inputLocked : ''}`}
               />
             </FormRow>
             <div className={saleRequestDetail.summaryRow}>
-              <span className={saleRequestDetail.summaryLabel}>Recibidas referencial (lb): </span>
-              <span className={saleRequestDetail.summaryValue}>{recibidasReferencial.toFixed(2)}</span>
+              <span className={saleRequestDetail.summaryLabel}>Recibidas referencial ({unitLabel}): </span>
+              <span className={saleRequestDetail.summaryValue}>{toDisplay(recibidasReferencialLb).toFixed(2)}</span>
             </div>
             <div className={saleRequestDetail.summaryRow}>
-              <span className={saleRequestDetail.summaryLabel}>Procesadas reales (lb): </span>
-              <span className={saleRequestDetail.summaryValue}>{procesadasReales.toFixed(2)}</span>
+              <span className={saleRequestDetail.summaryLabel}>Procesadas reales ({unitLabel}): </span>
+              <span className={saleRequestDetail.summaryValue}>{toDisplay(procesadasRealesLb).toFixed(2)}</span>
             </div>
             <div className={saleRequestDetail.summaryRow}>
               <span className={saleRequestDetail.summaryLabel}>Total valor: </span>
