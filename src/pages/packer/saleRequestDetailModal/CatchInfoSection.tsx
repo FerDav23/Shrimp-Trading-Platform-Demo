@@ -64,17 +64,6 @@ const CatchInfoContent: React.FC<{ request: SaleRequest }> = ({ request }) => (
             </p>
           </FormRow>
         </div>
-        {request.catchInfo.notes && (
-          <div className={`md:col-span-2 ${saleRequestDetail.sectionRowCompact}`}>
-            <FormRow
-              labelClassName={saleRequestDetail.sectionLabelSm}
-              className={saleRequestDetail.sectionRowCompact}
-              label="Notas del Productor"
-            >
-              <p className={collapsible.notesBox}>{request.catchInfo.notes}</p>
-            </FormRow>
-          </div>
-        )}
         {request.catchInfo.attachments && request.catchInfo.attachments.length > 0 && (
           <div className={`md:col-span-2 ${saleRequestDetail.sectionRowCompact}`}>
             <FormRow

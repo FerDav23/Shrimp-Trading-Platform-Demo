@@ -13,9 +13,11 @@ export type WorkflowStatus =
 
 /** Vista "todas las solicitudes" (todos los estados) */
 export const VIEW_ALL = 'ALL' as const;
+/** Tab de vista: cotización de logística (en proceso + pendiente de aceptar) */
+export const TAB_LOGISTICS_QUOTE = 'LOGISTICS_QUOTE' as const;
 /** Tab de vista: solicitudes con tracking logístico activo */
 export const TAB_LOGISTICS_TRACKING = 'LOGISTICS_TRACKING' as const;
-export type SalesViewTab = SalesViewFilter | typeof VIEW_ALL | typeof TAB_LOGISTICS_TRACKING;
+export type SalesViewTab = SalesViewFilter | typeof VIEW_ALL | typeof TAB_LOGISTICS_QUOTE | typeof TAB_LOGISTICS_TRACKING;
 
 /** Slug usado en la URL para cada estado del flujo (los 6 workflow) */
 export const STATUS_TO_SLUG: Record<WorkflowStatus, string> = {
@@ -28,6 +30,8 @@ export const STATUS_TO_SLUG: Record<WorkflowStatus, string> = {
 };
 
 export const SLUG_VIEW_ALL = 'todas';
+/** Vista especial: cotización de logística */
+export const SLUG_LOGISTICS_QUOTE = 'cotizacion-logistica';
 /** Vista especial: solicitudes con tracking logístico (para probar la implementación) */
 export const SLUG_LOGISTICS_TRACKING = 'tracking-logistico';
 
@@ -45,6 +49,7 @@ export function slugToStatus(slug: string | undefined): WorkflowStatus | null {
 /** Parsea el query param ?view= a SalesViewTab. */
 export function slugToViewTab(slug: string | undefined): SalesViewTab {
   if (!slug || slug === SLUG_VIEW_ALL) return VIEW_ALL;
+  if (slug === SLUG_LOGISTICS_QUOTE) return TAB_LOGISTICS_QUOTE;
   if (slug === SLUG_LOGISTICS_TRACKING) return TAB_LOGISTICS_TRACKING;
   const status = SLUG_TO_STATUS[slug];
   return status ?? VIEW_ALL;
@@ -53,6 +58,7 @@ export function slugToViewTab(slug: string | undefined): SalesViewTab {
 /** Slug del tab actual para la URL (?view=). */
 export function viewTabToSlug(tab: SalesViewTab): string {
   if (tab === VIEW_ALL) return SLUG_VIEW_ALL;
+  if (tab === TAB_LOGISTICS_QUOTE) return SLUG_LOGISTICS_QUOTE;
   if (tab === TAB_LOGISTICS_TRACKING) return SLUG_LOGISTICS_TRACKING;
   return STATUS_TO_SLUG[tab as WorkflowStatus];
 }
@@ -61,10 +67,11 @@ export function statusToPath(status: WorkflowStatus): string {
   return `/packer/sales?view=${STATUS_TO_SLUG[status]}`;
 }
 
-/** Tabs de la página de Compras: Todas + cada estado + tracking logístico. */
+/** Tabs de la página de Compras: Todas + Cotización logística + Pendientes + … + Logística. */
 export const SALES_VIEW_TABS: { tab: SalesViewTab; label: string }[] = [
   { tab: VIEW_ALL, label: 'Todas las solicitudes' },
-  { tab: 'PENDING_ACCEPTANCE', label: 'Pendientes de Aceptar' }, 
+  { tab: 'PENDING_ACCEPTANCE', label: 'Pendientes de Aceptar' },
+  { tab: TAB_LOGISTICS_QUOTE, label: 'Cotización de logística' },
   { tab: TAB_LOGISTICS_TRACKING, label: 'Logistica' },
   { tab: 'ADVANCE_PENDING', label: 'Anticipo Pendiente' },
   { tab: 'CATCH_SETTLEMENT_PENDING', label: 'Liquidación de Pesca pendiente' },
@@ -73,7 +80,8 @@ export const SALES_VIEW_TABS: { tab: SalesViewTab; label: string }[] = [
   { tab: 'REJECTED', label: 'Rechazadas' },
 ];
 
-/** Solo los 6 estados del flujo (sin "Todas" ni "Tracking logístico"), para dashboard etc. */
+/** Solo los 6 estados del flujo (sin "Todas" ni tabs especiales), para dashboard etc. */
 export const SALES_STATUS_TABS = SALES_VIEW_TABS.filter(
-  (t): t is { tab: WorkflowStatus; label: string } => t.tab !== VIEW_ALL && t.tab !== TAB_LOGISTICS_TRACKING
+  (t): t is { tab: WorkflowStatus; label: string } =>
+    t.tab !== VIEW_ALL && t.tab !== TAB_LOGISTICS_QUOTE && t.tab !== TAB_LOGISTICS_TRACKING
 );

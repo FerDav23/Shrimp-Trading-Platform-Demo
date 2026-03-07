@@ -6,7 +6,7 @@ export const MAX_MESSAGE_LENGTH = 500;
 export const SECTION_LABELS: Record<SectionKey, string> = {
   general: 'Información General',
   catch: 'Información de Pesca',
-  packerNotes: 'Notas del Packer',
+  possibleValueFinal: 'Posible valor final',
   logisticsTracking: 'Logistica',
   settlement: 'Liquidación de pesca',
   settlementReadOnly: 'Liquidación de pesca',
@@ -33,7 +33,7 @@ export const REJECTION_REASONS = [
 export const defaultExpanded: Record<SectionKey, boolean> = {
   general: false,
   catch: false,
-  packerNotes: false,
+  possibleValueFinal: false,
   logisticsTracking: false,
   settlement: false,
   settlementReadOnly: false,

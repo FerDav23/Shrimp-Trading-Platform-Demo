@@ -9,7 +9,6 @@ import { SECTION_LABELS, REJECTION_REASONS, ADVANCE_DEADLINE_HOURS, BALANCE_DEAD
 import { createEmptySettlement, normalizeSettlement } from './utils';
 import { GeneralInfoSection } from './GeneralInfoSection';
 import { CatchInfoSection } from './CatchInfoSection';
-import { PackerNotesSection } from './PackerNotesSection';
 import { SettlementReadOnlySection } from './SettlementReadOnlySection';
 import { AdvanceTransferSection } from './AdvanceTransferSection';
 import { AdvanceReadOnlySection } from './AdvanceReadOnlySection';
@@ -19,6 +18,8 @@ import { SettlementFormSection } from './SettlementFormSection';
 import { MessagesSection } from './MessagesSection';
 import { RejectFormSection } from './RejectFormSection';
 import { LogisticsTrackingSection } from './LogisticsTrackingSection';
+import { AcceptOfferConfirmSection } from './AcceptOfferConfirmSection';
+import { PossibleValueFinalSection } from './PossibleValueFinalSection';
 import { DetailActions } from './DetailActions';
 import { LinkedOfferModal } from './LinkedOfferModal';
 import type { CatchSettlement } from '../../../types';
@@ -37,6 +38,8 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
   onSendAdvanceProof,
   onSendBalanceProof,
   onConfirmDelivery,
+  onRejectLogisticsQuote,
+  onAcceptLogisticsQuote,
 }) => {
   const { user } = useAuth();
   const [rejectNotes, setRejectNotes] = useState('');
@@ -66,6 +69,8 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
   const [documentFile, setDocumentFile] = useState<File | null>(null);
   const [documentPreviewUrl, setDocumentPreviewUrl] = useState<string | null>(null);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [showAcceptConfirm, setShowAcceptConfirm] = useState(false);
+  const [acceptTermsAccepted, setAcceptTermsAccepted] = useState(false);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
 
@@ -247,13 +252,27 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
         return null;
       });
       setTermsAccepted(false);
+      setShowAcceptConfirm(false);
+      setAcceptTermsAccepted(false);
     }
   }, [isOpen]);
 
   if (!request) return null;
 
-  const handleAccept = () => {
+  const handleStartAccept = () => {
+    setShowAcceptConfirm(true);
+  };
+
+  const handleCancelAcceptConfirm = () => {
+    setShowAcceptConfirm(false);
+    setAcceptTermsAccepted(false);
+  };
+
+  const handleConfirmAccept = () => {
+    if (!acceptTermsAccepted) return;
     onAccept(request.id);
+    setShowAcceptConfirm(false);
+    setAcceptTermsAccepted(false);
     onClose();
   };
 
@@ -262,7 +281,11 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
       const reasonLabel =
         REJECTION_REASONS.find((r) => r.value === selectedRejectionReason)?.label ??
         selectedRejectionReason;
-      onReject(request.id, reasonLabel || undefined, rejectNotes || undefined);
+      if (request.status === 'LOGISTICS_QUOTE_PENDING_ACCEPTANCE') {
+        onRejectLogisticsQuote?.(request.id, reasonLabel || undefined, rejectNotes || undefined);
+      } else {
+        onReject(request.id, reasonLabel || undefined, rejectNotes || undefined);
+      }
       setRejectNotes('');
       setSelectedRejectionReason('');
       setShowRejectForm(false);
@@ -270,6 +293,11 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
     } else {
       setShowRejectForm(true);
     }
+  };
+
+  const handleAcceptLogisticsQuote = () => {
+    onAcceptLogisticsQuote?.(request.id);
+    onClose();
   };
 
   const handleCancelReject = () => {
@@ -345,6 +373,8 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
   };
 
   const isMessagesActive =
+    request.status === 'LOGISTICS_QUOTE_IN_PROGRESS' ||
+    request.status === 'LOGISTICS_QUOTE_PENDING_ACCEPTANCE' ||
     request.status === 'PENDING_ACCEPTANCE' ||
     request.status === 'CATCH_SETTLEMENT_PENDING' ||
     request.status === 'ADVANCE_PENDING' ||
@@ -355,7 +385,10 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
     : null;
 
   const isRequestAccepted =
-    request.status !== 'PENDING_ACCEPTANCE' && request.status !== 'REJECTED';
+    request.status !== 'LOGISTICS_QUOTE_IN_PROGRESS' &&
+    request.status !== 'LOGISTICS_QUOTE_PENDING_ACCEPTANCE' &&
+    request.status !== 'PENDING_ACCEPTANCE' &&
+    request.status !== 'REJECTED';
 
   const isLogisticsActive =
     isLogisticsTrackingStatus(request.status) &&
@@ -363,10 +396,14 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
 
   const showPaymentTabs = !isLogisticsActive;
 
+  const isLogisticsQuoteStatus =
+    request.status === 'LOGISTICS_QUOTE_IN_PROGRESS' ||
+    request.status === 'LOGISTICS_QUOTE_PENDING_ACCEPTANCE';
+
   const visibleTabs: SectionKey[] = [
     'general',
     'catch',
-    ...(request.packerNotes ? (['packerNotes'] as const) : []),
+    ...(isLogisticsQuoteStatus ? (['possibleValueFinal'] as const) : []),
     ...(isRequestAccepted ? (['logisticsTracking'] as const) : []),
     // Para estado "Liquidación de pesca pendiente", mostrar primero "Anticipo pagado"
     // y luego "Liquidación de pesca" en el orden de pestañas.
@@ -385,7 +422,10 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
     ...(showPaymentTabs && request.status === 'ADVANCE_PENDING' ? (['advanceTransfer'] as const) : []),
     ...(showPaymentTabs && request.status === 'BALANCE_PENDING' ? (['balanceTransfer'] as const) : []),
     ...(showPaymentTabs && request.status === 'SALE_COMPLETED' ? (['balanceReadOnly'] as const) : []),
-    ...(request.status !== 'SALE_COMPLETED' && request.status !== 'REJECTED' ? (['messages'] as const) : []),
+    ...(request.status !== 'SALE_COMPLETED' &&
+    request.status !== 'REJECTED'
+      ? (['messages'] as const)
+      : []),
     ...(showRejectForm || (request.status === 'REJECTED' && rejectionReasonDisplay)
       ? (['rejectForm'] as const)
       : []),
@@ -394,10 +434,24 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
   const isTabVisible = (key: SectionKey) => visibleTabs.includes(key);
   const effectiveActiveTab = isTabVisible(activeTab) ? activeTab : 'general';
 
+  const showAcceptConfirmStep =
+    request.status === 'PENDING_ACCEPTANCE' && showAcceptConfirm;
+
   return (
     <>
       <Modal isOpen={isOpen} onClose={onClose} title="Detalles de Solicitud de Compra" size="xl">
         <div className={saleRequestDetail.modalBody}>
+          {showAcceptConfirmStep ? (
+            <div className={`${saleRequestDetail.tabContent} flex-1 min-h-0 overflow-y-auto pt-4`}>
+              <AcceptOfferConfirmSection
+                termsAccepted={acceptTermsAccepted}
+                onTermsAcceptedChange={setAcceptTermsAccepted}
+                onConfirm={handleConfirmAccept}
+                onCancel={handleCancelAcceptConfirm}
+              />
+            </div>
+          ) : (
+            <>
           <div className={saleRequestDetail.tabsBar}>
             {canScrollLeft && (
               <button
@@ -457,6 +511,16 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
             {effectiveActiveTab === 'catch' && (
               <CatchInfoSection request={request} contentOnly />
             )}
+            {effectiveActiveTab === 'possibleValueFinal' && isLogisticsQuoteStatus && (
+              <PossibleValueFinalSection
+                request={request}
+                linkedOffer={linkedOffer}
+                contentOnly
+                messageText={request.status === 'LOGISTICS_QUOTE_PENDING_ACCEPTANCE' ? messageText : undefined}
+                onMessageTextChange={request.status === 'LOGISTICS_QUOTE_PENDING_ACCEPTANCE' ? setMessageText : undefined}
+                onSendMessage={request.status === 'LOGISTICS_QUOTE_PENDING_ACCEPTANCE' ? handleSendMessage : undefined}
+              />
+            )}
             {effectiveActiveTab === 'logisticsTracking' && isRequestAccepted && (
               <LogisticsTrackingSection
                 request={request}
@@ -472,9 +536,6 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
                 onTermsAcceptedChange={setTermsAccepted}
                 onConfirmDelivery={onConfirmDelivery ? handleConfirmDelivery : undefined}
               />
-            )}
-            {effectiveActiveTab === 'packerNotes' && request.packerNotes && (
-              <PackerNotesSection packerNotes={request.packerNotes} contentOnly />
             )}
             {effectiveActiveTab === 'settlementReadOnly' && settlementReadOnlySettlement && (
               <SettlementReadOnlySection
@@ -578,22 +639,26 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
 
           <div className={saleRequestDetail.detailActionsWrap}>
             <DetailActions
-            status={request.status}
-            showRejectForm={showRejectForm}
-            canConfirmReject={canConfirmReject}
-            isSettlementLocked={isSettlementLocked}
-            advanceProofFile={advanceProofFile}
-            balanceProofFile={balanceProofFile}
-            onClose={onClose}
-            onAccept={handleAccept}
-            onReject={handleReject}
-            onCancelReject={handleCancelReject}
-            onSendSettlement={onSendSettlement ? handleSendSettlement : undefined}
-            onCancelPurchase={onCancelPurchase ? handleCancelPurchase : undefined}
-            onSendAdvanceProof={onSendAdvanceProof ? handleSendAdvanceProof : undefined}
-            onSendBalanceProof={onSendBalanceProof ? handleSendBalanceProof : undefined}
-          />
+              status={request.status}
+              showRejectForm={showRejectForm}
+              canConfirmReject={canConfirmReject}
+              isSettlementLocked={isSettlementLocked}
+              advanceProofFile={advanceProofFile}
+              balanceProofFile={balanceProofFile}
+              onClose={onClose}
+              onStartAccept={handleStartAccept}
+              onAccept={handleConfirmAccept}
+              onReject={handleReject}
+              onCancelReject={handleCancelReject}
+              onSendSettlement={onSendSettlement ? handleSendSettlement : undefined}
+              onCancelPurchase={onCancelPurchase ? handleCancelPurchase : undefined}
+              onSendAdvanceProof={onSendAdvanceProof ? handleSendAdvanceProof : undefined}
+              onSendBalanceProof={onSendBalanceProof ? handleSendBalanceProof : undefined}
+              onAcceptLogisticsQuote={onAcceptLogisticsQuote ? handleAcceptLogisticsQuote : undefined}
+            />
           </div>
+            </>
+          )}
         </div>
       </Modal>
       <LinkedOfferModal

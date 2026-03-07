@@ -1,4 +1,5 @@
-import type { SaleRequest, SaleRequestStatus, CatchSettlement, CatchSettlementLine } from '../../../types';
+import type { SaleRequest, SaleRequestStatus, CatchSettlement, CatchSettlementLine, Offer } from '../../../types';
+import { LB_TO_KG } from './constants';
 
 export function createEmptySettlement(request?: SaleRequest | null): CatchSettlement {
   const remitidasReferencialLb = request?.catchInfo?.estimatedQuantityLb ?? 0;
@@ -74,7 +75,9 @@ export function getProductFormLabel(form: string): string {
 
 export function getStatusLabel(status: SaleRequestStatus): string {
   const labels: Record<SaleRequestStatus, string> = {
-    PENDING_ACCEPTANCE: 'Pendientes de Aceptar',
+    LOGISTICS_QUOTE_IN_PROGRESS: 'Cotización en proceso',
+    LOGISTICS_QUOTE_PENDING_ACCEPTANCE: 'Cotización pendiente de aceptar',
+    PENDING_ACCEPTANCE: 'Pendiente de aceptar',
     CATCH_SETTLEMENT_PENDING: 'Liquidación de Pesca pendiente',
     ADVANCE_PENDING: 'Anticipo Pendiente',
     BALANCE_PENDING: 'Saldo Restante Pendiente',
@@ -86,4 +89,42 @@ export function getStatusLabel(status: SaleRequestStatus): string {
     DELIVERED: 'Pesca entregada',
   };
   return labels[status];
+}
+
+/**
+ * Devuelve el precio por unidad de la oferta para la talla de la solicitud (y la unidad).
+ * Para usar en "Precio de la talla".
+ */
+export function getPriceTierForRequest(
+  request: SaleRequest,
+  offer: Offer | null
+): { price: number; unit: 'PER_LB' | 'PER_KG' } | null {
+  if (!offer?.priceTiers?.length) return null;
+  const { sizeRange } = request.catchInfo;
+  const tier = offer.priceTiers.find(
+    (t) => t.isActive && t.sizeMin <= sizeRange.min && t.sizeMax >= sizeRange.min
+  );
+  if (!tier) return null;
+  return { price: tier.price, unit: offer.priceUnit };
+}
+
+/**
+ * Calcula el posible total de la pesca (cantidad estimada × precio de la oferta para la talla).
+ * Devuelve null si no hay oferta o no hay tier que coincida con el rango de tallas.
+ */
+export function getEstimatedCatchTotalFromOffer(
+  request: SaleRequest,
+  offer: Offer | null
+): number | null {
+  if (!offer?.priceTiers?.length) return null;
+  const { sizeRange, estimatedQuantityLb } = request.catchInfo;
+  const tier = offer.priceTiers.find(
+    (t) => t.isActive && t.sizeMin <= sizeRange.min && t.sizeMax >= sizeRange.min
+  );
+  if (!tier) return null;
+  if (offer.priceUnit === 'PER_LB') {
+    return estimatedQuantityLb * tier.price;
+  }
+  const quantityKg = estimatedQuantityLb * LB_TO_KG;
+  return quantityKg * tier.price;
 }

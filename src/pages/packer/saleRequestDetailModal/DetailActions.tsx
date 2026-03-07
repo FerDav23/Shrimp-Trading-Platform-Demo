@@ -10,6 +10,8 @@ interface DetailActionsProps {
   advanceProofFile: File | null;
   balanceProofFile: File | null;
   onClose: () => void;
+  /** Al hacer clic en "Aceptar" se muestra el paso de confirmación (términos y condiciones) */
+  onStartAccept?: () => void;
   onAccept: () => void;
   onReject: () => void;
   onCancelReject: () => void;
@@ -17,6 +19,8 @@ interface DetailActionsProps {
   onCancelPurchase?: () => void;
   onSendAdvanceProof?: () => void;
   onSendBalanceProof?: () => void;
+  /** Al aceptar la cotización de logística (estado LOGISTICS_QUOTE_PENDING_ACCEPTANCE) */
+  onAcceptLogisticsQuote?: () => void;
 }
 
 export const DetailActions: React.FC<DetailActionsProps> = ({
@@ -27,6 +31,7 @@ export const DetailActions: React.FC<DetailActionsProps> = ({
   advanceProofFile,
   balanceProofFile,
   onClose,
+  onStartAccept,
   onAccept,
   onReject,
   onCancelReject,
@@ -34,8 +39,46 @@ export const DetailActions: React.FC<DetailActionsProps> = ({
   onCancelPurchase,
   onSendAdvanceProof,
   onSendBalanceProof,
+  onAcceptLogisticsQuote,
 }) => (
   <div className={detailActions.container}>
+    {status === 'LOGISTICS_QUOTE_IN_PROGRESS' && (
+      <button type="button" onClick={onClose} className={detailActions.close}>
+        Cerrar
+      </button>
+    )}
+    {status === 'LOGISTICS_QUOTE_PENDING_ACCEPTANCE' && !showRejectForm && (
+      <>
+        <button type="button" onClick={onClose} className={detailActions.cancel}>
+          Cerrar
+        </button>
+        <button type="button" onClick={onReject} className={detailActions.reject}>
+          Rechazar cotización
+        </button>
+        <button
+          type="button"
+          onClick={onAcceptLogisticsQuote}
+          className={detailActions.accept}
+        >
+          Aceptar cotización
+        </button>
+      </>
+    )}
+    {status === 'LOGISTICS_QUOTE_PENDING_ACCEPTANCE' && showRejectForm && (
+      <>
+        <button type="button" onClick={onCancelReject} className={detailActions.cancel}>
+          Cancelar
+        </button>
+        <button
+          type="button"
+          onClick={onReject}
+          disabled={!canConfirmReject}
+          className={detailActions.rejectDisabled}
+        >
+          Confirmar rechazo de cotización
+        </button>
+      </>
+    )}
     {status === 'PENDING_ACCEPTANCE' && !showRejectForm && (
       <>
         <button type="button" onClick={onClose} className={detailActions.cancel}>
@@ -44,7 +87,11 @@ export const DetailActions: React.FC<DetailActionsProps> = ({
         <button type="button" onClick={onReject} className={detailActions.reject}>
           Rechazar solicitud de compra
         </button>
-        <button type="button" onClick={onAccept} className={detailActions.accept}>
+        <button
+          type="button"
+          onClick={onStartAccept ?? onAccept}
+          className={detailActions.accept}
+        >
           Aceptar solicitud de compra
         </button>
       </>
@@ -64,7 +111,9 @@ export const DetailActions: React.FC<DetailActionsProps> = ({
         </button>
       </>
     )}
-    {status !== 'PENDING_ACCEPTANCE' && (
+    {status !== 'PENDING_ACCEPTANCE' &&
+      status !== 'LOGISTICS_QUOTE_IN_PROGRESS' &&
+      status !== 'LOGISTICS_QUOTE_PENDING_ACCEPTANCE' && (
       <>
         <button type="button" onClick={onClose} className={detailActions.close}>
           Cerrar

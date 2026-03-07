@@ -10,16 +10,18 @@ export type PaymentTermType = 'ADVANCE' | 'BALANCE' | 'CUSTOM';
 export type AdjustmentType = 'CLASS_DISCOUNT';
 /** Todos los estados de la solicitud (flujo de aceptación/pagos + tracking logístico) */
 export type SaleRequestStatus =
-  | 'PENDING_ACCEPTANCE'       // Pendientes de Aceptar
-  | 'CATCH_SETTLEMENT_PENDING' // Liquidación de Pesca pendiente
-  | 'ADVANCE_PENDING'          // Anticipo Pendiente
-  | 'BALANCE_PENDING'          // Saldo Restante Pendiente
-  | 'SALE_COMPLETED'           // Venta Finalizada
-  | 'REJECTED'                 // Rechazada
-  | 'PENDING_PICKUP'           // Pendiente de recoger (logística)
-  | 'PENDING_DELIVERY'         // Pesca pendiente de entregar (logística en camino)
-  | 'PICKED_UP'                // Pesca pendiente de aceptar (camión en planta)
-  | 'DELIVERED';               // Pesca entregada (recepción registrada)
+  | 'LOGISTICS_QUOTE_IN_PROGRESS'      // Cotización de logística en proceso
+  | 'LOGISTICS_QUOTE_PENDING_ACCEPTANCE' // Cotización de logística pendiente de aceptar
+  | 'PENDING_ACCEPTANCE'               // Pendientes de Aceptar
+  | 'CATCH_SETTLEMENT_PENDING'          // Liquidación de Pesca pendiente
+  | 'ADVANCE_PENDING'                   // Anticipo Pendiente
+  | 'BALANCE_PENDING'                   // Saldo Restante Pendiente
+  | 'SALE_COMPLETED'                    // Venta Finalizada
+  | 'REJECTED'                          // Rechazada
+  | 'PENDING_PICKUP'                    // Pendiente de recoger (logística)
+  | 'PENDING_DELIVERY'                  // Pesca pendiente de entregar (logística en camino)
+  | 'PICKED_UP'                         // Pesca pendiente de aceptar (camión en planta)
+  | 'DELIVERED';                        // Pesca entregada (recepción registrada)
 
 /** Estados que corresponden al tracking logístico (subconjunto de SaleRequestStatus) */
 export type LogisticsTrackingStatus =
@@ -269,4 +271,13 @@ export interface SaleRequest {
   catchSettlement?: CatchSettlement;
   /** Confirmación de recepción de carga (cuando status es DELIVERED) */
   logisticsDelivery?: LogisticsDeliveryConfirm;
+  /** Cotización de logística (cuando status es LOGISTICS_QUOTE_PENDING_ACCEPTANCE) */
+  logisticsQuote?: {
+    /** Valor estimado de la pesca (cantidad × precio de la oferta para la talla) */
+    estimatedCatchTotalUSD: number;
+    /** Valor de la logística */
+    logisticsAmountUSD: number;
+    /** Total a pagar (pesca + logística) */
+    totalToPayUSD: number;
+  };
 }

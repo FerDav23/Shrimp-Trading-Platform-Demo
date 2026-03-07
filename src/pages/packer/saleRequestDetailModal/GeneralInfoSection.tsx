@@ -9,6 +9,8 @@ import { getProductFormLabel, getStatusLabel } from './utils';
 import { CollapsibleSection } from './CollapsibleSection';
 
 const STATUS_CLASS: Record<SaleRequestStatus, string> = {
+  LOGISTICS_QUOTE_IN_PROGRESS: packerSales.colStatusLogisticsQuoteInProgress,
+  LOGISTICS_QUOTE_PENDING_ACCEPTANCE: packerSales.colStatusLogisticsQuotePendingAcceptance,
   PENDING_ACCEPTANCE: packerSales.colStatusPendingAcceptance,
   CATCH_SETTLEMENT_PENDING: packerSales.colStatusCatchSettlement,
   ADVANCE_PENDING: packerSales.colStatusAdvancePending,
@@ -46,13 +48,6 @@ const GeneralInfoContent: React.FC<{
     <div className={collapsible.content}>
       <div className={saleRequestDetail.generalInfoCard}>
         <div className={saleRequestDetail.generalInfoGrid}>
-          <FormRow
-            labelClassName={saleRequestDetail.generalInfoLabel}
-            className={saleRequestDetail.generalInfoRow}
-            label="ID Solicitud"
-          >
-            <p className={saleRequestDetail.generalInfoValueBold}>#{request.id.split('-')[1]}</p>
-          </FormRow>
           <FormRow
             labelClassName={saleRequestDetail.generalInfoLabel}
             className={saleRequestDetail.generalInfoRow}
