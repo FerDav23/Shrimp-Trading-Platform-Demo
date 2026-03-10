@@ -135,7 +135,6 @@ const PendingAcceptanceContent: React.FC<{
 export const PossibleValueFinalSection: React.FC<PossibleValueFinalSectionProps> = ({
   request,
   linkedOffer,
-  contentOnly = false,
   messageText,
   onMessageTextChange,
   onSendMessage,

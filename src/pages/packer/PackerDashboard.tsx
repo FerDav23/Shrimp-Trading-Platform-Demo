@@ -15,6 +15,8 @@ import type { WorkflowStatus } from './salesRoutes';
 import { getStatusLabel } from './saleRequestDetailModal/utils';
 
 const STATUS_CLASS: Record<SaleRequestStatus, string> = {
+  LOGISTICS_QUOTE_IN_PROGRESS: packerSales.colStatusLogisticsQuoteInProgress,
+  LOGISTICS_QUOTE_PENDING_ACCEPTANCE: packerSales.colStatusLogisticsQuotePendingAcceptance,
   PENDING_ACCEPTANCE: packerSales.colStatusPendingAcceptance,
   CATCH_SETTLEMENT_PENDING: packerSales.colStatusCatchSettlement,
   ADVANCE_PENDING: packerSales.colStatusAdvancePending,
