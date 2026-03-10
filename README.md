@@ -61,8 +61,6 @@ The system uses local authentication with dummy users. When logging in, you can 
 
 1. **Juan Pérez** (PRODUCER) – Producer
 2. **ROSASUD S.A.S.** (PACKER) – Packer
-3. **Grupo FJ Logística** (LOGISTICS) – Logistics
-4. **Admin FJ** (MANAGER) – Administrator
 
 The selected user is stored in `localStorage` and determines the dashboard and pages available for that role.
 
@@ -70,8 +68,6 @@ The selected user is stored in `localStorage` and determines the dashboard and p
 
 - **PRODUCER**: Can view offers, create sales, view sales history
 - **PACKER**: Can create and manage offers, view received sales
-- **LOGISTICS**: Can manage shipments, view rates, certificates
-- **MANAGER**: Full access to users, offers, sales, and approvals
 
 ## Dummy Data
 
