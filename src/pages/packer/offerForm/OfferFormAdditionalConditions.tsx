@@ -135,7 +135,7 @@ export const OfferFormAdditionalConditions: React.FC<OfferFormAdditionalConditio
                   colSpan={isLocked ? 2 : 3}
                   className={offerSection.tableEmpty}
                 >
-                  No hay condiciones. Use el botón para añadir.
+                  No conditions. Use the button to add.
                 </td>
               </tr>
             ) : (
@@ -167,7 +167,7 @@ export const OfferFormAdditionalConditions: React.FC<OfferFormAdditionalConditio
                         onClick={() => removeAdditionalCondition(idx)}
                         className={button.delete}
                       >
-                        Eliminar
+                        Remove
                       </button>
                     </td>
                   )}

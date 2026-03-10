@@ -2,32 +2,32 @@ import type { SectionKey } from './types';
 
 export const MAX_MESSAGE_LENGTH = 500;
 
-/** Etiquetas de las pestañas del modal de detalle (por SectionKey) */
+/** Tab labels for the detail modal (by SectionKey) */
 export const SECTION_LABELS: Record<SectionKey, string> = {
-  general: 'Información General',
-  catch: 'Información de Pesca',
-  possibleValueFinal: 'Posible valor final',
-  logisticsTracking: 'Logistica',
-  settlement: 'Liquidación de pesca',
-  settlementReadOnly: 'Liquidación de pesca',
-  advanceTransfer: 'Transferencia de anticipo',
-  advanceReadOnly: 'Anticipo pagado',
-  balanceTransfer: 'Pago del saldo',
-  balanceReadOnly: 'Saldo restante pagado',
-  messages: 'Mensajes',
-  rejectForm: 'Motivo del rechazo',
+  general: 'General Information',
+  catch: 'Catch Information',
+  possibleValueFinal: 'Possible final value',
+  logisticsTracking: 'Logistics',
+  settlement: 'Catch settlement',
+  settlementReadOnly: 'Catch settlement',
+  advanceTransfer: 'Advance transfer',
+  advanceReadOnly: 'Advance paid',
+  balanceTransfer: 'Balance payment',
+  balanceReadOnly: 'Balance paid',
+  messages: 'Messages',
+  rejectForm: 'Rejection reason',
 };
 
-/** Opciones del dropdown de motivo de rechazo (packer elige al rechazar) */
+/** Rejection reason dropdown options (packer chooses when rejecting) */
 export const REJECTION_REASONS = [
-  { value: '', label: 'Seleccione un motivo...' },
-  { value: 'SIZE_RANGE', label: 'No cumple con el rango de tallas requerido para esta oferta.' },
-  { value: 'NO_CAPACITY', label: 'Sin capacidad de procesamiento en la fecha indicada.' },
-  { value: 'PRICE', label: 'Condiciones de precio no aceptables.' },
-  { value: 'OTHER_OFFER', label: 'Se priorizó otra oferta o productor.' },
-  { value: 'QUALITY', label: 'No cumple con los requisitos de calidad de la oferta.' },
-  { value: 'LOGISTICS', label: 'Problemas de logística o ubicación.' },
-  { value: 'OTHER', label: 'Otro motivo.' },
+  { value: '', label: 'Select a reason...' },
+  { value: 'SIZE_RANGE', label: 'Does not meet the size range required for this offer.' },
+  { value: 'NO_CAPACITY', label: 'No processing capacity on the indicated date.' },
+  { value: 'PRICE', label: 'Price terms not acceptable.' },
+  { value: 'OTHER_OFFER', label: 'Another offer or producer was prioritized.' },
+  { value: 'QUALITY', label: 'Does not meet the quality requirements of the offer.' },
+  { value: 'LOGISTICS', label: 'Logistics or location issues.' },
+  { value: 'OTHER', label: 'Other reason.' },
 ] as const;
 
 export const defaultExpanded: Record<SectionKey, boolean> = {

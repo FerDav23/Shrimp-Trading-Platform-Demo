@@ -64,29 +64,29 @@ export function normalizeSettlement(s: SettlementWithLegacy): CatchSettlement {
 
 export function getProductFormLabel(form: string): string {
   const labels: Record<string, string> = {
-    ENTERO: 'Entero',
-    COLA_DIRECTA: 'Cola Directa',
-    CAMARON_VIVO: 'Camarón Vivo',
-    SOBRANTE: 'Sobrante',
-    COLA_SOBRANTE: 'Cola Sobrante',
+    ENTERO: 'Whole',
+    COLA_DIRECTA: 'Direct Tail',
+    CAMARON_VIVO: 'Live Shrimp',
+    SOBRANTE: 'Surplus',
+    COLA_SOBRANTE: 'Tail Surplus',
   };
   return labels[form] || form;
 }
 
 export function getStatusLabel(status: SaleRequestStatus): string {
   const labels: Record<SaleRequestStatus, string> = {
-    LOGISTICS_QUOTE_IN_PROGRESS: 'Cotización en proceso',
-    LOGISTICS_QUOTE_PENDING_ACCEPTANCE: 'Cotización pendiente de aceptar',
-    PENDING_ACCEPTANCE: 'Pendiente de aceptar',
-    CATCH_SETTLEMENT_PENDING: 'Liquidación de Pesca pendiente',
-    ADVANCE_PENDING: 'Anticipo Pendiente',
-    BALANCE_PENDING: 'Saldo Restante Pendiente',
-    SALE_COMPLETED: 'Venta Finalizada',
-    REJECTED: 'Rechazada',
-    PENDING_PICKUP: 'Pesca pendiente de recoger',
-    PENDING_DELIVERY: 'Pesca pendiente de entregar',
-    PICKED_UP: 'Pesca pendiente de aceptar',
-    DELIVERED: 'Pesca entregada',
+    LOGISTICS_QUOTE_IN_PROGRESS: 'Quote in progress',
+    LOGISTICS_QUOTE_PENDING_ACCEPTANCE: 'Quote pending acceptance',
+    PENDING_ACCEPTANCE: 'Pending acceptance',
+    CATCH_SETTLEMENT_PENDING: 'Catch settlement pending',
+    ADVANCE_PENDING: 'Advance pending',
+    BALANCE_PENDING: 'Balance pending',
+    SALE_COMPLETED: 'Sale completed',
+    REJECTED: 'Rejected',
+    PENDING_PICKUP: 'Pending pickup',
+    PENDING_DELIVERY: 'Pending delivery',
+    PICKED_UP: 'Pending acceptance',
+    DELIVERED: 'Delivered',
   };
   return labels[status];
 }

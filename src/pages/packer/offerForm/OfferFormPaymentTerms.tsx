@@ -163,7 +163,7 @@ export const OfferFormPaymentTerms: React.FC<OfferFormPaymentTermsProps> = ({
                   onClick={() => removePaymentTerm(idx)}
                   className={button.delete}
                 >
-                  Eliminar
+                  Remove
                 </button>
               )}
             </div>

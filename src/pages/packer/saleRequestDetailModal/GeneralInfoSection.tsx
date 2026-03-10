@@ -3,7 +3,7 @@ import { FormRow } from '../../../components/FormRow';
 import { StatusBadge } from '../../../components/StatusBadge';
 import { collapsible, saleRequestDetail, packerSales } from '../../../styles';
 import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 import type { SaleRequest, SaleRequestStatus } from '../../../types';
 import { getProductFormLabel, getStatusLabel } from './utils';
 import { CollapsibleSection } from './CollapsibleSection';
@@ -51,7 +51,7 @@ const GeneralInfoContent: React.FC<{
           <FormRow
             labelClassName={saleRequestDetail.generalInfoLabel}
             className={saleRequestDetail.generalInfoRow}
-            label="Estado"
+            label="Status"
           >
             <div className={saleRequestDetail.generalInfoValue}>
               <StatusBadge
@@ -64,34 +64,34 @@ const GeneralInfoContent: React.FC<{
           <FormRow
             labelClassName={saleRequestDetail.generalInfoLabel}
             className={saleRequestDetail.generalInfoRow}
-            label="Productor"
+            label="Producer"
           >
             <p className={saleRequestDetail.generalInfoValue}>{request.producerName}</p>
           </FormRow>
           <FormRow
             labelClassName={saleRequestDetail.generalInfoLabel}
             className={saleRequestDetail.generalInfoRow}
-            label="Producto"
+            label="Product"
           >
             <p className={saleRequestDetail.generalInfoValue}>{getProductFormLabel(request.productForm)}</p>
           </FormRow>
           <FormRow
             labelClassName={saleRequestDetail.generalInfoLabel}
             className={saleRequestDetail.generalInfoRow}
-            label="Fecha de Solicitud"
+            label="Request date"
           >
             <p className={saleRequestDetail.generalInfoValue}>
-              {format(new Date(request.createdAt), 'dd MMM yyyy, HH:mm', { locale: es })}
+              {format(new Date(request.createdAt), 'dd MMM yyyy, HH:mm', { locale: enUS })}
             </p>
           </FormRow>
           {request.respondedAt && (
             <FormRow
               labelClassName={saleRequestDetail.generalInfoLabel}
               className={saleRequestDetail.generalInfoRow}
-              label="Fecha de Respuesta"
+              label="Response date"
             >
               <p className={saleRequestDetail.generalInfoValue}>
-                {format(new Date(request.respondedAt), 'dd MMM yyyy, HH:mm', { locale: es })}
+                {format(new Date(request.respondedAt), 'dd MMM yyyy, HH:mm', { locale: enUS })}
               </p>
             </FormRow>
           )}
@@ -99,7 +99,7 @@ const GeneralInfoContent: React.FC<{
             <FormRow
               labelClassName={saleRequestDetail.generalInfoLabel}
               className={saleRequestDetail.generalInfoRow}
-              label="Oferta vinculada"
+              label="Linked offer"
             >
               <div className={saleRequestDetail.generalInfoInline}>
                 {linkedOffer ? (
@@ -110,11 +110,11 @@ const GeneralInfoContent: React.FC<{
                       onClick={onOpenOfferModal}
                       className={collapsible.skyButton}
                     >
-                      Ver oferta
+                      View offer
                     </button>
                   </>
                 ) : (
-                  <span className={saleRequestDetail.mutedText}>Oferta no encontrada</span>
+                  <span className={saleRequestDetail.mutedText}>Offer not found</span>
                 )}
               </div>
             </FormRow>
@@ -123,20 +123,20 @@ const GeneralInfoContent: React.FC<{
 
         {showLogisticsDelivery && (
           <div className={`${saleRequestDetail.sectionCard} mt-4`}>
-            <p className={saleRequestDetail.sectionLabelSm}>Registro de logística (recepción en planta)</p>
+            <p className={saleRequestDetail.sectionLabelSm}>Logistics record (plant reception)</p>
             <div className={saleRequestDetail.sectionGridTwoCols}>
               <div>
-                <p className={saleRequestDetail.sectionLabelSm}>Peso de la pesca recibida (lb)</p>
+                <p className={saleRequestDetail.sectionLabelSm}>Received catch weight (lb)</p>
                 <p className={saleRequestDetail.sectionValueSm}>
                   {request.logisticsDelivery?.catchWeight.toLocaleString('es-EC')}
                 </p>
               </div>
               <div>
-                <p className={saleRequestDetail.sectionLabelSm}>Términos y condiciones</p>
+                <p className={saleRequestDetail.sectionLabelSm}>Terms and conditions</p>
                 <p className={saleRequestDetail.sectionValueSm}>
                   {request.logisticsDelivery?.termsAcceptedAt
-                    ? `Aceptados el ${format(new Date(request.logisticsDelivery.termsAcceptedAt), 'dd MMM yyyy, HH:mm', {
-                        locale: es,
+                    ? `Accepted on ${format(new Date(request.logisticsDelivery.termsAcceptedAt), 'dd MMM yyyy, HH:mm', {
+                        locale: enUS,
                       })}`
                     : 'Aceptados'}
                 </p>
@@ -173,7 +173,7 @@ export const GeneralInfoSection: React.FC<GeneralInfoSectionProps> = ({
     return <GeneralInfoContent request={request} linkedOffer={linkedOffer} onOpenOfferModal={onOpenOfferModal} />;
   }
   return (
-    <CollapsibleSection title="Información General" expanded={expanded} onToggle={onToggle}>
+    <CollapsibleSection title="General Information" expanded={expanded} onToggle={onToggle}>
       <GeneralInfoContent request={request} linkedOffer={linkedOffer} onOpenOfferModal={onOpenOfferModal} />
     </CollapsibleSection>
   );

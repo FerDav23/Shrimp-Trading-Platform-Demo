@@ -61,7 +61,7 @@ export const SettlementReadOnlySection: React.FC<SettlementReadOnlySectionProps>
               <FormRow labelClassName={saleRequestDetail.formRowLabel} label="No. Lote">
                 <span>{s.lotNumber || '—'}</span>
               </FormRow>
-              <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Guía rem.">
+              <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Rem. guide">
                 <span>{s.remissionGuide || '—'}</span>
               </FormRow>
               <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Piscina">
@@ -73,7 +73,7 @@ export const SettlementReadOnlySection: React.FC<SettlementReadOnlySectionProps>
             </div>
           </div>
           <div className="space-y-4">
-            <h4 className={saleRequestDetail.subsectionSmallPlain}>Detalle por clase y talla</h4>
+            <h4 className={saleRequestDetail.subsectionSmallPlain}>Detail by class and size</h4>
             {[
               { key: 'colaDirectaALines' as const, title: CATCH_SETTLEMENT_CLASSES.COLA_DIRECTA_A },
               { key: 'colaDirectaBLines' as const, title: CATCH_SETTLEMENT_CLASSES.COLA_DIRECTA_B },
@@ -150,7 +150,7 @@ export const SettlementReadOnlySection: React.FC<SettlementReadOnlySectionProps>
   );
   if (contentOnly) return content;
   return (
-    <CollapsibleSection title="Liquidación de pesca" expanded={expanded} onToggle={onToggle}>
+    <CollapsibleSection title="Catch settlement" expanded={expanded} onToggle={onToggle}>
       {content}
     </CollapsibleSection>
   );

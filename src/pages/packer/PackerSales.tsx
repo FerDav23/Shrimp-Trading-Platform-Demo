@@ -17,39 +17,39 @@ import {
   type WorkflowStatus,
 } from './salesRoutes';
 import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 
 const TAB_LABELS: Record<WorkflowStatus, string> = {
-  PENDING_ACCEPTANCE: 'Pendientes de Aceptar',
-  CATCH_SETTLEMENT_PENDING: 'Liquidación de Pesca pendiente',
-  ADVANCE_PENDING: 'Anticipo Pendiente',
-  BALANCE_PENDING: 'Saldo Restante Pendiente',
-  SALE_COMPLETED: 'Venta Finalizada',
-  REJECTED: 'Rechazada',
+  PENDING_ACCEPTANCE: 'Pending Acceptance',
+  CATCH_SETTLEMENT_PENDING: 'Catch Settlement Pending',
+  ADVANCE_PENDING: 'Advance Pending',
+  BALANCE_PENDING: 'Balance Pending',
+  SALE_COMPLETED: 'Sale Completed',
+  REJECTED: 'Rejected',
 };
 
 const SECTION_TITLES: Record<WorkflowStatus, string> = {
-  PENDING_ACCEPTANCE: 'Solicitudes Pendientes de Aceptar',
-  CATCH_SETTLEMENT_PENDING: 'Solicitudes con Liquidación de Pesca pendiente',
-  ADVANCE_PENDING: 'Solicitudes con Anticipo Pendiente',
-  BALANCE_PENDING: 'Solicitudes con Saldo Restante Pendiente',
-  SALE_COMPLETED: 'Solicitudes con Venta Finalizada',
-  REJECTED: 'Solicitudes Rechazadas',
+  PENDING_ACCEPTANCE: 'Requests Pending Acceptance',
+  CATCH_SETTLEMENT_PENDING: 'Requests with Catch Settlement Pending',
+  ADVANCE_PENDING: 'Requests with Advance Pending',
+  BALANCE_PENDING: 'Requests with Balance Pending',
+  SALE_COMPLETED: 'Requests with Sale Completed',
+  REJECTED: 'Rejected Requests',
 };
 
 const LOGISTICS_QUOTE_STATUSES: SaleRequestStatus[] = ['LOGISTICS_QUOTE_IN_PROGRESS', 'LOGISTICS_QUOTE_PENDING_ACCEPTANCE'];
 
 function getTabLabel(status: SalesViewTab): string {
-  if (status === VIEW_ALL) return 'Todas las solicitudes';
-  if (status === TAB_LOGISTICS_QUOTE) return 'Cotización de logística';
-  if (status === TAB_LOGISTICS_TRACKING) return 'Tracking logístico';
+  if (status === VIEW_ALL) return 'All requests';
+  if (status === TAB_LOGISTICS_QUOTE) return 'Logistics quote';
+  if (status === TAB_LOGISTICS_TRACKING) return 'Logistics tracking';
   return TAB_LABELS[status as WorkflowStatus];
 }
 
 function getSectionTitle(tab: SalesViewTab): string {
-  if (tab === VIEW_ALL) return 'Todas las solicitudes de compra';
-  if (tab === TAB_LOGISTICS_QUOTE) return 'Solicitudes en cotización de logística';
-  if (tab === TAB_LOGISTICS_TRACKING) return 'Solicitudes con Logistica Pendiente';
+  if (tab === VIEW_ALL) return 'All purchase requests';
+  if (tab === TAB_LOGISTICS_QUOTE) return 'Requests in logistics quote';
+  if (tab === TAB_LOGISTICS_TRACKING) return 'Requests with logistics pending';
   return SECTION_TITLES[tab as WorkflowStatus];
 }
 
@@ -149,12 +149,12 @@ export const PackerSales: React.FC = () => {
   };
 
   const handleAccept = (requestId: string) => {
-    alert(`Solicitud ${requestId} aceptada (simulado)`);
+    alert(`Request ${requestId} accepted (simulated)`);
   };
 
   const handleReject = (requestId: string, reason?: string, notes?: string) => {
     if (reason) setRejectionReasons((prev) => ({ ...prev, [requestId]: reason }));
-    alert(`Solicitud ${requestId} rechazada${reason ? `: ${reason}` : ''}${notes ? ` | ${notes}` : ''} (simulado)`);
+    alert(`Request ${requestId} rejected${reason ? `: ${reason}` : ''}${notes ? ` | ${notes}` : ''} (simulated)`);
   };
 
   const handleSendSettlement = (requestId: string) => {
@@ -162,36 +162,36 @@ export const PackerSales: React.FC = () => {
   };
 
   const handleCancelPurchase = (requestId: string) => {
-    alert(`Cancelar compra para solicitud ${requestId} (simulado)`);
+    alert(`Cancel purchase for request ${requestId} (simulated)`);
   };
 
   const handleSendAdvanceProof = (requestId: string) => {
-    alert(`Prueba de anticipo enviada para solicitud ${requestId} (simulado)`);
+    alert(`Advance proof sent for request ${requestId} (simulated)`);
   };
 
   const handleSendBalanceProof = (requestId: string) => {
-    alert(`Prueba de saldo enviada para solicitud ${requestId} (simulado)`);
+    alert(`Balance proof sent for request ${requestId} (simulated)`);
   };
 
   const handleConfirmDelivery = (requestId: string, data: LogisticsDeliveryConfirm) => {
     setDeliveryConfirmed((prev) => ({ ...prev, [requestId]: data }));
-    alert(`Recepción de carga registrada para solicitud ${requestId} (simulado)`);
+    alert(`Cargo reception recorded for request ${requestId} (simulated)`);
   };
 
   const handleRejectLogisticsQuote = (requestId: string, reason?: string, notes?: string) => {
     if (reason) setRejectionReasons((prev) => ({ ...prev, [requestId]: reason }));
-    alert(`Cotización rechazada para solicitud ${requestId}${reason ? `: ${reason}` : ''}${notes ? ` | ${notes}` : ''} (simulado)`);
+    alert(`Quote rejected for request ${requestId}${reason ? `: ${reason}` : ''}${notes ? ` | ${notes}` : ''} (simulated)`);
   };
 
   const handleAcceptLogisticsQuote = (requestId: string) => {
-    alert(`Cotización aceptada para solicitud ${requestId} (simulado)`);
+    alert(`Quote accepted for request ${requestId} (simulated)`);
   };
 
   const isAllView = activeTab === VIEW_ALL;
 
   const columns = [
     {
-      header: 'Productor',
+      header: 'Producer',
       accessor: (request: SaleRequest) => (
         <div>
           <div className={packerSales.colProducerName}>{request.producerName}</div>
@@ -199,29 +199,29 @@ export const PackerSales: React.FC = () => {
       ),
     },
     {
-      header: 'Producto',
+      header: 'Product',
       accessor: (request: SaleRequest) => (
         <span className={packerSales.colProduct}>{request.productForm}</span>
       ),
     },
     {
-      header: 'Información de Pesca',
+      header: 'Catch Info',
       accessor: (request: SaleRequest) => (
         <div className="text-sm">
           <div className={packerSales.colCatchQty}>
             {request.catchInfo.estimatedQuantityLb} lb
           </div>
           <div className={packerSales.colCatchSub}>
-            Talla: {request.catchInfo.sizeRange.min}/{request.catchInfo.sizeRange.max}
+            Size: {request.catchInfo.sizeRange.min}/{request.catchInfo.sizeRange.max}
           </div>
           <div className={packerSales.colCatchMeta}>
-            Cosecha: {format(new Date(request.catchInfo.estimatedHarvestDate), 'dd MMM yyyy', { locale: es })}
+            Harvest: {format(new Date(request.catchInfo.estimatedHarvestDate), 'dd MMM yyyy', { locale: enUS })}
           </div>
         </div>
       ),
     },
     {
-      header: 'Ubicación',
+      header: 'Location',
       accessor: (request: SaleRequest) => (
         <div className="text-sm">
           <div className={packerSales.colLocationMain}>{request.catchInfo.harvestLocation.city}</div>
@@ -230,21 +230,21 @@ export const PackerSales: React.FC = () => {
       ),
     },
     {
-      header: 'Fecha Solicitud',
+      header: 'Request Date',
       accessor: (request: SaleRequest) => (
         <span className={packerSales.colDate}>
-          {format(new Date(request.createdAt), 'dd MMM yyyy', { locale: es })}
+          {format(new Date(request.createdAt), 'dd MMM yyyy', { locale: enUS })}
         </span>
       ),
     },
     {
-      header: 'Estado',
+      header: 'Status',
       accessor: (request: SaleRequest) => {
         const awaiting = settlementSentIds.has(request.id);
         const showRequestStatus =
           isAllView || activeTab === TAB_LOGISTICS_QUOTE || activeTab === TAB_LOGISTICS_TRACKING;
         const statusLabel = awaiting
-          ? 'En espera de confirmación'
+          ? 'Awaiting confirmation'
           : showRequestStatus
             ? getRequestStatusLabel(request.status)
             : getTabLabel(activeTab);
@@ -264,17 +264,17 @@ export const PackerSales: React.FC = () => {
 
   const emptyMessage =
     activeTab === VIEW_ALL
-      ? 'No hay solicitudes de compra.'
+      ? 'No purchase requests.'
       : activeTab === TAB_LOGISTICS_QUOTE
-        ? 'No hay solicitudes en cotización de logística.'
+        ? 'No requests in logistics quote.'
         : activeTab === TAB_LOGISTICS_TRACKING
-          ? 'No hay solicitudes con tracking logístico. Acepte una solicitud para ver el tab Compras.'
-          : `No hay solicitudes ${getTabLabel(activeTab).toLowerCase()} disponibles.`;
+          ? 'No requests with logistics tracking. Accept a request to see the Purchases tab.'
+          : `No ${getTabLabel(activeTab).toLowerCase()} requests available.`;
 
   return (
     <div className={packerSales.pageLayout}>
       <div className={page.headerWithSubtitle}>
-        <h1 className={page.headerTitle}>Compras</h1>
+        <h1 className={page.headerTitle}>Purchases</h1>
         <p className={page.headerSubtitle}>{getSectionTitle(activeTab)}</p>
       </div>
 
@@ -318,7 +318,7 @@ export const PackerSales: React.FC = () => {
                 type="button"
                 onClick={() => scrollTabs('right')}
                 className={packerSales.tabArrow}
-                aria-label="Ver más opciones"
+                aria-label="View more options"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

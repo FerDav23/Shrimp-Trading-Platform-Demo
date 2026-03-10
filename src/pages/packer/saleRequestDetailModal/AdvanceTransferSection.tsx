@@ -82,13 +82,13 @@ export const AdvanceTransferSection: React.FC<AdvanceTransferSectionProps> = ({
             className={isExpired ? collapsible.timerExpired : collapsible.timerActive}
           >
             <p className={`${collapsible.fieldLabel} mb-1`}>
-              Plazo para pagar el anticipo
+              Deadline to pay the advance
             </p>
             <p className={collapsible.timerHelp}>
-              Tiene {ADVANCE_DEADLINE_HOURS} horas para realizar la transferencia y subir la prueba.
+              You have {ADVANCE_DEADLINE_HOURS} hours to make the transfer and upload the proof.
             </p>
             {isExpired ? (
-              <p className={collapsible.timerTextExpired}>Tiempo agotado</p>
+              <p className={collapsible.timerTextExpired}>Time expired</p>
             ) : (
               <>
                 <p className={collapsible.timerDigits} aria-live="polite">
@@ -103,13 +103,13 @@ export const AdvanceTransferSection: React.FC<AdvanceTransferSectionProps> = ({
 
           <div className="space-y-4">
             <h4 className={collapsible.subsectionTitle}>
-              Información bancaria de la empacadora
+              Packer bank information
             </h4>
             {bankAccounts.length > 0 ? (
               <>
                 <div>
                   <label className={`block ${collapsible.fieldLabel} mb-2`}>
-                    Banco para transferencia
+                    Bank for transfer
                   </label>
                   <select
                     value={safeBankIndex}
@@ -126,32 +126,32 @@ export const AdvanceTransferSection: React.FC<AdvanceTransferSectionProps> = ({
                 {account && (
                   <div className={collapsible.bankCard}>
                     <h5 className={collapsible.bankCardTitle}>
-                      Datos de la cuenta seleccionada
+                      Selected account details
                     </h5>
                     <div className={saleRequestDetail.gridFormDense}>
                       <div>
-                        <p className={collapsible.fieldLabel}>Banco</p>
+                        <p className={collapsible.fieldLabel}>Bank</p>
                         <p className={saleRequestDetail.fieldValue}>{account.bankName}</p>
                       </div>
                       <div>
-                        <p className={collapsible.fieldLabel}>Tipo de cuenta</p>
+                        <p className={collapsible.fieldLabel}>Account type</p>
                         <p className={saleRequestDetail.fieldValueText}>{account.accountType}</p>
                       </div>
                       <div>
-                        <p className={collapsible.fieldLabel}>Número de cuenta</p>
+                        <p className={collapsible.fieldLabel}>Account number</p>
                         <p className={saleRequestDetail.fieldValueSemibold}>{account.accountNumber}</p>
                       </div>
                       <div>
-                        <p className={collapsible.fieldLabel}>Titular</p>
+                        <p className={collapsible.fieldLabel}>Account holder</p>
                         <p className={saleRequestDetail.fieldValue}>{account.accountHolderName}</p>
                       </div>
                       <div>
-                        <p className={collapsible.fieldLabel}>Cédula / Identificación</p>
+                        <p className={collapsible.fieldLabel}>ID number</p>
                         <p className="text-gray-900 tabular-nums">{account.identification}</p>
                       </div>
                       {account.email && (
                         <div className="md:col-span-2">
-                          <p className={collapsible.fieldLabel}>Correo</p>
+                          <p className={collapsible.fieldLabel}>Email</p>
                           <p className="text-gray-900">{account.email}</p>
                         </div>
                       )}
@@ -161,72 +161,71 @@ export const AdvanceTransferSection: React.FC<AdvanceTransferSectionProps> = ({
               </>
             ) : (
               <p className={saleRequestDetail.noBankData}>
-                No hay datos bancarios registrados para la empacadora.
+                No bank data registered for the packer.
               </p>
             )}
           </div>
 
           <div className={collapsible.transferBox}>
             <h4 className={collapsible.subsectionTitleMb}>
-              Datos para la transferencia del anticipo
+              Advance transfer details
             </h4>
             <div className={saleRequestDetail.gridFormDense}>
               <div>
-                <p className={collapsible.fieldLabel}>Beneficiario (productor)</p>
+                <p className={collapsible.fieldLabel}>Beneficiary (producer)</p>
                 <p className={saleRequestDetail.fieldValue}>{request.producerName}</p>
               </div>
               <div>
-                <p className={collapsible.fieldLabel}>Concepto</p>
-                <p className={saleRequestDetail.fieldValueText}>Anticipo por compra de pesca</p>
+                <p className={collapsible.fieldLabel}>Concept</p>
+                <p className={saleRequestDetail.fieldValueText}>Advance for catch purchase</p>
               </div>
               <div>
-                <p className={collapsible.fieldLabel}>Peso de la pesca</p>
+                <p className={collapsible.fieldLabel}>Catch weight</p>
                 <p className={saleRequestDetail.fieldValueSemibold}>
                   {lotWeight.toFixed(2)} {unitLabel}
                 </p>
               </div>
               <div>
-                <p className={collapsible.fieldLabel}>Valor unitario de la talla</p>
+                <p className={collapsible.fieldLabel}>Unit price (size)</p>
                 <p className={saleRequestDetail.fieldValueText}>
                   $ {unitPriceTalla.toFixed(2)} / {unitLabel}
                 </p>
               </div>
               <div>
-                <p className={collapsible.fieldLabel}>Valor unitario de comisión</p>
+                <p className={collapsible.fieldLabel}>Commission unit rate</p>
                 <p className={saleRequestDetail.fieldValueText}>
                   $ {commissionUnitRate.toFixed(3)} / {unitLabel}
                 </p>
               </div>
               <div>
-                <p className={collapsible.fieldLabel}>Valor total (liquidación)</p>
+                <p className={collapsible.fieldLabel}>Total value (settlement)</p>
                 <p className={saleRequestDetail.fieldValueSemibold}>$ {totalValor.toFixed(2)}</p>
               </div>
               <div>
-                <p className={collapsible.fieldLabel}>Porcentaje de anticipo (oferta)</p>
+                <p className={collapsible.fieldLabel}>Advance percentage (offer)</p>
                 <p className="text-gray-900 tabular-nums">{advancePercent}%</p>
               </div>
               <div>
-                <p className={collapsible.fieldLabel}>Monto del anticipo</p>
+                <p className={collapsible.fieldLabel}>Advance amount</p>
                 <p className={saleRequestDetail.fieldValueSemibold}>$ {advanceAmount.toFixed(2)}</p>
               </div>
               <div>
-                <p className={collapsible.fieldLabel}>Pago de comisión</p>
+                <p className={collapsible.fieldLabel}>Commission payment</p>
                 <p className={saleRequestDetail.fieldValueSemibold}>$ {commissionAmount.toFixed(2)}</p>
               </div>
               <div>
-                <p className={collapsible.fieldLabel}>Valor final a pagar</p>
+                <p className={collapsible.fieldLabel}>Final amount to pay</p>
                 <p className={saleRequestDetail.amountHighlight}>$ {totalToPay.toFixed(2)}</p>
               </div>
             </div>
             <p className={saleRequestDetail.transferHelp}>
-              Realice la transferencia según los datos acordados con el productor y adjunte la prueba de pago
-              abajo.
+              Make the transfer according to the details agreed with the producer and attach the payment proof below.
             </p>
           </div>
 
           <div className="space-y-3">
             <h4 className={collapsible.subsectionTitle}>
-              Prueba del anticipo
+              Advance proof
             </h4>
             <input
               ref={advanceProofInputRef}
@@ -260,7 +259,7 @@ export const AdvanceTransferSection: React.FC<AdvanceTransferSectionProps> = ({
                       d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
                     />
                   </svg>
-                  Subir imagen
+                  Upload image
                 </button>
                 {advanceProofFile && (
                   <>
@@ -270,7 +269,7 @@ export const AdvanceTransferSection: React.FC<AdvanceTransferSectionProps> = ({
                       onClick={() => onAdvanceProofFileChange(null)}
                       className={button.linkRemove}
                     >
-                      Quitar
+                      Remove
                     </button>
                   </>
                 )}
@@ -279,7 +278,7 @@ export const AdvanceTransferSection: React.FC<AdvanceTransferSectionProps> = ({
                 <div className={collapsible.proofImageLg}>
                   <img
                     src={advanceProofPreviewUrl}
-                    alt="Vista previa del comprobante"
+                    alt="Proof preview"
                     className={collapsible.proofImg}
                   />
                 </div>
@@ -292,7 +291,7 @@ export const AdvanceTransferSection: React.FC<AdvanceTransferSectionProps> = ({
   if (contentOnly) return content;
   return (
     <CollapsibleSection
-      title="Transferencia de anticipo al productor"
+      title="Advance transfer to producer"
       expanded={expanded}
       onToggle={onToggle}
     >

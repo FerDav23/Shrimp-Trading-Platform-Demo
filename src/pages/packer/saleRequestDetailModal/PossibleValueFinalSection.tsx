@@ -19,8 +19,8 @@ interface PossibleValueFinalSectionProps {
 const InProgressContent: React.FC = () => (
   <div className={saleRequestDetail.sectionCard}>
     <p className="text-sm text-gray-700 leading-relaxed">
-      La cotización de la logística sigue en proceso. Una vez esté lista se le hará saber el
-      posible valor a pagar de la compra.
+      The logistics quote is still in progress. Once it is ready you will be notified of the
+      possible amount to pay for the purchase.
     </p>
   </div>
 );
@@ -44,7 +44,7 @@ const PendingAcceptanceContent: React.FC<{
       <div className={saleRequestDetail.sectionCard}>
         <div className={`${saleRequestDetail.sectionGridTwoCols} gap-y-3`}>
           <div>
-            <p className={saleRequestDetail.sectionLabelSm}>Cantidad estimada de la pesca</p>
+            <p className={saleRequestDetail.sectionLabelSm}>Estimated catch quantity</p>
             <p className={saleRequestDetail.sectionValueSm}>
               {estimatedQuantityLb.toLocaleString('es-EC')} lb
               {linkedOffer?.priceUnit === 'PER_KG' && (
@@ -56,7 +56,7 @@ const PendingAcceptanceContent: React.FC<{
           </div>
           {priceTier && (
             <div>
-              <p className={saleRequestDetail.sectionLabelSm}>Precio de la talla ({sizeRange.min}/{sizeRange.max})</p>
+              <p className={saleRequestDetail.sectionLabelSm}>Size price ({sizeRange.min}/{sizeRange.max})</p>
               <p className={saleRequestDetail.sectionValueSm}>
                 USD {priceTier.price.toLocaleString('es-EC', { minimumFractionDigits: 2 })} / {priceTier.unit === 'PER_LB' ? 'lb' : 'kg'}
               </p>
@@ -64,7 +64,7 @@ const PendingAcceptanceContent: React.FC<{
           )}
           {estimatedCatch != null && (
             <div>
-              <p className={saleRequestDetail.sectionLabelSm}>Posible total de la pesca</p>
+              <p className={saleRequestDetail.sectionLabelSm}>Possible catch total</p>
               <p className={saleRequestDetail.sectionValueSm}>
                 USD {estimatedCatch.toLocaleString('es-EC', { minimumFractionDigits: 2 })}
               </p>
@@ -73,13 +73,13 @@ const PendingAcceptanceContent: React.FC<{
           {quote && (
             <>
               <div>
-                <p className={saleRequestDetail.sectionLabelSm}>Logística</p>
+                <p className={saleRequestDetail.sectionLabelSm}>Logistics</p>
                 <p className={saleRequestDetail.sectionValueSm}>
                   USD {quote.logisticsAmountUSD.toLocaleString('es-EC', { minimumFractionDigits: 2 })}
                 </p>
               </div>
               <div className="md:col-span-2">
-                <p className={saleRequestDetail.sectionLabelSm}>Total a pagar</p>
+                <p className={saleRequestDetail.sectionLabelSm}>Total to pay</p>
                 <p className={saleRequestDetail.amountHighlight}>
                   USD {quote.totalToPayUSD.toLocaleString('es-EC', { minimumFractionDigits: 2 })}
                 </p>
@@ -88,7 +88,7 @@ const PendingAcceptanceContent: React.FC<{
           )}
           {estimatedCatch == null && quote && (
             <div>
-              <p className={saleRequestDetail.sectionLabelSm}>Posible total de la pesca</p>
+              <p className={saleRequestDetail.sectionLabelSm}>Possible catch total</p>
               <p className={saleRequestDetail.sectionValueSm}>
                 USD {quote.estimatedCatchTotalUSD.toLocaleString('es-EC', { minimumFractionDigits: 2 })}
               </p>
@@ -99,16 +99,16 @@ const PendingAcceptanceContent: React.FC<{
 
       {onSendMessage && onMessageTextChange !== undefined && (
         <div className={saleRequestDetail.sectionCard}>
-          <p className={saleRequestDetail.sectionLabelSm}>Envíenos un mensaje</p>
+          <p className={saleRequestDetail.sectionLabelSm}>Send us a message</p>
           <p className="text-sm text-gray-600 mb-2">
-            Si tiene dudas sobre la cotización o desea comentar algo, puede escribirnos aquí.
+            If you have questions about the quote or want to comment, you can write to us here.
           </p>
           <div className={messagesSection.inputArea}>
             <div className={messagesSection.inputRow}>
               <textarea
                 value={messageText}
                 onChange={(e) => onMessageTextChange(e.target.value)}
-                placeholder="Escriba su mensaje..."
+                placeholder="Write your message..."
                 className={messagesSection.textarea}
                 rows={3}
                 maxLength={MAX_MESSAGE_LENGTH}

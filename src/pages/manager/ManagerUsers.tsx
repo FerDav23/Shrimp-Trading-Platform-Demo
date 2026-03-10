@@ -8,15 +8,15 @@ import { page, typography, button } from '../../styles';
 export const ManagerUsers: React.FC = () => {
   const columns = [
     {
-      header: 'Nombre',
+      header: 'Name',
       accessor: (user: User) => user.name,
     },
     {
-      header: 'Rol',
+      header: 'Role',
       accessor: (user: User) => user.role,
     },
     {
-      header: 'RUC/CI',
+      header: 'RUC/ID',
       accessor: (user: User) => user.ruc,
     },
     {
@@ -24,17 +24,17 @@ export const ManagerUsers: React.FC = () => {
       accessor: (user: User) => user.email,
     },
     {
-      header: 'Teléfono',
+      header: 'Phone',
       accessor: (user: User) => user.phone,
     },
     {
-      header: 'Acciones',
+      header: 'Actions',
       accessor: (user: User) => (
         <button
-          onClick={() => alert(`Editar usuario ${user.id} (simulado)`)}
+          onClick={() => alert(`Edit user ${user.id} (simulated)`)}
           className={typography.linkPrimarySm}
         >
-          Editar
+          Edit
         </button>
       ),
     },
@@ -43,12 +43,12 @@ export const ManagerUsers: React.FC = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className={page.title}>Usuarios</h1>
+        <h1 className={page.title}>Users</h1>
         <button
-          onClick={() => alert('Crear nuevo usuario (simulado)')}
+          onClick={() => alert('Create new user (simulated)')}
           className={button.primaryMd}
         >
-          Crear Usuario
+          Create User
         </button>
       </div>
       <Card>

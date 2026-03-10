@@ -1,28 +1,36 @@
-# Plataforma de Comercialización de Camarón - Frontend
+# Shrimp Commercialization Platform – Frontend
 
-Plataforma frontend para la comercialización de camarón en Ecuador. Centraliza ofertas de empacadoras para que productores vendan, con gestión de logística integrada.
+Frontend platform for shrimp commercialization in Ecuador. It centralizes packer offers so producers can sell, with integrated logistics management.
 
-## Stack Tecnológico
+---
 
-- **React 18** con TypeScript
-- **Vite** como bundler
-- **React Router** para navegación
-- **Tailwind CSS** para estilos
-- **date-fns** para manejo de fechas
+## About This Repository (Demo)
 
-## Instalación
+**This is a demo version of the original project.** Although I received permission from the company to publish the project, I had to leave out sensitive information. The live backend, APIs, real credentials, and other confidential parts are not included. What you see here is a **frontend-only demo** with mock data and fake authentication to showcase the UI and flows.
+
+---
+
+## Tech Stack
+
+- **React 18** with TypeScript
+- **Vite** as bundler
+- **React Router** for navigation
+- **Tailwind CSS** for styling
+- **date-fns** for date handling
+
+## Installation
 
 ```bash
 npm install
 ```
 
-## Desarrollo
+## Development
 
 ```bash
 npm run dev
 ```
 
-La aplicación estará disponible en `http://localhost:5173`
+The app will be available at `http://localhost:5173`
 
 ## Build
 
@@ -30,52 +38,53 @@ La aplicación estará disponible en `http://localhost:5173`
 npm run build
 ```
 
-## Estructura del Proyecto
+## Project Structure
 
 ```
 src/
-├── components/       # Componentes reutilizables
-├── contexts/        # Contextos de React (Auth)
-├── data/           # Datos dummy (users, offers, sales, logistics)
-├── layouts/        # Layouts principales
-├── pages/          # Páginas por rol
-│   ├── producer/   # Páginas del productor
-│   ├── packer/     # Páginas de la empacadora
-│   ├── logistics/  # Páginas de logística
-│   └── manager/    # Páginas del administrador
-├── types/          # Tipos TypeScript
-└── App.tsx         # Componente principal con rutas
+├── components/       # Reusable components
+├── contexts/        # React contexts (Auth)
+├── data/            # Dummy data (users, offers, sales, logistics)
+├── layouts/         # Main layouts
+├── pages/           # Role-based pages
+│   ├── producer/    # Producer pages
+│   ├── packer/      # Packer pages
+│   ├── logistics/   # Logistics pages
+│   └── manager/     # Admin pages
+├── types/           # TypeScript types
+└── App.tsx          # Main component with routes
 ```
 
-## Autenticación Fake
+## Fake Authentication
 
-El sistema utiliza autenticación local con usuarios dummy. Al iniciar sesión, puedes seleccionar uno de los 4 usuarios disponibles:
+The system uses local authentication with dummy users. When logging in, you can choose one of the 4 available users:
 
-1. **Juan Pérez** (PRODUCER) - Productor
-2. **ROSASUD S.A.S.** (PACKER) - Empacadora
-3. **Grupo FJ Logística** (LOGISTICS) - Logística
-4. **Admin FJ** (MANAGER) - Administrador
+1. **Juan Pérez** (PRODUCER) – Producer
+2. **ROSASUD S.A.S.** (PACKER) – Packer
+3. **Grupo FJ Logística** (LOGISTICS) – Logistics
+4. **Admin FJ** (MANAGER) – Administrator
 
-El usuario seleccionado se guarda en `localStorage` y determina el dashboard y las páginas accesibles según su rol.
+The selected user is stored in `localStorage` and determines the dashboard and pages available for that role.
 
-## Roles y Permisos
+## Roles and Permissions
 
-- **PRODUCER**: Puede ver ofertas, crear ventas, ver historial de ventas
-- **PACKER**: Puede crear y gestionar ofertas, ver ventas recibidas
-- **LOGISTICS**: Puede gestionar envíos, ver tarifas, certificados
-- **MANAGER**: Acceso completo a usuarios, ofertas, ventas y aprobaciones
+- **PRODUCER**: Can view offers, create sales, view sales history
+- **PACKER**: Can create and manage offers, view received sales
+- **LOGISTICS**: Can manage shipments, view rates, certificates
+- **MANAGER**: Full access to users, offers, sales, and approvals
 
-## Datos Dummy
+## Dummy Data
 
-Todos los datos están en archivos dentro de `src/data/`:
-- `users.ts` - Usuarios del sistema
-- `offers.ts` - Ofertas de empacadoras
-- `sales.ts` - Ventas realizadas
-- `logistics.ts` - Tarifas y camiones de logística
+All data lives in files under `src/data/`:
 
-## Notas
+- `users.ts` – System users
+- `offers.ts` – Packer offers
+- `sales.ts` – Sales
+- `logistics.ts` – Logistics rates and trucks
 
-- Esta es una aplicación **solo frontend** sin backend ni base de datos
-- Todos los cambios son simulados (alertas) y no persisten entre recargas
-- Los datos están hardcodeados en archivos TypeScript
-- El diseño es responsive y sigue un estilo SaaS moderno
+## Notes
+
+- This is a **frontend-only** app with no backend or database
+- All changes are simulated (alerts) and do not persist after refresh
+- Data is hardcoded in TypeScript files
+- The layout is responsive and uses a modern SaaS-style design

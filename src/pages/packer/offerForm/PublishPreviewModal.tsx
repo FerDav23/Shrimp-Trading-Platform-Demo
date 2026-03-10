@@ -34,12 +34,11 @@ export const PublishPreviewModal: React.FC<PublishPreviewModalProps> = ({
   );
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Vista previa antes de publicar" size="xl">
+    <Modal isOpen={isOpen} onClose={onClose} title="Preview before publishing" size="xl">
       <div className="space-y-3">
         <p className={page.infoBox}>
-          Esto es una vista previa de cómo el productor verá la oferta. Desplázate hacia abajo para
-          revisar el contenido, acepta el checklist y pulsa Publicar para que la oferta pase a
-          estado publicado.
+          This is a preview of how the producer will see the offer. Scroll down to review the content,
+          accept the checklist and click Publish to set the offer to published status.
         </p>
 
         <div className={page.previewBox}>
@@ -48,9 +47,8 @@ export const PublishPreviewModal: React.FC<PublishPreviewModalProps> = ({
 
         <div className={page.modalSection}>
           <p className="text-sm text-gray-700">
-            Al publicar, usted confirma que la información de la oferta es correcta y que cumple con
-            las condiciones de uso de la plataforma. (Aquí irán las condiciones de publicación de
-            oferta.)
+            By publishing, you confirm that the offer information is correct and complies with the
+            platform terms of use. (Offer publication conditions will go here.)
           </p>
           <label className={page.checkboxLabel}>
             <input
@@ -60,7 +58,7 @@ export const PublishPreviewModal: React.FC<PublishPreviewModalProps> = ({
               className={page.checkboxInput}
             />
             <span className="text-sm text-gray-700">
-              Acepto las condiciones anteriores y deseo publicar esta oferta.
+              I accept the above conditions and wish to publish this offer.
             </span>
           </label>
 
@@ -70,7 +68,7 @@ export const PublishPreviewModal: React.FC<PublishPreviewModalProps> = ({
               onClick={onClose}
               className={page.modalCancel}
             >
-              Cancelar
+              Cancel
             </button>
             <button
               type="button"
@@ -78,7 +76,7 @@ export const PublishPreviewModal: React.FC<PublishPreviewModalProps> = ({
               disabled={!checklistAccepted}
               className={page.modalConfirm}
             >
-              Publicar oferta
+              Publish offer
             </button>
           </div>
         </div>

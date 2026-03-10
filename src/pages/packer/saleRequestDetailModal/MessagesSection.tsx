@@ -1,6 +1,6 @@
 import React, { RefObject } from 'react';
 import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 import type { RequestMessage } from '../../../data/requestMessages';
 import { messagesSection } from '../../../styles';
 import { MAX_MESSAGE_LENGTH } from './constants';
@@ -39,8 +39,8 @@ export const MessagesSection: React.FC<MessagesSectionProps> = ({
                 className={isMessagesActive ? messagesSection.emptyText : messagesSection.emptyTextReadOnly}
               >
                 {isMessagesActive
-                  ? 'No hay mensajes aún. Inicia la conversación enviando un mensaje.'
-                  : 'No hay mensajes en el historial de esta solicitud.'}
+                  ? 'No messages yet. Start the conversation by sending a message.'
+                  : 'No messages in this request history.'}
               </div>
             ) : (
               messages.map((msg) => {
@@ -64,7 +64,7 @@ export const MessagesSection: React.FC<MessagesSectionProps> = ({
                       <div className={messagesSection.messageSender}>{msg.senderName}</div>
                       <div className={messagesSection.messageText}>{msg.text}</div>
                       <div className={messagesSection.messageTime}>
-                        {format(new Date(msg.createdAt), 'dd MMM yyyy, HH:mm', { locale: es })}
+                        {format(new Date(msg.createdAt), 'dd MMM yyyy, HH:mm', { locale: enUS })}
                       </div>
                     </div>
                   </div>
@@ -81,7 +81,7 @@ export const MessagesSection: React.FC<MessagesSectionProps> = ({
                   onChange={(e) => {
                     if (e.target.value.length <= MAX_MESSAGE_LENGTH) onMessageTextChange(e.target.value);
                   }}
-                  placeholder="Escribe tu mensaje..."
+                  placeholder="Write your message..."
                   className={messagesSection.textarea}
                   rows={2}
                 />
@@ -91,11 +91,11 @@ export const MessagesSection: React.FC<MessagesSectionProps> = ({
                   disabled={!messageText.trim() || messageText.length > MAX_MESSAGE_LENGTH}
                   className={messagesSection.sendButton}
                 >
-                  Enviar
+                  Send
                 </button>
               </div>
               <div className={messagesSection.charCount}>
-                {messageText.length}/{MAX_MESSAGE_LENGTH} caracteres
+                {messageText.length}/{MAX_MESSAGE_LENGTH} characters
               </div>
             </div>
           )}
@@ -113,9 +113,9 @@ export const MessagesSection: React.FC<MessagesSectionProps> = ({
         className={messagesSection.headerButton}
       >
         <div className={messagesSection.headerTitleWrap}>
-          <h3 className={messagesSection.title}>Mensajes sobre esta Solicitud</h3>
+          <h3 className={messagesSection.title}>Messages for this Request</h3>
           {!isMessagesActive && (
-            <span className={messagesSection.readOnlyBadge}>Solo lectura</span>
+            <span className={messagesSection.readOnlyBadge}>Read only</span>
           )}
         </div>
         <span className={messagesSection.chevronWrap}>

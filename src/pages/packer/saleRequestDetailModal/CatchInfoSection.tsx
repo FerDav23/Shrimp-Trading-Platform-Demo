@@ -57,7 +57,7 @@ const CatchInfoContent: React.FC<{ request: SaleRequest }> = ({ request }) => (
           <FormRow
             labelClassName={saleRequestDetail.sectionLabelSm}
             className={saleRequestDetail.sectionRowCompact}
-            label="Dirección de Cosecha"
+            label="Harvest Address"
           >
             <p className={saleRequestDetail.sectionValueSm}>
               {request.catchInfo.harvestLocation.address}
@@ -112,7 +112,7 @@ export const CatchInfoSection: React.FC<CatchInfoSectionProps> = ({
     return <CatchInfoContent request={request} />;
   }
   return (
-    <CollapsibleSection title="Información de Pesca" expanded={expanded} onToggle={onToggle}>
+    <CollapsibleSection title="Catch Information" expanded={expanded} onToggle={onToggle}>
       <CatchInfoContent request={request} />
     </CollapsibleSection>
   );

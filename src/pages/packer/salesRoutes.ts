@@ -67,17 +67,17 @@ export function statusToPath(status: WorkflowStatus): string {
   return `/packer/sales?view=${STATUS_TO_SLUG[status]}`;
 }
 
-/** Tabs de la página de Compras: Todas + Cotización logística + Pendientes + … + Logística. */
+/** Purchases page tabs: All + Logistics quote + Pending + … + Logistics. */
 export const SALES_VIEW_TABS: { tab: SalesViewTab; label: string }[] = [
-  { tab: VIEW_ALL, label: 'Todas las solicitudes' },
-  { tab: 'PENDING_ACCEPTANCE', label: 'Pendientes de Aceptar' },
-  { tab: TAB_LOGISTICS_QUOTE, label: 'Cotización de logística' },
-  { tab: TAB_LOGISTICS_TRACKING, label: 'Logistica' },
-  { tab: 'ADVANCE_PENDING', label: 'Anticipo Pendiente' },
-  { tab: 'CATCH_SETTLEMENT_PENDING', label: 'Liquidación de Pesca pendiente' },
-  { tab: 'BALANCE_PENDING', label: 'Saldo Restante Pendiente' },
-  { tab: 'SALE_COMPLETED', label: 'Venta Finalizada' },
-  { tab: 'REJECTED', label: 'Rechazadas' },
+  { tab: VIEW_ALL, label: 'All requests' },
+  { tab: 'PENDING_ACCEPTANCE', label: 'Pending Acceptance' },
+  { tab: TAB_LOGISTICS_QUOTE, label: 'Logistics quote' },
+  { tab: TAB_LOGISTICS_TRACKING, label: 'Logistics' },
+  { tab: 'ADVANCE_PENDING', label: 'Advance Pending' },
+  { tab: 'CATCH_SETTLEMENT_PENDING', label: 'Catch Settlement Pending' },
+  { tab: 'BALANCE_PENDING', label: 'Balance Pending' },
+  { tab: 'SALE_COMPLETED', label: 'Sale Completed' },
+  { tab: 'REJECTED', label: 'Rejected' },
 ];
 
 /** Solo los 6 estados del flujo (sin "Todas" ni tabs especiales), para dashboard etc. */

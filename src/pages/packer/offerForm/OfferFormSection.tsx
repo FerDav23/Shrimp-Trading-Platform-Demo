@@ -110,7 +110,7 @@ export const OfferFormSection: React.FC<OfferFormSectionProps> = ({
   const handleEditAttempt = () => {
     if (isLocked) {
       alert(
-        'No puede modificar una oferta visible. Debe despublicar la oferta (desactivar el switch) para poder editarla.'
+        'You cannot edit a visible offer. You must unpublish the offer (turn off the switch) to edit it.'
       );
     }
   };

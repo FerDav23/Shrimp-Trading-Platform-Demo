@@ -15,30 +15,30 @@ const getNavItems = (role: string): NavItem[] => {
     case 'PRODUCER':
       return [
         { label: 'Dashboard', path: '/producer/dashboard' },
-        { label: 'Ofertas', path: '/producer/offers' },
-        { label: 'Ventas', path: '/producer/sales' },
-        { label: 'Perfil', path: '/producer/profile' },
+        { label: 'Offers', path: '/producer/offers' },
+        { label: 'Sales', path: '/producer/sales' },
+        { label: 'Profile', path: '/producer/profile' },
       ];
     case 'PACKER':
       return [
         { label: 'Dashboard', path: '/packer/dashboard' },
-        { label: 'Mis Ofertas', path: '/packer/offers' },
-        { label: 'Compras', path: '/packer/sales' },
+        { label: 'My Offers', path: '/packer/offers' },
+        { label: 'Purchases', path: '/packer/sales' },
       ];
     case 'LOGISTICS':
       return [
         { label: 'Dashboard', path: '/logistics/dashboard' },
-        { label: 'Envíos', path: '/logistics/shipments' },
-        { label: 'Tarifas', path: '/logistics/pricing' },
-        { label: 'Certificados', path: '/logistics/certificates' },
+        { label: 'Shipments', path: '/logistics/shipments' },
+        { label: 'Pricing', path: '/logistics/pricing' },
+        { label: 'Certificates', path: '/logistics/certificates' },
       ];
     case 'MANAGER':
       return [
         { label: 'Dashboard', path: '/manager/dashboard' },
-        { label: 'Usuarios', path: '/manager/users' },
-        { label: 'Ofertas', path: '/manager/offers' },
-        { label: 'Ventas', path: '/manager/sales' },
-        { label: 'Aprobaciones', path: '/manager/approvals' },
+        { label: 'Users', path: '/manager/users' },
+        { label: 'Offers', path: '/manager/offers' },
+        { label: 'Sales', path: '/manager/sales' },
+        { label: 'Approvals', path: '/manager/approvals' },
       ];
     default:
       return [];

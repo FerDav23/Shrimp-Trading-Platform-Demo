@@ -15,8 +15,8 @@ export const ProducerOfferDetail: React.FC = () => {
   if (!offer) {
     return (
       <div>
-        <p className={typography.body}>Oferta no encontrada</p>
-        <Link to="/producer/offers" className={typography.linkPrimary}>Volver a ofertas</Link>
+        <p className={typography.body}>Offer not found</p>
+        <Link to="/producer/offers" className={typography.linkPrimary}>Back to offers</Link>
       </div>
     );
   }
@@ -29,7 +29,7 @@ export const ProducerOfferDetail: React.FC = () => {
     <div>
       <Breadcrumbs
         items={[
-          { label: 'Ofertas', path: '/producer/offers' },
+          { label: 'Offers', path: '/producer/offers' },
           { label: offer.offerCode },
         ]}
       />
@@ -51,12 +51,12 @@ export const ProducerOfferDetail: React.FC = () => {
 
           <div className="lg:col-span-1">
             <Card className="sticky top-6">
-              <h3 className={`${page.cardTitle} mb-4`}>Iniciar Venta</h3>
+              <h3 className={`${page.cardTitle} mb-4`}>Start Sale</h3>
               <p className={`${typography.body} mb-4`}>
-                Completa el formulario para iniciar una nueva venta con esta oferta.
+                Complete the form to start a new sale with this offer.
               </p>
               <button onClick={handleStartSale} className={button.primaryFull}>
-                Iniciar Venta
+                Start Sale
               </button>
             </Card>
           </div>

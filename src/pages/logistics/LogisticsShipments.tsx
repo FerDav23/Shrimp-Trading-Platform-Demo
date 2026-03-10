@@ -7,7 +7,7 @@ import { DataTable } from '../../components/DataTable';
 import { Modal } from '../../components/Modal';
 import { Sale } from '../../types';
 import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 import { page, form, button } from '../../styles';
 
 export const LogisticsShipments: React.FC = () => {
@@ -23,7 +23,7 @@ export const LogisticsShipments: React.FC = () => {
   const handleConfirmTruck = () => {
     if (selectedSale && selectedTruck) {
       alert(
-        `Camión ${selectedTruck} asignado a venta ${selectedSale.id} (simulado)`
+        `Truck ${selectedTruck} assigned to sale ${selectedSale.id} (simulated)`
       );
       setShowTruckModal(false);
       setSelectedSale(null);
@@ -32,37 +32,37 @@ export const LogisticsShipments: React.FC = () => {
   };
 
   const handleStatusChange = (saleId: string, newStatus: string) => {
-    alert(`Estado cambiado a ${newStatus} para venta ${saleId} (simulado)`);
+    alert(`Status changed to ${newStatus} for sale ${saleId} (simulated)`);
   };
 
   const columns = [
     {
-      header: 'ID Venta',
+      header: 'Sale ID',
       accessor: (sale: Sale) => `#${sale.id.split('-')[1]}`,
     },
     {
-      header: 'Origen',
+      header: 'Origin',
       accessor: (sale: Sale) => sale.pickupLocation.city,
     },
     {
-      header: 'Destino',
+      header: 'Destination',
       accessor: (sale: Sale) => sale.deliveryPlant.city,
     },
     {
-      header: 'Cantidad',
+      header: 'Quantity',
       accessor: (sale: Sale) => `${sale.quantityLb} lb`,
     },
     {
-      header: 'Fecha',
+      header: 'Date',
       accessor: (sale: Sale) =>
-        format(new Date(sale.createdAt), 'dd MMM yyyy', { locale: es }),
+        format(new Date(sale.createdAt), 'dd MMM yyyy', { locale: enUS }),
     },
     {
-      header: 'Estado',
+      header: 'Status',
       accessor: (sale: Sale) => <StatusBadge status={sale.logisticsStatus} />,
     },
     {
-      header: 'Acciones',
+      header: 'Actions',
       accessor: (sale: Sale) => (
         <div className="flex gap-2">
           {sale.logisticsStatus === 'PENDING_PICKUP' && (
@@ -71,7 +71,7 @@ export const LogisticsShipments: React.FC = () => {
                 onClick={() => handleAssignTruck(sale)}
                 className={button.actionSmallBlue}
               >
-                Asignar Camión
+                Assign Truck
               </button>
               <button
                 onClick={() => handleStatusChange(sale.id, 'IN_TRANSIT')}
@@ -108,11 +108,11 @@ export const LogisticsShipments: React.FC = () => {
           setSelectedSale(null);
           setSelectedTruck('');
         }}
-        title="Asignar Camión"
+        title="Assign Truck"
       >
         <div className="space-y-4">
           <div>
-            <label className={form.label}>Seleccionar Camión</label>
+            <label className={form.label}>Select Truck</label>
             <select
               value={selectedTruck}
               onChange={(e) => setSelectedTruck(e.target.value)}
@@ -138,7 +138,7 @@ export const LogisticsShipments: React.FC = () => {
               Cancelar
             </button>
             <button onClick={handleConfirmTruck} className={button.primaryMd}>
-              Confirmar
+              Confirm
             </button>
           </div>
         </div>

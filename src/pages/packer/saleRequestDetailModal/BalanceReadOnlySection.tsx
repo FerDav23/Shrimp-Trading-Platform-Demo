@@ -135,8 +135,8 @@ export const BalanceReadOnlySection: React.FC<BalanceReadOnlySectionProps> = ({
                 <p className={saleRequestDetail.amountHighlight}>$ {balanceAmountRO.toFixed(2)}</p>
               </div>
               <div className="md:col-span-2">
-                <p className={collapsible.fieldLabel}>Estado</p>
-                <p className={`${saleRequestDetail.fieldValue} ${saleRequestDetail.statusSuccess}`}>Saldo enviado y confirmado</p>
+                <p className={collapsible.fieldLabel}>Status</p>
+                <p className={`${saleRequestDetail.fieldValue} ${saleRequestDetail.statusSuccess}`}>Balance sent and confirmed</p>
               </div>
             </div>
           </div>

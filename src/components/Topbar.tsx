@@ -69,7 +69,7 @@ export const Topbar: React.FC = () => {
               onClick={handleLogout}
               className={topbar.dropdownItem}
             >
-              Cerrar sesión
+              Log out
             </button>
           </div>
         )}

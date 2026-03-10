@@ -32,10 +32,8 @@ export const Login: React.FC = () => {
 
   const getRoleLabel = (role: string) => {
     const labels: Record<string, string> = {
-      PRODUCER: 'Productor',
-      PACKER: 'Empacadora',
-      LOGISTICS: 'Logística',
-      MANAGER: 'Administrador',
+      PRODUCER: 'Producer',
+      PACKER: 'Packer',
     };
     return labels[role] || role;
   };
@@ -45,12 +43,17 @@ export const Login: React.FC = () => {
       <div className="w-full max-w-4xl">
         <div className="text-center mb-8">
           <h1 className={loginStyles.title}>
-            Plataforma de Comercialización de Camarón
+            Shrimp Commercialization Platform
           </h1>
-          <p className={loginStyles.subtitle}>Selecciona un usuario para continuar</p>
+          <p className={loginStyles.subtitle}>Select a user to continue</p>
+          <p className="mt-3 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 max-w-2xl mx-auto">
+            <strong>Demo.</strong> This is a simplified demo of the original system. The full system is not included here in order to protect sensitive company information and system architecture.
+          </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {dummyUsers.map((user) => (
+          {dummyUsers
+            .filter((u) => u.role === 'PRODUCER' || u.role === 'PACKER')
+            .map((user) => (
             <Card
               key={user.id}
               onClick={() => handleLogin(user.id)}

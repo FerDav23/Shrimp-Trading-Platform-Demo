@@ -171,7 +171,7 @@ export const BalanceTransferSection: React.FC<BalanceTransferSectionProps> = ({
               </>
             ) : (
               <p className={saleRequestDetail.noBankData}>
-                No hay datos bancarios registrados para la empacadora.
+                No bank data registered for the packer.
               </p>
             )}
           </div>

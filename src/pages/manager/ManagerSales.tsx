@@ -5,7 +5,7 @@ import { StatusBadge } from '../../components/StatusBadge';
 import { DataTable } from '../../components/DataTable';
 import { Sale } from '../../types';
 import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 import { page, form } from '../../styles';
 
 export const ManagerSales: React.FC = () => {
@@ -24,62 +24,62 @@ export const ManagerSales: React.FC = () => {
 
   const columns = [
     {
-      header: 'ID Venta',
+      header: 'Sale ID',
       accessor: (sale: Sale) => `#${sale.id.split('-')[1]}`,
     },
     {
-      header: 'Producto',
+      header: 'Product',
       accessor: (sale: Sale) => sale.productForm,
     },
     {
-      header: 'Cantidad',
+      header: 'Quantity',
       accessor: (sale: Sale) => `${sale.quantityLb} lb`,
     },
     {
-      header: 'Fecha',
+      header: 'Date',
       accessor: (sale: Sale) =>
-        format(new Date(sale.createdAt), 'dd MMM yyyy', { locale: es }),
+        format(new Date(sale.createdAt), 'dd MMM yyyy', { locale: enUS }),
     },
     {
-      header: 'Logística',
+      header: 'Logistics',
       accessor: (sale: Sale) => <StatusBadge status={sale.logisticsStatus} />,
     },
     {
-      header: 'Pago',
+      header: 'Payment',
       accessor: (sale: Sale) => <StatusBadge status={sale.paymentStatus} />,
     },
   ];
 
   return (
     <div>
-      <h1 className={page.title}>Todas las Ventas</h1>
+      <h1 className={page.title}>All Sales</h1>
       <Card className="mb-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className={form.label}>Filtro por Pago</label>
+            <label className={form.label}>Filter by Payment</label>
             <select
               value={filterPayment}
               onChange={(e) => setFilterPayment(e.target.value)}
               className={form.selectFilter}
             >
-              <option value="all">Todos</option>
-              <option value="PENDING">Pendiente</option>
-              <option value="PARTIAL">Parcial</option>
-              <option value="PAID">Pagado</option>
-              <option value="OVERDUE">Vencido</option>
+              <option value="all">All</option>
+              <option value="PENDING">Pending</option>
+              <option value="PARTIAL">Partial</option>
+              <option value="PAID">Paid</option>
+              <option value="OVERDUE">Overdue</option>
             </select>
           </div>
           <div>
-            <label className={form.label}>Filtro por Logística</label>
+            <label className={form.label}>Filter by Logistics</label>
             <select
               value={filterLogistics}
               onChange={(e) => setFilterLogistics(e.target.value)}
               className={form.selectFilter}
             >
-              <option value="all">Todos</option>
-              <option value="PENDING_PICKUP">Pendiente Recolección</option>
-              <option value="IN_TRANSIT">En Tránsito</option>
-              <option value="DELIVERED">Entregado</option>
+              <option value="all">All</option>
+              <option value="PENDING_PICKUP">Pending Pickup</option>
+              <option value="IN_TRANSIT">In Transit</option>
+              <option value="DELIVERED">Delivered</option>
             </select>
           </div>
         </div>

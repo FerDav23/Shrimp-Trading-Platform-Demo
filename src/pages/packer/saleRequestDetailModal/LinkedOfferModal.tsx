@@ -16,12 +16,12 @@ export const LinkedOfferModal: React.FC<LinkedOfferModalProps> = ({ isOpen, onCl
     <Modal isOpen={isOpen} onClose={onClose} size="xl">
       <div className={linkedOfferModal.wrap}>
         <div className={linkedOfferModal.header}>
-          <h3 className={linkedOfferModal.title}>Oferta aceptada</h3>
+          <h3 className={linkedOfferModal.title}>Accepted offer</h3>
           <button
             type="button"
             onClick={onClose}
             className={linkedOfferModal.closeBtn}
-            aria-label="Cerrar"
+            aria-label="Close"
           >
             <span className={linkedOfferModal.closeIcon}>×</span>
           </button>
@@ -29,7 +29,7 @@ export const LinkedOfferModal: React.FC<LinkedOfferModalProps> = ({ isOpen, onCl
         <OfferPreviewContent offer={offer} />
         <div className={linkedOfferModal.footer}>
           <button type="button" onClick={onClose} className={button.primaryMd}>
-            Cerrar
+            Close
           </button>
         </div>
       </div>

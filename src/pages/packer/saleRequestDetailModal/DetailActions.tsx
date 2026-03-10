@@ -44,30 +44,30 @@ export const DetailActions: React.FC<DetailActionsProps> = ({
   <div className={detailActions.container}>
     {status === 'LOGISTICS_QUOTE_IN_PROGRESS' && (
       <button type="button" onClick={onClose} className={detailActions.close}>
-        Cerrar
+        Close
       </button>
     )}
     {status === 'LOGISTICS_QUOTE_PENDING_ACCEPTANCE' && !showRejectForm && (
       <>
         <button type="button" onClick={onClose} className={detailActions.cancel}>
-          Cerrar
+          Close
         </button>
         <button type="button" onClick={onReject} className={detailActions.reject}>
-          Rechazar cotización
+          Reject quote
         </button>
         <button
           type="button"
           onClick={onAcceptLogisticsQuote}
           className={detailActions.accept}
         >
-          Aceptar cotización
+          Accept quote
         </button>
       </>
     )}
     {status === 'LOGISTICS_QUOTE_PENDING_ACCEPTANCE' && showRejectForm && (
       <>
         <button type="button" onClick={onCancelReject} className={detailActions.cancel}>
-          Cancelar
+          Cancel
         </button>
         <button
           type="button"
@@ -75,31 +75,31 @@ export const DetailActions: React.FC<DetailActionsProps> = ({
           disabled={!canConfirmReject}
           className={detailActions.rejectDisabled}
         >
-          Confirmar rechazo de cotización
+          Confirm quote rejection
         </button>
       </>
     )}
     {status === 'PENDING_ACCEPTANCE' && !showRejectForm && (
       <>
         <button type="button" onClick={onClose} className={detailActions.cancel}>
-          Cerrar
+          Close
         </button>
         <button type="button" onClick={onReject} className={detailActions.reject}>
-          Rechazar solicitud de compra
+          Reject purchase request
         </button>
         <button
           type="button"
           onClick={onStartAccept ?? onAccept}
           className={detailActions.accept}
         >
-          Aceptar solicitud de compra
+          Accept purchase request
         </button>
       </>
     )}
     {status === 'PENDING_ACCEPTANCE' && showRejectForm && (
       <>
         <button type="button" onClick={onCancelReject} className={detailActions.cancel}>
-          Cancelar
+          Cancel
         </button>
         <button
           type="button"
@@ -107,7 +107,7 @@ export const DetailActions: React.FC<DetailActionsProps> = ({
           disabled={!canConfirmReject}
           className={detailActions.rejectDisabled}
         >
-          Confirmar rechazo de solicitud de compra
+          Confirm purchase request rejection
         </button>
       </>
     )}
@@ -116,7 +116,7 @@ export const DetailActions: React.FC<DetailActionsProps> = ({
       status !== 'LOGISTICS_QUOTE_PENDING_ACCEPTANCE' && (
       <>
         <button type="button" onClick={onClose} className={detailActions.close}>
-          Cerrar
+          Close
         </button>
         {status === 'CATCH_SETTLEMENT_PENDING' && (
           <>
@@ -127,7 +127,7 @@ export const DetailActions: React.FC<DetailActionsProps> = ({
                 disabled={!isSettlementLocked}
                 className={button.skyPrimary}
               >
-                Enviar liquidación de pesca
+                Send catch settlement
               </button>
             )}
             {onCancelPurchase && (
@@ -136,7 +136,7 @@ export const DetailActions: React.FC<DetailActionsProps> = ({
                 onClick={onCancelPurchase}
                 className={button.rejectOutline}
               >
-                Cancelar compra
+                Cancel purchase
               </button>
             )}
           </>
@@ -150,7 +150,7 @@ export const DetailActions: React.FC<DetailActionsProps> = ({
                 disabled={!advanceProofFile}
                 className={button.skyPrimary}
               >
-                Enviar prueba de anticipo
+                Send advance proof
               </button>
             )}
             {onCancelPurchase && (
@@ -159,7 +159,7 @@ export const DetailActions: React.FC<DetailActionsProps> = ({
                 onClick={onCancelPurchase}
                 className={button.rejectOutline}
               >
-                Cancelar compra
+                Cancel purchase
               </button>
             )}
           </>
@@ -173,7 +173,7 @@ export const DetailActions: React.FC<DetailActionsProps> = ({
                 disabled={!balanceProofFile}
                 className={button.skyPrimary}
               >
-                Enviar prueba de saldo
+                Send balance proof
               </button>
             )}
           </>

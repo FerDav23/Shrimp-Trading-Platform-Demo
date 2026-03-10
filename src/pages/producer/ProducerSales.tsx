@@ -7,7 +7,7 @@ import { StatusBadge } from '../../components/StatusBadge';
 import { DataTable } from '../../components/DataTable';
 import { Sale } from '../../types';
 import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 import { page, typography } from '../../styles';
 
 export const ProducerSales: React.FC = () => {
@@ -16,7 +16,7 @@ export const ProducerSales: React.FC = () => {
 
   const columns = [
     {
-      header: 'ID Venta',
+      header: 'Sale ID',
       accessor: (sale: Sale) => (
         <Link to={`/producer/sales/${sale.id}`} className={typography.linkPrimary}>
           #{sale.id.split('-')[1]}
@@ -24,35 +24,35 @@ export const ProducerSales: React.FC = () => {
       ),
     },
     {
-      header: 'Producto',
+      header: 'Product',
       accessor: (sale: Sale) => sale.productForm,
     },
     {
-      header: 'Talla',
+      header: 'Size',
       accessor: (sale: Sale) => `${sale.sizeRangeSelected.min}/${sale.sizeRangeSelected.max}`,
     },
     {
-      header: 'Cantidad',
+      header: 'Quantity',
       accessor: (sale: Sale) => `${sale.quantityLb} lb`,
     },
     {
-      header: 'Fecha',
+      header: 'Date',
       accessor: (sale: Sale) =>
-        format(new Date(sale.createdAt), 'dd MMM yyyy', { locale: es }),
+        format(new Date(sale.createdAt), 'dd MMM yyyy', { locale: enUS }),
     },
     {
-      header: 'Logística',
+      header: 'Logistics',
       accessor: (sale: Sale) => <StatusBadge status={sale.logisticsStatus} />,
     },
     {
-      header: 'Pago',
+      header: 'Payment',
       accessor: (sale: Sale) => <StatusBadge status={sale.paymentStatus} />,
     },
   ];
 
   return (
     <div>
-      <h1 className={page.title}>Mis Ventas</h1>
+      <h1 className={page.title}>My Sales</h1>
       <Card>
         <DataTable data={mySales} columns={columns} />
       </Card>

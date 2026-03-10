@@ -10,13 +10,13 @@ export const ProducerProfile: React.FC = () => {
 
   return (
     <div>
-      <h1 className={page.title}>Mi Perfil</h1>
+      <h1 className={page.title}>My Profile</h1>
       <div className={page.grid2}>
         <Card>
-          <h2 className={`${page.cardTitle} mb-4`}>Información Personal</h2>
+          <h2 className={`${page.cardTitle} mb-4`}>Personal Information</h2>
           <div className="space-y-3 text-sm">
             <div>
-              <span className={typography.body}>Nombre:</span>
+              <span className={typography.body}>Name:</span>
               <span className="ml-2 font-medium">{user.name}</span>
             </div>
             <div>
@@ -28,12 +28,12 @@ export const ProducerProfile: React.FC = () => {
               <span className="ml-2 font-medium">{user.email}</span>
             </div>
             <div>
-              <span className={typography.body}>Teléfono:</span>
+              <span className={typography.body}>Phone:</span>
               <span className="ml-2 font-medium">{user.phone}</span>
             </div>
             {user.address && (
               <div>
-                <span className={typography.body}>Dirección:</span>
+                <span className={typography.body}>Address:</span>
                 <span className="ml-2 font-medium">{user.address}</span>
               </div>
             )}
@@ -41,7 +41,7 @@ export const ProducerProfile: React.FC = () => {
         </Card>
 
         <Card>
-          <h2 className={`${page.cardTitle} mb-4`}>Documentos</h2>
+          <h2 className={`${page.cardTitle} mb-4`}>Documents</h2>
           {user.docs && user.docs.length > 0 ? (
             <ul className="space-y-2">
               {user.docs.map((doc, idx) => (
@@ -51,12 +51,12 @@ export const ProducerProfile: React.FC = () => {
               ))}
             </ul>
           ) : (
-            <p className={page.cardEmpty}>No hay documentos registrados</p>
+            <p className={page.cardEmpty}>No documents registered</p>
           )}
         </Card>
 
         <Card>
-          <h2 className={`${page.cardTitle} mb-4`}>Información Bancaria</h2>
+          <h2 className={`${page.cardTitle} mb-4`}>Bank Information</h2>
           {user.bankInfo && user.bankInfo.length > 0 ? (
             <ul className="space-y-2">
               {user.bankInfo.map((info, idx) => (
@@ -66,7 +66,7 @@ export const ProducerProfile: React.FC = () => {
               ))}
             </ul>
           ) : (
-            <p className={page.cardEmpty}>No hay información bancaria registrada</p>
+            <p className={page.cardEmpty}>No bank information registered</p>
           )}
         </Card>
       </div>

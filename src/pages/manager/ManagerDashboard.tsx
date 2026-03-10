@@ -17,32 +17,32 @@ export const ManagerDashboard: React.FC = () => {
 
   return (
     <div>
-      <h1 className={page.title}>Dashboard Administrador</h1>
+      <h1 className={page.title}>Admin Dashboard</h1>
       <div className={page.gridStats4}>
         <Card>
-          <div className={page.statLabel}>Total Ventas</div>
+          <div className={page.statLabel}>Total Sales</div>
           <div className={page.statValue}>{totalSales}</div>
         </Card>
         <Card>
-          <div className={page.statLabel}>Ventas Pagadas</div>
+          <div className={page.statLabel}>Paid Sales</div>
           <div className={page.statValueGreen}>{paidSales}</div>
         </Card>
         <Card>
-          <div className={page.statLabel}>Pendientes de Pago</div>
+          <div className={page.statLabel}>Pending Payment</div>
           <div className={page.statValueYellow}>{unpaidSales}</div>
         </Card>
         <Card>
-          <div className={page.statLabel}>Volumen Total (lb)</div>
+          <div className={page.statLabel}>Total Volume (lb)</div>
           <div className={page.statValueBlue}>{totalVolume.toLocaleString()}</div>
         </Card>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card>
-          <div className={page.statLabel}>Ofertas Activas</div>
+          <div className={page.statLabel}>Active Offers</div>
           <div className={page.statValuePrimary}>{activeOffers}</div>
         </Card>
         <Card>
-          <div className={page.statLabel}>Total Usuarios</div>
+          <div className={page.statLabel}>Total Users</div>
           <div className={page.statValuePurple}>{totalUsers}</div>
         </Card>
       </div>

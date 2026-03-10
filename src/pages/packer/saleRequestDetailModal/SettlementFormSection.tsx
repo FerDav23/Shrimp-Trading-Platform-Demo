@@ -77,7 +77,7 @@ export const SettlementFormSection: React.FC<SettlementFormSectionProps> = ({
                 onClick={() => onSettlementLockedChange(false)}
                 className={button.skySmall}
               >
-                Editar liquidación
+                Edit settlement
               </button>
             ) : (
               <button
@@ -85,7 +85,7 @@ export const SettlementFormSection: React.FC<SettlementFormSectionProps> = ({
                 onClick={() => onSettlementLockedChange(true)}
                 className={button.skySmall}
               >
-                Guardar
+                Save
               </button>
             )}
           </div>
@@ -112,7 +112,7 @@ export const SettlementFormSection: React.FC<SettlementFormSectionProps> = ({
                   className={`${form.inputEditable} ${isSettlementLocked ? saleRequestDetail.inputLocked : ''}`}
                 />
               </FormRow>
-              <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Guía rem.">
+              <FormRow labelClassName={saleRequestDetail.formRowLabel} label="Rem. guide">
                 <input
                   type="text"
                   value={settlement.remissionGuide}
@@ -146,7 +146,7 @@ export const SettlementFormSection: React.FC<SettlementFormSectionProps> = ({
           </div>
 
           <div className="space-y-6">
-            <h4 className={saleRequestDetail.subsectionSmallPlain}>Detalle por clase y talla</h4>
+            <h4 className={saleRequestDetail.subsectionSmallPlain}>Detail by class and size</h4>
             {tableGroups.map(({ key, title }) => {
               const lines = settlement[key];
               const updateLine = (lineId: string, field: keyof CatchSettlementLine, value: string | number) => {
@@ -262,7 +262,7 @@ export const SettlementFormSection: React.FC<SettlementFormSectionProps> = ({
                                     type="button"
                                     onClick={() => removeLine(line.id)}
                                     className={settlementTable.removeBtn}
-                                    aria-label="Quitar línea"
+                                    aria-label="Remove line"
                                   >
                                     ×
                                   </button>
@@ -328,7 +328,7 @@ export const SettlementFormSection: React.FC<SettlementFormSectionProps> = ({
   );
   if (contentOnly) return content;
   return (
-    <CollapsibleSection title="Liquidación de pesca" expanded={expanded} onToggle={onToggle}>
+    <CollapsibleSection title="Catch settlement" expanded={expanded} onToggle={onToggle}>
       {content}
     </CollapsibleSection>
   );

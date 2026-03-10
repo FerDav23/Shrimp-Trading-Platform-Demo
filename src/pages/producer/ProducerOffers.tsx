@@ -6,7 +6,7 @@ import { StatusBadge } from '../../components/StatusBadge';
 import { DataTable } from '../../components/DataTable';
 import { Offer } from '../../types';
 import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 import { page, form, typography } from '../../styles';
 
 export const ProducerOffers: React.FC = () => {
@@ -35,7 +35,7 @@ export const ProducerOffers: React.FC = () => {
 
   const columns = [
     {
-      header: 'Código',
+      header: 'Code',
       accessor: (offer: Offer) => (
         <Link to={`/producer/offers/${offer.id}`} className={typography.linkPrimary}>
           {offer.offerCode}
@@ -43,31 +43,31 @@ export const ProducerOffers: React.FC = () => {
       ),
     },
     {
-      header: 'Empacadora',
+      header: 'Packer',
       accessor: (offer: Offer) => offer.packingCompany.name,
     },
     {
-      header: 'Producto',
+      header: 'Product',
       accessor: (offer: Offer) => offer.productForm,
     },
     {
-      header: 'Unidad',
+      header: 'Unit',
       accessor: (offer: Offer) => offer.priceUnit.replace('PER_', '/'),
     },
     {
-      header: 'Vigencia',
+      header: 'Valid',
       accessor: (offer: Offer) =>
-        `${format(new Date(offer.validFrom), 'dd MMM', { locale: es })} - ${format(new Date(offer.validTo), 'dd MMM yyyy', { locale: es })}`,
+        `${format(new Date(offer.validFrom), 'dd MMM', { locale: enUS })} - ${format(new Date(offer.validTo), 'dd MMM yyyy', { locale: enUS })}`,
     },
     {
-      header: 'Estado',
+      header: 'Status',
       accessor: (offer: Offer) => <StatusBadge status={offer.status} />,
     },
     {
-      header: 'Acciones',
+      header: 'Actions',
       accessor: (offer: Offer) => (
         <Link to={`/producer/offers/${offer.id}`} className={typography.linkPrimarySm}>
-          Ver
+          View
         </Link>
       ),
     },
@@ -76,19 +76,19 @@ export const ProducerOffers: React.FC = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className={page.title}>Ofertas Disponibles</h1>
+        <h1 className={page.title}>Available Offers</h1>
       </div>
 
       <Card className="mb-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className={form.label}>Empacadora</label>
+            <label className={form.label}>Packer</label>
             <select
               value={filterCompany}
               onChange={(e) => setFilterCompany(e.target.value)}
               className={form.selectFilter}
             >
-              <option value="all">Todas</option>
+              <option value="all">All</option>
               {companies.map((id) => {
                 const company = publishedOffers.find((o) => o.packingCompany.id === id)
                   ?.packingCompany;
@@ -101,28 +101,28 @@ export const ProducerOffers: React.FC = () => {
             </select>
           </div>
           <div>
-            <label className={form.label}>Producto</label>
+            <label className={form.label}>Product</label>
             <select
               value={filterProduct}
               onChange={(e) => setFilterProduct(e.target.value)}
               className={form.selectFilter}
             >
-              <option value="all">Todos</option>
-              <option value="ENTERO">Entero</option>
-              <option value="COLA_DIRECTA">Cola Directa</option>
-              <option value="CAMARON_VIVO">Camarón Vivo</option>
+              <option value="all">All</option>
+              <option value="ENTERO">Whole</option>
+              <option value="COLA_DIRECTA">Direct Tail</option>
+              <option value="CAMARON_VIVO">Live Shrimp</option>
             </select>
           </div>
           <div>
-            <label className={form.label}>Unidad</label>
+            <label className={form.label}>Unit</label>
             <select
               value={filterUnit}
               onChange={(e) => setFilterUnit(e.target.value)}
               className={form.selectFilter}
             >
-              <option value="all">Todas</option>
-              <option value="PER_LB">Por libra</option>
-              <option value="PER_KG">Por kilogramo</option>
+              <option value="all">All</option>
+              <option value="PER_LB">Per pound</option>
+              <option value="PER_KG">Per kilogram</option>
             </select>
           </div>
         </div>

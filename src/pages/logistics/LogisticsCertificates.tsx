@@ -10,9 +10,9 @@ export const LogisticsCertificates: React.FC = () => {
 
   return (
     <div>
-      <h1 className={page.title}>Certificados y Licencias</h1>
+      <h1 className={page.title}>Certificates and Licenses</h1>
       <Card>
-        <h2 className={`${page.cardTitle} mb-4`}>Documentos Registrados</h2>
+        <h2 className={`${page.cardTitle} mb-4`}>Registered Documents</h2>
         {certificates.length > 0 ? (
           <div className="space-y-4">
             {certificates.map((cert, idx) => (
@@ -24,13 +24,13 @@ export const LogisticsCertificates: React.FC = () => {
                   onClick={() => alert('Descargando PDF (simulado)')}
                   className={button.primaryMd}
                 >
-                  Descargar PDF
+                  Download PDF
                 </button>
               </div>
             ))}
           </div>
         ) : (
-          <p className={page.cardEmpty}>No hay certificados registrados</p>
+          <p className={page.cardEmpty}>No certificates registered</p>
         )}
       </Card>
     </div>

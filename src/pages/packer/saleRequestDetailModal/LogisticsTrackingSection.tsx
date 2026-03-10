@@ -11,8 +11,8 @@ const LOGISTICS_STATUS_CONFIG: Record<
   { title: string; subtitle: string; icon: React.ReactNode; cardClass: string }
 > = {
   PENDING_PICKUP: {
-    title: 'Pendiente de recoger',
-    subtitle: 'A la espera de que logística recoja la pesca',
+    title: 'Pending pickup',
+    subtitle: 'Waiting for logistics to pick up the catch',
     icon: (
       <svg className={logisticsTracking.iconPendingPickup} fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
@@ -21,8 +21,8 @@ const LOGISTICS_STATUS_CONFIG: Record<
     cardClass: logisticsTracking.statusCardPendingPickup,
   },
   PENDING_DELIVERY: {
-    title: 'Pesca pendiente de entregar',
-    subtitle: 'Logística en camino',
+    title: 'Catch pending delivery',
+    subtitle: 'Logistics on the way',
     icon: (
       <svg className={logisticsTracking.iconPendingDelivery} fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
@@ -31,8 +31,8 @@ const LOGISTICS_STATUS_CONFIG: Record<
     cardClass: logisticsTracking.statusCardPendingDelivery,
   },
   PICKED_UP: {
-    title: 'Pesca pendiente de aceptar',
-    subtitle: 'El camión llegó a planta. Registre la recepción: peso, documento y términos.',
+    title: 'Catch pending acceptance',
+    subtitle: 'Truck arrived at plant. Record reception: weight, document and terms.',
     icon: (
       <svg className={logisticsTracking.iconPickedUp} fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8 4-8-4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
@@ -58,10 +58,10 @@ interface LogisticsTrackingSectionProps {
   onConfirmDelivery?: () => void;
 }
 
-const TERMS_TEXT = `Al confirmar la recepción de la carga, declaro que:
-• El peso del camión registrado corresponde al vehículo que entregó la pesca.
-• He verificado el estado de la mercadería al momento de la recepción.
-• Acepto los términos de recepción establecidos en el contrato de compra.`;
+const TERMS_TEXT = `By confirming receipt of the cargo, I declare that:
+• The registered truck weight corresponds to the vehicle that delivered the catch.
+• I have verified the condition of the goods at the time of receipt.
+• I accept the receipt terms set out in the purchase contract.`;
 
 export const LogisticsTrackingSection: React.FC<LogisticsTrackingSectionProps> = ({
   request,
@@ -92,10 +92,10 @@ export const LogisticsTrackingSection: React.FC<LogisticsTrackingSectionProps> =
           {(['PENDING_PICKUP', 'PENDING_DELIVERY', 'PICKED_UP'] as LogisticsDisplayStatus[]).map((key, idx) => {
             const label =
               key === 'PENDING_PICKUP'
-                ? 'Pendiente de recoger'
+                ? 'Pending pickup'
                 : key === 'PENDING_DELIVERY'
-                  ? 'Pesca pendiente de entregar'
-                  : 'Pesca pendiente de aceptar';
+                  ? 'Catch pending delivery'
+                  : 'Catch pending acceptance';
             return (
               <React.Fragment key={key}>
                 <div className={logisticsTracking.stepWrapper}>
@@ -127,24 +127,24 @@ export const LogisticsTrackingSection: React.FC<LogisticsTrackingSectionProps> =
         </div>
 
         <div className={saleRequestDetail.sectionCard}>
-          <h4 className={collapsible.subsectionTitle}>Registro de recepción de carga</h4>
+          <h4 className={collapsible.subsectionTitle}>Cargo reception record</h4>
           {delivery ? (
             <>
               <div className={saleRequestDetail.sectionGridTwoCols}>
                 <div>
                   <p className={saleRequestDetail.sectionLabelSm}>
-                    Peso de la pesca recibida ({weightUnitLabel})
+                    Received catch weight ({weightUnitLabel})
                   </p>
                   <p className={saleRequestDetail.sectionValueSm}>
                     {delivery.catchWeight.toLocaleString('es-EC')}
                   </p>
                 </div>
                 <div>
-                  <p className={saleRequestDetail.sectionLabelSm}>Fecha de aceptación</p>
+                  <p className={saleRequestDetail.sectionLabelSm}>Acceptance date</p>
                   <p className={saleRequestDetail.sectionValueSm}>
                     {delivery.termsAcceptedAt
-                      ? new Date(delivery.termsAcceptedAt).toLocaleString('es-EC')
-                      : 'Aceptados'}
+                      ? new Date(delivery.termsAcceptedAt).toLocaleString('en-US')
+                      : 'Accepted'}
                   </p>
                 </div>
               </div>
@@ -292,12 +292,12 @@ export const LogisticsTrackingSection: React.FC<LogisticsTrackingSectionProps> =
       {showReceptionForm && (
         <div className={logisticsTracking.receptionForm}>
           <div className={saleRequestDetail.sectionCard}>
-            <h4 className={collapsible.subsectionTitle}>Registro de recepción de carga</h4>
+            <h4 className={collapsible.subsectionTitle}>Cargo reception record</h4>
 
             <FormRow
               labelClassName={collapsible.fieldLabel}
               className="mb-4 mt-3"
-              label={`Peso de la pesca recibida (${weightUnitLabel})`}
+              label={`Received catch weight (${weightUnitLabel})`}
             >
               <input
                 type="number"
@@ -343,7 +343,7 @@ export const LogisticsTrackingSection: React.FC<LogisticsTrackingSectionProps> =
                         d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
                       />
                     </svg>
-                    Subir documento
+                    Upload document
                   </button>
                   {documentFile && (
                     <>
@@ -390,7 +390,7 @@ export const LogisticsTrackingSection: React.FC<LogisticsTrackingSectionProps> =
                   disabled={!canConfirm}
                   className={button.skyPrimary}
                 >
-                  Confirmar recepción de carga
+                  Confirm cargo reception
                 </button>
               </div>
             )}

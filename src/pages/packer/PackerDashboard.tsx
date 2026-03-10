@@ -8,7 +8,7 @@ import { Card } from '../../components/Card';
 import { StatusBadge } from '../../components/StatusBadge';
 import { SALES_STATUS_TABS, statusToPath, SLUG_LOGISTICS_TRACKING } from './salesRoutes';
 import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 import type { SaleRequestStatus } from '../../types';
 import { isLogisticsTrackingStatus } from '../../types';
 import type { WorkflowStatus } from './salesRoutes';
@@ -28,8 +28,8 @@ const STATUS_CLASS: Record<SaleRequestStatus, string> = {
 };
 
 const PRODUCT_FORM_LABELS: Record<string, string> = {
-  ENTERO: 'Entero',
-  COLA_DIRECTA: 'Cola directa',
+  ENTERO: 'Whole',
+  COLA_DIRECTA: 'Direct tail',
 };
 
 /** ID del packer logueado (en producción vendría del AuthContext) */
@@ -60,46 +60,46 @@ export const PackerDashboard: React.FC = () => {
     <div className="max-w-6xl mx-auto">
       <h1 className={page.titleLg}>Dashboard</h1>
 
-      {/* Tarjetas de resumen */}
-      <section className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8" aria-label="Resumen">
+      {/* Summary cards */}
+      <section className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8" aria-label="Summary">
         <Link to="/packer/offers" className="block">
           <Card className="h-full transition-shadow hover:shadow-md">
-            <p className={page.statLabel}>Ofertas publicadas</p>
+            <p className={page.statLabel}>Published offers</p>
             <p className={page.statValueEmerald}>{publishedOffers.length}</p>
             <p className={page.statDesc}>
               {publishedOffers.length === 0
-                ? 'Sin ofertas activas'
-                : `${offersEntero} Entero${offersCola > 0 ? ` · ${offersCola} Cola directa` : ''}`}
+                ? 'No active offers'
+                : `${offersEntero} Whole${offersCola > 0 ? ` · ${offersCola} Direct tail` : ''}`}
             </p>
           </Card>
         </Link>
         <Link to={statusToPath('PENDING_ACCEPTANCE')} className="block">
           <Card className="h-full transition-shadow hover:shadow-md">
-            <p className={page.statLabel}>Pendientes de aceptar</p>
+            <p className={page.statLabel}>Pending acceptance</p>
             <p className={page.statValueAmber}>{pendingAcceptance}</p>
-            <p className={page.statDesc}>Solicitudes por revisar</p>
+            <p className={page.statDesc}>Requests to review</p>
           </Card>
         </Link>
         <Link to="/packer/sales" className="block">
           <Card className="h-full transition-shadow hover:shadow-md">
-            <p className={page.statLabel}>Total solicitudes</p>
+            <p className={page.statLabel}>Total requests</p>
             <p className={page.statValueSky}>{mySaleRequests.length}</p>
-            <p className={page.statDesc}>Todas las compras</p>
+            <p className={page.statDesc}>All purchases</p>
           </Card>
         </Link>
       </section>
 
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Mis ofertas (solo del packer actual) */}
+        {/* My offers (current packer only) */}
         <Card>
           <div className={page.cardHeader}>
-            <h2 className={page.cardTitle}>Mis ofertas</h2>
+            <h2 className={page.cardTitle}>My offers</h2>
             <Link to="/packer/offers" className={page.cardLink}>
-              Gestionar ofertas
+              Manage offers
             </Link>
           </div>
           {publishedOffers.length === 0 ? (
-            <p className={page.cardEmpty}>No tienes ofertas publicadas.</p>
+            <p className={page.cardEmpty}>You have no published offers.</p>
           ) : (
             <ul className="space-y-0 divide-y divide-gray-100">
               {publishedOffers.slice(0, 5).map((offer) => (
@@ -110,10 +110,10 @@ export const PackerDashboard: React.FC = () => {
                         {PRODUCT_FORM_LABELS[offer.productForm] ?? offer.productForm}
                       </p>
                       <p className="text-sm text-gray-500 mt-0.5">
-                        {offer.offerCode} · Válida hasta {format(new Date(offer.validTo), 'dd MMM yyyy', { locale: es })}
+                        {offer.offerCode} · Valid until {format(new Date(offer.validTo), 'dd MMM yyyy', { locale: enUS })}
                       </p>
                     </div>
-                    <span className="shrink-0 text-sm font-medium text-emerald-600">Publicada</span>
+                    <span className="shrink-0 text-sm font-medium text-emerald-600">Published</span>
                   </div>
                 </li>
               ))}
@@ -121,17 +121,17 @@ export const PackerDashboard: React.FC = () => {
           )}
         </Card>
 
-        {/* Compras por estado + recientes */}
+        {/* Purchases by status + recent */}
         <Card>
           <div className={page.cardHeader}>
-            <h2 className={page.cardTitle}>Compras</h2>
+            <h2 className={page.cardTitle}>Purchases</h2>
             <Link to="/packer/sales" className={page.cardLink}>
-              Ver todas
+              View all
             </Link>
           </div>
 
           <div className="mb-6">
-            <h3 className={page.sectionSubtitle}>Por estado</h3>
+            <h3 className={page.sectionSubtitle}>By status</h3>
             <ul className="space-y-2">
               {SALES_STATUS_TABS.map(({ tab, label }) => {
                 const count = requestsByStatus[tab] ?? 0;
@@ -151,9 +151,9 @@ export const PackerDashboard: React.FC = () => {
           </div>
 
           <div className="pt-4 border-t border-gray-200">
-            <h3 className={page.sectionSubtitle}>Solicitudes recientes</h3>
+            <h3 className={page.sectionSubtitle}>Recent requests</h3>
             {recentRequests.length === 0 ? (
-              <p className="text-sm text-gray-500 py-2">Ninguna solicitud.</p>
+              <p className="text-sm text-gray-500 py-2">No requests.</p>
             ) : (
               <ul className="space-y-0 divide-y divide-gray-100">
                 {recentRequests.map((request) => (
@@ -170,7 +170,7 @@ export const PackerDashboard: React.FC = () => {
                           {request.catchInfo.estimatedQuantityLb} lb · {PRODUCT_FORM_LABELS[request.productForm] ?? request.productForm}
                         </p>
                         <p className="text-xs text-gray-400 mt-0.5">
-                          {format(new Date(request.createdAt), 'dd MMM yyyy', { locale: es })}
+                          {format(new Date(request.createdAt), 'dd MMM yyyy', { locale: enUS })}
                         </p>
                       </div>
                       <StatusBadge

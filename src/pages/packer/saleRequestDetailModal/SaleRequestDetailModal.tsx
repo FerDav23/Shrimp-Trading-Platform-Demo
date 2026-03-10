@@ -315,7 +315,7 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
     if (!request || !onSendSettlement) return;
     if (
       window.confirm(
-        'Una vez que se envía la liquidación debe esperar la respuesta del productor antes de poder proseguir con la compra de la pesca. ¿Desea enviar la liquidación?'
+        'Once the settlement is sent you must wait for the producer\'s response before proceeding with the catch purchase. Do you want to send the settlement?'
       )
     ) {
       onSendSettlement(request.id);
@@ -439,7 +439,7 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose} title="Detalles de Solicitud de Compra" size="xl">
+      <Modal isOpen={isOpen} onClose={onClose} title="Purchase Request Details" size="xl">
         <div className={saleRequestDetail.modalBody}>
           {showAcceptConfirmStep ? (
             <div className={`${saleRequestDetail.tabContent} flex-1 min-h-0 overflow-y-auto pt-4`}>
@@ -490,7 +490,7 @@ export const SaleRequestDetailModal: React.FC<SaleRequestDetailModalProps> = ({
                 type="button"
                 onClick={() => scrollTabs('right')}
                 className={saleRequestDetail.tabArrow}
-                aria-label="Ver más secciones"
+                aria-label="View more sections"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

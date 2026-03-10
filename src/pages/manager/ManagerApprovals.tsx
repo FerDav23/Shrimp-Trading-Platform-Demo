@@ -16,21 +16,21 @@ const dummyApprovals: ApprovalItem[] = [
   {
     id: 'app-1',
     user: 'Juan Pérez',
-    documentType: 'Permiso de Acuicultura',
+    documentType: 'Aquaculture Permit',
     submittedAt: '2024-01-15',
     status: 'PENDING',
   },
   {
     id: 'app-2',
     user: 'ROSASUD S.A.S.',
-    documentType: 'Permiso de Planta',
+    documentType: 'Plant Permit',
     submittedAt: '2024-01-20',
     status: 'APPROVED',
   },
   {
     id: 'app-3',
     user: 'Grupo FJ Logística',
-    documentType: 'Licencia de Transporte',
+    documentType: 'Transport License',
     submittedAt: '2024-02-01',
     status: 'PENDING',
   },
@@ -38,28 +38,28 @@ const dummyApprovals: ApprovalItem[] = [
 
 export const ManagerApprovals: React.FC = () => {
   const handleAction = (id: string, action: 'APPROVED' | 'REJECTED') => {
-    alert(`Documento ${id} ${action === 'APPROVED' ? 'aprobado' : 'rechazado'} (simulado)`);
+    alert(`Document ${id} ${action === 'APPROVED' ? 'approved' : 'rejected'} (simulated)`);
   };
 
   const columns = [
     {
-      header: 'Usuario',
+      header: 'User',
       accessor: (item: ApprovalItem) => item.user,
     },
     {
-      header: 'Tipo de Documento',
+      header: 'Document Type',
       accessor: (item: ApprovalItem) => item.documentType,
     },
     {
-      header: 'Fecha de Envío',
+      header: 'Submitted',
       accessor: (item: ApprovalItem) => item.submittedAt,
     },
     {
-      header: 'Estado',
+      header: 'Status',
       accessor: (item: ApprovalItem) => <StatusBadge status={item.status} />,
     },
     {
-      header: 'Acciones',
+      header: 'Actions',
       accessor: (item: ApprovalItem) =>
         item.status === 'PENDING' ? (
           <div className="flex gap-2">
@@ -67,13 +67,13 @@ export const ManagerApprovals: React.FC = () => {
               onClick={() => handleAction(item.id, 'APPROVED')}
               className={button.actionSmallGreen}
             >
-              Aprobar
+              Approve
             </button>
             <button
               onClick={() => handleAction(item.id, 'REJECTED')}
               className={button.actionSmallRed}
             >
-              Rechazar
+              Reject
             </button>
           </div>
         ) : (
@@ -84,7 +84,7 @@ export const ManagerApprovals: React.FC = () => {
 
   return (
     <div>
-      <h1 className={page.title}>Aprobaciones</h1>
+      <h1 className={page.title}>Approvals</h1>
       <Card>
         <DataTable data={dummyApprovals} columns={columns} />
       </Card>
